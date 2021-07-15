@@ -1,13 +1,9 @@
 <?php
 # Web interface to arca using MEI output displayed via Verovio
-# Andrew Cashner, 2021/07/12
+# Andrew Cashner, 2021/07/14
 #
 # Run the arca to generate MEI music output, given a choice of input texts
 # from a webform. Display the MEI using the Verovio web app.
-#
-# This requires the arca executable to be in the system path.
-#
-# Tested using local server: `php -S localhost:8000`
 #
 # Take the choice of input text from the form in index.html,
 # select the correct XML input file from the array of file names,
@@ -17,6 +13,9 @@
 # For DIY files, where users set the input parameters instead of them being
 # preset in the XML input, we have to subsitute the user's input choices
 # instead of the placeholders in the XML input file.
+# 
+# We store the standard output from 'arca-exe' in a PHP variable, which we
+# then pass to Javascript and load into the Verovio app.
 
 # GET INPUT
 # Input values from HTML form
@@ -41,7 +40,7 @@ $baseName = array(
 
 # File titles to be used in the generated HTML output
 $fileTitle = array(
-    "Abide_with_Me"    => "Abide with Me (Decasyllabic meter)"
+    "Abide"              => "Abide with Me (Decasyllabic meter)"
     , "Ave_maris_stella" => "Ave maris stella (Iambic Euripidaeic meter)"
     , "Ave_Regina"       => "Ave Regina Angelorum (Iambic Enneasyllabic meter)"
     , "Boethius"         => "Boethius, Nubibus atriis (Adonic meter)"
