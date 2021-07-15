@@ -1,0 +1,19 @@
+@import
+url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
+
+html {
+  max-width: 40em;
+  min-width: 20em;
+  margin: auto;
+}
+
+body {
+  font-family: 'Cardo', serif;
+  font-size: 110%;
+}
+q {
+  quotes: "\201C" "\201D" "\2018" "\2019";
+}
+cite {
+  font-style: italic;
+}
