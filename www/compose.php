@@ -27,7 +27,7 @@ $inputMeter = $_POST['musicMeter'];
 
 # File basenames for input and output
 $baseName = array(
-    "Abide"            => "Abide_with_Me"
+    "Abide"              => "Abide_with_Me"
     , "Ave_maris_stella" => "Ave_maris_stella"
     , "Ave_Regina"       => "Ave_Regina_Angelorum"
     , "Boethius"         => "Boethius-Nubibus_atris"
@@ -74,7 +74,6 @@ if ($inputType == "DIY") {
     # file text (as string) to arca in the shell.
 
     $infileName  = "input/text/$fileBasename.xml";
-    $outfileName = "build/$fileBasename-diy.mei";
 
     $fileString  = file_get_contents($infileName);
     $fileString  = str_replace(
@@ -90,7 +89,6 @@ if ($inputType == "DIY") {
     # style and run arca on that.
 
     $infileName  = "input/prepared/$inputStyle/$fileBasename.xml";
-    $outfileName = "build/$fileBasename-$inputStyle.mei";
 
     $mei = shell_exec("{$arca} {$infileName} -");
 }
