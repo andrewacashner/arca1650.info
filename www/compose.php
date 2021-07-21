@@ -81,7 +81,7 @@ if ($inputType == "DIY") {
         array($style[$inputStyle], $inputMeter, $inputMode), 
         $fileString);
 
-    $mei = shell_exec("echo '{$fileString}' | {$arca} - -");
+    $rawMei = shell_exec("echo '{$fileString}' | {$arca} - -");
 
 } else {
 
@@ -90,10 +90,10 @@ if ($inputType == "DIY") {
 
     $infileName  = "input/prepared/$inputStyle/$fileBasename.xml";
 
-    $mei = shell_exec("{$arca} {$infileName} -");
+    $rawMei = shell_exec("{$arca} {$infileName} -");
 }
 
-$mei = addslashes($mei);
+$mei = addslashes($rawMei);
 
 ?>
 <!DOCTYPE HTML>
@@ -103,6 +103,19 @@ $mei = addslashes($mei);
         <meta charset="utf-8"/> 
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <link rel="stylesheet" type="text/css" href="arca.css"/>
+        <script>
+const inputText     = '<?=$inputText?>';
+const inputType     = '<?=$inputType?>';
+const inputStyle    = '<?=$inputStyle?>';
+const inputMode     = '<?=$inputMode?>';
+const inputMeter    = '<?=$inputMeter?>';
+const infileName    = '<?=$infileName?>';
+const mei           = '<?=$mei?>';
+console.log("Setting input text [%s] in method [%s]: style [%s], mode [%s], meter [%s]...", 
+    inputText, inputType, inputStyle, inputMode, inputMeter);
+console.log("Loading input file [%s]...", infileName);
+console.log("Rendering output file [%s]...", mei);
+</script>
     </head>
     <body>
     <header>
@@ -142,8 +155,11 @@ $mei = addslashes($mei);
 <script type="module">
 // Put the Arca output from PHP into a variable and load it into Verovio
 import 'https://www.verovio.org/javascript/app/verovio-app.js';
-const app = new Verovio.App(document.getElementById("app"), {});
-var mei = '<?=$mei?>';
+const options = {
+defaultZoom : 3
+}
+const app = new Verovio.App(document.getElementById("app"), options);
+const mei = '<?=$mei?>';
 app.loadData(mei);
 </script>
         </section>

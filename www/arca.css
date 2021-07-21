@@ -17,3 +17,8 @@ q {
 cite {
   font-style: italic;
 }
+
+div.panel-body {
+  border: 1px solid lightgray;
+  min-height: 3em;
+}
