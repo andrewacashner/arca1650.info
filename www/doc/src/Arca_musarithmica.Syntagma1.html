@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-|
+Module      : Arca_musarithmica.Syntagma1
+Description : Data for Syntagma 1
+Copyright   : Data from Kircher, 1650; implementation (c) Andrew A. Cashner 2020
+Maintainer  : Andrew Cashner, &lt;andrew.cashner@rochester.edu&gt;
+Stability   : Experimental
+
+&quot;Syntagma I. Melothesias siue Contrapuncti simplicis.&quot;
+
+Sub-structures used by @Arca_musarithmica@ to build Kircher's ark.
+-}</span><span>
+</span><a name="line-12"></a><span>
+</span><a name="line-13"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Arca_musarithmica.Syntagma1</span><span> </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.html#s1"><span class="hs-identifier hs-var">s1</span></a><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-14"></a><span>
+</span><a name="line-15"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data.Vector</span><span>
+</span><a name="line-16"></a><span>    </span><span class="hs-special">(</span><span class="hs-identifier hs-var">fromList</span><span class="hs-special">)</span><span>
+</span><a name="line-17"></a><span>
+</span><a name="line-18"></a><span class="hs-keyword">import</span><span> </span><a href="Aedifico.html"><span class="hs-identifier">Aedifico</span></a><span>
+</span><a name="line-19"></a><span>    </span><span class="hs-special">(</span><a href="Aedifico.html#buildSyntagma"><span class="hs-identifier hs-var">buildSyntagma</span></a><span class="hs-special">)</span><span>
+</span><a name="line-20"></a><span>
+</span><a name="line-21"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax01.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax01</span></a><span>
+</span><a name="line-22"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax01.html#s1p1"><span class="hs-identifier hs-var">s1p1</span></a><span class="hs-special">)</span><span>
+</span><a name="line-23"></a><span>
+</span><a name="line-24"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax02.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax02</span></a><span>
+</span><a name="line-25"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax02.html#s1p2"><span class="hs-identifier hs-var">s1p2</span></a><span class="hs-special">)</span><span>
+</span><a name="line-26"></a><span>
+</span><a name="line-27"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax03.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax03</span></a><span>
+</span><a name="line-28"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax03.html#s1p3"><span class="hs-identifier hs-var">s1p3</span></a><span class="hs-special">)</span><span>
+</span><a name="line-29"></a><span>
+</span><a name="line-30"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax04.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax04</span></a><span>
+</span><a name="line-31"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax04.html#s1p4"><span class="hs-identifier hs-var">s1p4</span></a><span class="hs-special">)</span><span>
+</span><a name="line-32"></a><span>
+</span><a name="line-33"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax05.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax05</span></a><span>
+</span><a name="line-34"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax05.html#s1p5"><span class="hs-identifier hs-var">s1p5</span></a><span class="hs-special">)</span><span>
+</span><a name="line-35"></a><span>
+</span><a name="line-36"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax06.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax06</span></a><span>
+</span><a name="line-37"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax06.html#s1p6"><span class="hs-identifier hs-var">s1p6</span></a><span class="hs-special">)</span><span>
+</span><a name="line-38"></a><span>
+</span><a name="line-39"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax07.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax07</span></a><span>
+</span><a name="line-40"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax07.html#s1p7"><span class="hs-identifier hs-var">s1p7</span></a><span class="hs-special">)</span><span>
+</span><a name="line-41"></a><span>
+</span><a name="line-42"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax08.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax08</span></a><span>
+</span><a name="line-43"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax08.html#s1p8"><span class="hs-identifier hs-var">s1p8</span></a><span class="hs-special">)</span><span>
+</span><a name="line-44"></a><span>
+</span><a name="line-45"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax09.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax09</span></a><span>
+</span><a name="line-46"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax09.html#s1p9"><span class="hs-identifier hs-var">s1p9</span></a><span class="hs-special">)</span><span>
+</span><a name="line-47"></a><span>
+</span><a name="line-48"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax10.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax10</span></a><span>
+</span><a name="line-49"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax10.html#s1p10"><span class="hs-identifier hs-var">s1p10</span></a><span class="hs-special">)</span><span>
+</span><a name="line-50"></a><span>
+</span><a name="line-51"></a><span class="hs-keyword">import</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax11.html"><span class="hs-identifier">Arca_musarithmica.Syntagma1.Pinax11</span></a><span>
+</span><a name="line-52"></a><span>    </span><span class="hs-special">(</span><a href="Arca_musarithmica.Syntagma1.Pinax11.html#s1p11"><span class="hs-identifier hs-var">s1p11</span></a><span class="hs-special">)</span><span>
+</span><a name="line-53"></a><span>
+</span><a name="line-54"></a><span class="hs-comment">-- | To build the /syntagma/, convert the /pinakes/ from lists to vectors.</span><span>
+</span><a name="line-55"></a><a name="s1"><a href="Arca_musarithmica.Syntagma1.html#s1"><span class="hs-identifier">s1</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="Aedifico.html#buildSyntagma"><span class="hs-identifier hs-var">buildSyntagma</span></a><span> </span><span class="hs-special">[</span><a href="Arca_musarithmica.Syntagma1.Pinax01.html#s1p1"><span class="hs-identifier hs-var">s1p1</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax02.html#s1p2"><span class="hs-identifier hs-var">s1p2</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax03.html#s1p3"><span class="hs-identifier hs-var">s1p3</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax04.html#s1p4"><span class="hs-identifier hs-var">s1p4</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax05.html#s1p5"><span class="hs-identifier hs-var">s1p5</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax06.html#s1p6"><span class="hs-identifier hs-var">s1p6</span></a><span class="hs-special">,</span><span>
+</span><a name="line-56"></a><span>                    </span><a href="Arca_musarithmica.Syntagma1.Pinax07.html#s1p7"><span class="hs-identifier hs-var">s1p7</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax08.html#s1p8"><span class="hs-identifier hs-var">s1p8</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax09.html#s1p9"><span class="hs-identifier hs-var">s1p9</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax10.html#s1p10"><span class="hs-identifier hs-var">s1p10</span></a><span class="hs-special">,</span><span> </span><a href="Arca_musarithmica.Syntagma1.Pinax11.html#s1p11"><span class="hs-identifier hs-var">s1p11</span></a><span class="hs-special">]</span><span>
+</span><a name="line-57"></a><span>
+</span><a name="line-58"></a></pre></body></html>
