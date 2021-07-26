@@ -86,6 +86,9 @@
 --   </pre>
 module Aedifico
 
+-- | Safe list indexing
+(!!?) :: [a] -> Int -> Maybe a
+
 -- | Pitches
 --   
 --   The <a>Pnum</a> is a 0-indexed diatonic pitch-class number, C through
@@ -352,6 +355,7 @@ Mode9 :: Mode
 Mode10 :: Mode
 Mode11 :: Mode
 Mode12 :: Mode
+ModeUnset :: Mode
 
 -- | Select mode by string (e.g., <a>Mode1</a> or <a>Mode12</a> in XML
 --   input)
@@ -370,7 +374,10 @@ type ModeSystem = Vector (System)
 type PnumAccid = (Pnum, Accid)
 
 -- | A list of scales, including some notes with accidentals, from Kircher
-type ModeList = Vector (Vector (PnumAccid))
+type ModeList = Vector (Vector PnumAccid)
+
+-- | List of modes appropriate for each pinax within each syntagma (style)
+type PinaxModeList = Vector (Vector [[Mode]])
 
 -- | Penultimate Syllable Length
 --   
@@ -401,6 +408,10 @@ PinaxNil :: PinaxLabel
 --   in Syntagma 2 it is <a>Pinax2</a>.
 meter2pinax :: Style -> TextMeter -> PinaxLabel
 
+-- | Is this mode acceptable to use for this pinax in this syntagma, for
+--   this line number ("stropha")?
+isModeLegalInPinax :: PinaxModeList -> Style -> PinaxLabel -> Int -> Mode -> Bool
+
 -- | In prose, determine <a>TextMeter</a> based on penultimate syllable
 --   length
 proseMeter :: PenultLength -> TextMeter
@@ -409,9 +420,12 @@ proseMeter :: PenultLength -> TextMeter
 --   configuration settings through many functions down to the core level
 --   of pulling data from the ark.
 data ArkConfig
-ArkConfig :: Style -> Mode -> MusicMeter -> TextMeter -> ArkConfig
+ArkConfig :: Style -> Mode -> Mode -> MusicMeter -> TextMeter -> ArkConfig
 [arkStyle] :: ArkConfig -> Style
 [arkMode] :: ArkConfig -> Mode
+
+-- | optional second mode (only used in syntagma 2, pinax 4)
+[arkModeB] :: ArkConfig -> Mode
 [arkMusicMeter] :: ArkConfig -> MusicMeter
 [arkTextMeter] :: ArkConfig -> TextMeter
 
@@ -498,10 +512,11 @@ type Syntagma = Vector (Pinax)
 
 -- | A vector of <a>Syntagma</a> instances makes up the full <a>Arca</a>.
 data Arca
-Arca :: Vector Syntagma -> ModeList -> ModeSystem -> VoiceRanges -> Arca
+Arca :: Vector Syntagma -> ModeList -> ModeSystem -> PinaxModeList -> VoiceRanges -> Arca
 [perms] :: Arca -> Vector Syntagma
 [modes] :: Arca -> ModeList
 [systems] :: Arca -> ModeSystem
+[pinaxModes] :: Arca -> PinaxModeList
 [ranges] :: Arca -> VoiceRanges
 
 -- | Just get a vector value by index, safely (combining <a>fromJust</a>
@@ -528,13 +543,12 @@ rperm :: Column -> MusicMeter -> Int -> RpermChoir
 --   We go straight to a voice and a rhythm permutation, given all the
 --   needed variables and an index. Instead of choosing freely we tempt
 --   fate and use a random number.
---   
---   We subtract 2 from the number of syllables to get the column index,
---   since the first column in the <i>pinakes</i> is for two-syllable
---   words.
---   
---   <b>TODO</b>: Does <tt>columnIndex - 2</tt> always work?
 getVperm :: Arca -> ArkConfig -> Int -> Int -> Int -> VpermChoir
+
+-- | Use <tt>modeB</tt> attribute if needed, otherwise <tt>mode</tt> (We
+--   only use <tt>modeB</tt> for florid pinax 4, every third and fourth
+--   line!)
+modeOrModeB :: ArkConfig -> Int -> Mode
 
 -- | Select the rhythm values for a single phrase from the ark's rhythm
 --   permutations (Rperms).
@@ -681,6 +695,9 @@ instance GHC.Show.Show Aedifico.VoiceName
 -- | Sub-structures used by <tt>Arca_musarithmica</tt> to build Kircher's
 --   ark. This <i>pinax</i> (<a>s1p1</a>) is for phrases with long
 --   penultimate syllables. It contains five columns.
+--   
+--   It may be used with any mode except for IV and V. II and VI are
+--   especially recommended.
 module Arca_musarithmica.Syntagma1.Pinax01
 
 -- | Pinax 1 (<a>s1p1</a>): We build the <a>Pinax</a> from <a>Column</a>s.
@@ -696,6 +713,9 @@ s1p1 :: Pinax
 -- | Sub-structures used by <tt>Arca_musarithmica</tt> to build Kircher's
 --   ark. This <i>pinax</i> (<a>s1p2</a>) is for phrases with short
 --   penultimate syllables. It contains five columns.
+--   
+--   It may be used with any mode except IV and V. II and VI are especially
+--   recommended.
 module Arca_musarithmica.Syntagma1.Pinax02
 
 -- | Pinax 2, for phrases with short penultimate syllables.
@@ -711,6 +731,8 @@ s1p2 :: Pinax
 --   for each side, repeated for each column. So we implement the
 --   <i>pinax</i> as having two columns, each 40 vperms long. Column 0 is
 --   for Adonic; Column 1, for Dactylic meter.
+--   
+--   It may be used with any mode, especially 2 and 6.
 module Arca_musarithmica.Syntagma1.Pinax03
 
 -- | Pinax 3
@@ -723,6 +745,8 @@ s1p3 :: Pinax
 --   There are four columns, meant to be used in order of each line in a
 --   four-line strophe (though each column is confusingly labeled
 --   "stropha"). There is only one <a>RpermTable</a> for all four columns.
+--   
+--   Acceptable modes are I, II, III, IV, IX, and X.
 module Arca_musarithmica.Syntagma1.Pinax04
 
 -- | Pinax 4
@@ -735,6 +759,8 @@ s1p4 :: Pinax
 --   to be eight columns are really four, as they correspond with verse
 --   lines 1--4 as in <tt>Pinax4</tt>. There is only one <a>RpermTable</a>
 --   for all four columns.
+--   
+--   It may be used with Mode I, II, III, IV, IX, and X.
 module Arca_musarithmica.Syntagma1.Pinax05
 
 -- | Pinax 5
@@ -747,6 +773,8 @@ s1p5 :: Pinax
 --   meter, 8-syllable lines with short penultimate. There are four
 --   columns, one for each successive line (but called "strophes"). There
 --   is only one <a>RpermTable</a> for all four columns.
+--   
+--   It may be used with mode V, VI, VIII, and XII.
 module Arca_musarithmica.Syntagma1.Pinax06
 
 -- | Pinax 6
@@ -759,6 +787,8 @@ s1p6 :: Pinax
 --   lines with long penultimate. There are four columns, one for each
 --   successive line (but called "strophes"). There is only one
 --   <a>RpermTable</a> for all four columns.
+--   
+--   It may be used with mode V, VI, VIII, X, and XII.
 module Arca_musarithmica.Syntagma1.Pinax07
 
 -- | Pinax 7
@@ -771,6 +801,8 @@ s1p7 :: Pinax
 --   short penultimate. There are four columns, one for each successive
 --   line (but called "strophes"). There is only one <a>RpermTable</a> for
 --   all four columns.
+--   
+--   It may be used with mode V, VI, VII, VIII, XI, and XII.
 module Arca_musarithmica.Syntagma1.Pinax08
 
 -- | Pinax 8
@@ -789,6 +821,8 @@ s1p8 :: Pinax
 --   What look like the normal three groups of rperms are actually duple
 --   major (cut C), duple minor (compasillo, C), and triple major (cut C
 --   3). There is actually no rperm for triple minor (C3).
+--   
+--   It may be used with mode I, II, III, IV, and VII.
 module Arca_musarithmica.Syntagma1.Pinax09
 
 -- | Pinax 9
@@ -804,6 +838,8 @@ s1p9 :: Pinax
 --   
 --   There is only one <a>RpermTable</a> for the three 11-syllable columns,
 --   and a separate one for the Adonic column.
+--   
+--   It may be used with modes I, II, III, IV, IX, and X.
 module Arca_musarithmica.Syntagma1.Pinax10
 
 -- | Pinax 10
@@ -816,6 +852,8 @@ s1p10 :: Pinax
 --   11-syllable lines with short penultimates. There are four columns, one
 --   for each successive line (but called "strophes"). There is only one
 --   <a>RpermTable</a> for all four columns.
+--   
+--   It may be used with mode V, VI, VII, VIII, XI, and XII.
 module Arca_musarithmica.Syntagma1.Pinax11
 
 -- | Pinax 11
@@ -1450,8 +1488,8 @@ instance GHC.Show.Show Fortuna.Perm
 --   <tt>Scribo.Lilypond</tt> module, using the main function
 --   <a>getSymphonia</a>. It treated pitches and lyrics completely
 --   separately, which worked in Syntagma I but not in Syntagma II. These
---   functions are still here for safety until I decide to get rid of the
---   Lilypond module or rewrite it.
+--   functions are still here at the bottom of the file. The test module
+--   still uses them, for now.
 module Cogito
 
 -- | A <a>RawPitch</a> is the same as a <a>Pitch</a> except instead of a
@@ -1663,9 +1701,6 @@ stepwiseVoice :: Voice -> Voice
 --   range and the only way to adjust it is to make a seventh? need to
 --   adjust a whole phrase
 unleap :: Pitch -> Pitch -> Pitch
-
--- | Safe list indexing
-(!!?) :: [a] -> Int -> Maybe a
 
 -- | Return the highest pitch in a list of pitches.
 pitchMax :: [Pitch] -> Maybe Pitch
@@ -2100,7 +2135,7 @@ meiMeterAttr :: MusicMeter -> String
 --   </tt>scoreDef<tt>/</tt>staffDef@)
 meiMeterModern :: MusicMeter -> String
 
--- | Mensural version of <a>meiMeter</a>. We want either <a>C</a>,
+-- | Mensural version of <a>meiMeter</a>. We want either "cut C",
 --   <a>C3</a>, or "cutC3". Verovio does not render these correctly as of
 --   2021/07 when using the <tt>proport</tt> element (or
 --   <tt>proport.num</tt> attribute) for the number, which is the correct
