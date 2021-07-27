@@ -1,60 +1,67 @@
+// Conditional dropdown menus for input data to the Arca musarithmica
+// Andrew A. Cashner, 2021/07/27
+
+function removeChildren(node) {
+    // Return a node with no children
+    // Clear all options in case any have already been set
+    while (node.firstChild) {
+        node.removeChild(node.firstChild);
+    }
+    return node;
+}
+
+// Update 'inputText' and 'musicMeter' select options
 function setOptions(style) {
     textOptions(style);
     meterOptions(style);
 }
 
+// Update 'inputText' select options with only the texts that can be set in the
+// given style
 function textOptions(style) { 
-    switch (style) {
-        case "simple" :
-            document.getElementById("inputText").options[0] =
-                new Option("Select a text to set in simple style:", "");
-            document.getElementById("inputText").options[1] = 
-                new Option("Abide with Me", "Abide");
-            document.getElementById("inputText").options[2] = 
-                new Option("Ave maris stella", "Ave_maris_stella");
-            document.getElementById("inputText").options[3] = 
-                new Option("Ave Regina angelorum", "Ave_Regina");
-            document.getElementById("inputText").options[4] = 
-                new Option("Boethius, Nubibus atris", "Boethius");
-            document.getElementById("inputText").options[5] = 
-                new Option("Horace, Maecenas atavis edite regibus", "Horace");
-            document.getElementById("inputText").options[6] = 
-                new Option("Iste confessor Domini", "Iste_confessor");
-            document.getElementById("inputText").options[7] = 
-                new Option("Psalm 150", "Ps150");
-            document.getElementById("inputText").options[8] = 
-                new Option("Stephanus, O ter quaterque felix Cicada", "Stephanus");
-            document.getElementById("inputText").options[9] =
-                new Option("Veni creator Spiritus", "Veni_creator");
-            break;
+    console.log("Displaying input text options for style '%s'", style);
 
-        case "florid":
-            document.getElementById("inputText").options[0] =
-                new Option("Select a text to set in florid style:", "");
-            document.getElementById("inputText").options[1] = 
-                new Option("Abide with Me", "Abide");
-            document.getElementById("inputText").options[2] = 
-                new Option("Ave maris stella", "Ave_maris_stella");
-            document.getElementById("inputText").options[3] = 
-                new Option("Ave Regina angelorum", "Ave_Regina");
-            document.getElementById("inputText").options[4] = 
-                new Option("Boethius, Nubibus atris", "Boethius");
-            document.getElementById("inputText").options[5] = 
-                new Option("Stephanus, O ter quaterque felix Cicada", "Stephanus");
-            document.getElementById("inputText").options[6] =
-                new Option("Veni creator Spiritus", "Veni_creator");
-            break;
+    let texts = {
+        "simple": {
+            unselected:         "Select a text to set in simple style:",
+            "Abide":            "Abide with Me",
+            "Ave_maris_stella": "Ave maris stella",
+            "Boethius":         "Boethius, Nubibus atris",
+            "Horace":           "Horace, Maecenas atavis edite regibus",
+            "Iste_confessor":   "Iste confessor Domini",
+            "Stephanus":        "Stephanus, O ter quaterque felix Cicada",
+            "Veni_creator":     "Veni creator Spiritus"
+        },
+        "florid": { 
+            unselected:         "Select a text to set in florid style:", 
+            "Abide":            "Abide with Me", 
+            "Ave_maris_stella": "Ave maris stella",
+            "Ave_Regina":       "Ave Regina angelorum",
+            "Boethius":         "Boethius, Nubibus atris",
+            "Stephanus":        "Stephanus, O ter quaterque felix Cicada",
+            "Veni_creator":     "Veni creator Spiritus"
+        }
+    }
+
+    // Clear all options in case any have already been set
+    let textSelect = document.getElementById("inputText");
+    textSelect = removeChildren(textSelect);
+
+    // Write the options relevant for this style with their value labels
+    let theseTexts = texts[style];
+    for (let t in theseTexts) {
+        var opt = new Option(theseTexts[t], t);
+        textSelect.add(opt);
     }
 
     return true;
 }
 
+// Update musicMeter select with appropriate meter options for each style
 function meterOptions(style) {
-    // Update musicMeter select with appropriate meter options for each style
-
     console.log("Displaying meter options for style '%s'", style);
     
-    const meters = {
+    let meters = {
         labels: {
             unselected:  "",
             duple:       "Duple",
@@ -69,35 +76,29 @@ function meterOptions(style) {
         },
         "florid": {
             unselected:  "Duple meter (C), only option in florid style",
-            duple:       null,
-            tripleMinor: null,
-            tripleMajor: null
         }
     }
 
+    // Clear all options in case any have already been set
+    let meterSelect = document.getElementById("musicMeter");
+    meterSelect = removeChildren(meterSelect);
+
+    // Write the options relevant for this style with their value labels
     let theseMeters = meters[style];
-    let i = 0;
     for (let m in theseMeters) {
-        if (theseMeters[m] == null) {
-            var obj = document.getElementById("musicMeter").options;
-            obj.remove(i);
-        } else {
-            document.getElementById("musicMeter").options[i] = 
-                new Option(theseMeters[m], meters.labels[m]);
-        }
-        ++i;
+        var opt = new Option(theseMeters[m], meters.labels[m]);
+        meterSelect.add(opt);
     }
 
     return true;
 }
 
+// Update <select id="mode"> with the correct options for permissible
+// modes for this style and text
 function modeOptions(style, text) { 
-    // Update <select id="mode"> with the correct options for permissible
-    // modes for this style and text
-   
     console.log("Displaying mode options for style '%s', text '%s'", style, text);
 
-    const legalModes = {
+    let legalModes = {
         "simple": {
             "Abide": // Decasyllabicum // Pinax 8
             [5, 6, 7, 8, 11, 12],
@@ -134,7 +135,7 @@ function modeOptions(style, text) {
         }
     };
 
-    const modeLabels = {
+    let modeLabels = {
         "Mode0":  "Select a mode or mood",
         "Mode1":  "Mode I: Pious, religious",
         "Mode2":  "Mode II: Cheerful, easygoing",
@@ -152,20 +153,23 @@ function modeOptions(style, text) {
 
     let modes = legalModes[style][text];
 
-    document.getElementById("mode").options[0] = 
-        new Option(modeLabels["Mode0"], "");
+    // Clear all options in case any have already been set
+    let modeSelect = document.getElementById("mode");
+    modeSelect = removeChildren(modeSelect);
 
-    let i = 1;
+    // Reset the first option
+    var firstOpt = new Option(modeLabels["Mode0"], "");
+    modeSelect.add(firstOpt);
+
+    // Only add as many modes as allowed
     for (let m of modes) {
         let modeName = "Mode" + m;
-        document.getElementById("mode").options[i] = 
-            new Option(modeLabels[modeName], modeName);
-        ++i;
+        var opt = new Option(modeLabels[modeName], modeName);
+        modeSelect.add(opt);
     }
-
-    // TODO need to remove illegal options
 
     return true;
 }
+
 
 
