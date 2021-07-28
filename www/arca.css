@@ -5,7 +5,7 @@ html {
   max-width: 1920px;
   min-width: 320px;
   margin: auto;
-  background: #faeaf0;
+  background: LightGrey; 
 }
 
 body {
@@ -26,6 +26,10 @@ header {
   padding-right: 4em;
   padding-top: 1em;
   background: #ebadc2;
+}
+
+main {
+  padding-bottom: 1em;
 }
 
 nav {
@@ -62,9 +66,14 @@ a, a:visited {
 }
 
 div.panel-body {
-  border: 1px solid lightgray;
-  min-height: 3em;
+  border: 1px solid LightGrey;
+  background: white;
 }
+
+div.panel-body div.panel {
+  height: 800px;
+}
+
 
 q {
   quotes: "\201C" "\201D" "\2018" "\2019";
@@ -77,6 +86,7 @@ cite {
 footer {
   margin-left: -2em;
   margin-right: -2em;
+  padding-top: 1em;
   padding-bottom: 1em;
   text-align: center;
 }

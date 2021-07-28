@@ -97,12 +97,19 @@ $mei = addslashes($rawMei);
 
 ?>
 <!DOCTYPE HTML>
-<html>
-    <head>
-        <title>Arca musarithmica output</title>
-        <meta charset="utf-8"/> 
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link rel="stylesheet" type="text/css" href="arca.css"/>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="arca.css" />
+    <link rel="icon" type="image/png" href="img/panpipe.png" />
+
+    <title>Arca musarithmica</title>
+    <meta name="description" 
+          content="Display music generated automatically by Athanasius
+                   Kircher's device for automatic music composition from his
+                   Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
+                   implementation by Andrew Cashner (Rochester, New York, 2021)" />
         <script>
 const inputText     = '<?=$inputText?>';
 const inputType     = '<?=$inputType?>';
@@ -133,9 +140,9 @@ console.log("Rendering output file [%s]...", mei);
         <ul>
           <li><a href="index.html">Home</a></li>
           <li><a href="description.html">About</a></li>
+          <li><a href="doc/index.html">Code</a></li>
         </ul>
       </nav>
-      <hr/>
     </header>
     <main>
         <section>
@@ -147,8 +154,7 @@ console.log("Rendering output file [%s]...", mei);
             <p><a href="compose.html">Compose more music</a></p>
 
             <div class="panel-body">
-                <div id="app" class="panel" 
-                    style="border: 1px solid lightgray; min-height: 800px;">
+                <div id="app" class="panel">
                 </div>
             </div>
 
@@ -165,7 +171,6 @@ app.loadData(mei);
         </section>
     </main>
     <footer>
-      <hr/>
       Copyright © 2021 Andrew A. Cashner. All rights reserved.
     </footer>
 </html>
