@@ -2,14 +2,15 @@
 url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
 
 html {
-  max-width: 50em;
-  min-width: 30em;
+  max-width: 1920px;
+  min-width: 320px;
   margin: auto;
 }
 
 body {
+  margin: auto;
+  max-width: 45em;
   font-family: 'Cardo', serif;
-  font-size: 110%;
 }
 q {
   quotes: "\201C" "\201D" "\2018" "\2019";
