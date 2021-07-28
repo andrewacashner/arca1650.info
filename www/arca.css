@@ -28,6 +28,11 @@ header {
   background: #ebadc2;
 }
 
+header h2 {
+  font-style: italic;
+  text-align: right;
+}
+
 main {
   padding-bottom: 1em;
 }
