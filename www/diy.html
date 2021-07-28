@@ -5,7 +5,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" type="text/css" href="arca.css"/>
-    <script type="text/javascript" src="diy.js"></script>
+    <script type="text/javascript" src="options.js"></script>
   </head>
   <body>
     <header>
@@ -16,8 +16,7 @@
       1650), Book VIII.
       </p>
       <p>
-      Implemented in Haskell by Andrew Cashner (Rochester, New York,
-      2021).
+      Implemented in Haskell by Andrew Cashner (Rochester, New York, 2021).
       </p>
       <nav>
         <ul>
@@ -36,49 +35,41 @@
           <p>
           <fieldset>
             <legend>
-              <label for="style">What kind of music do you want the ark to
-                compose?</label>
+              <label for="style">What kind of music do you want the ark to compose?</label>
             </legend>
             <select name="style" 
                     id="style" 
                     required 
                     autocomplete="off"
-                    onchange="setOptions(this.options[this.selectedIndex].value);">
+                    onchange="diySetOptions(this.options[this.selectedIndex].value);">
               <option value="" selected>Select a musical style</option>
-              <option value="simple">Simple counterpoint (syllabic,
-              note-against-note)</option>
-              <option value="florid">Florid counterpoint (melismatic,
-              imitative)</option>
+              <option value="simple">Simple counterpoint (syllabic, note-against-note)</option>
+              <option value="florid">Florid counterpoint (melismatic, imitative)</option>
             </select>
           </fieldset>
           </p>
           <p>
           <fieldset>
             <legend>
-              <label for="inputText">What words do you want to set to
-                music?</label>
+              <label for="inputText">What words do you want to set to music?</label>
             </legend>
             <select name="inputText" 
                     id="inputText" 
                     required
-                    onchange="modeOptions(document.getElementById('style').value,
+                    autocomplete="off"
+                    onchange="diyModeOptions(document.getElementById('style').value,
                                           this.options[this.selectedIndex].value);">
-              <script type="text/javascript">
-                document.write('<option value="">(Select a style first)</option>');
-              </script>
+              <option value="" selected>(Select a style first)</option>
             </select>
           </fieldset>
           </p>
           <p>
           <fieldset>
             <legend>
-              <label for="mode">Select a permissible mode (<em>tonus</em>) or
-                mood for this text:</label>
+              <label for="mode">Select a mode (<em>tonus</em>) or mood for this text:</label>
             </legend>
-            <select name="mode" id="mode" required>
-              <script type="text/javascript">
-                document.write('<option value="">(Select a style and text first)</option>');
-              </script>
+            <select name="mode" id="mode" required autocomplete="off">
+              <option value="" selected>(Select a style and text first)</option>
             </select>
           </fieldset>
           </p>
@@ -87,17 +78,14 @@
             <legend>
               <label for="musicMeter">Select the musical meter (mensuration):</label>
             </legend>
-            <select name="musicMeter" id="musicMeter" required>
-              <script type="text/javascript">
-                document.write('<option value="">(Select a style first)</option>');
-              </script>
+            <select name="musicMeter" id="musicMeter" required autocomplete="off">
+              <option value="" selected>(Select a style first)</option>
             </select>
           </fieldset>
           </p>
           <button type="submit">Compose</button>
         </form>
       </section>
-
     </main>
     <footer>
       <hr/>
