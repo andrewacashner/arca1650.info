@@ -5,13 +5,67 @@ html {
   max-width: 1920px;
   min-width: 320px;
   margin: auto;
+  background: #faeaf0;
 }
 
 body {
   margin: auto;
-  max-width: 45em;
+  position: relative;
+  max-width: 40em;
+  padding-left: 2em;
+  padding-right: 2em;
   font-family: 'Cardo', serif;
+  font-size: 120%;
+  background: AntiqueWhite;
 }
+
+header {
+  margin-left: -2em;
+  margin-right: -2em;
+  padding-left: 4em;
+  padding-right: 4em;
+  padding-top: 1em;
+  background: #ebadc2;
+}
+
+nav {
+  margin-left: -4em;
+  margin-right: -4em;
+}
+
+nav, footer {
+  background: #009999;
+  color: white; 
+}
+
+nav ul {
+  list-style: none;
+  line-height: 2em;
+  display: table;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+nav ul li {
+  display: table-cell;
+  padding-right: 2em;
+}
+
+nav ul a, nav ul a:visited {
+  font-variant: small-caps;
+  text-decoration: none;
+  color: white;
+}
+
+a, a:visited {
+  color: DarkBlue;
+}
+
+div.panel-body {
+  border: 1px solid lightgray;
+  min-height: 3em;
+}
+
 q {
   quotes: "\201C" "\201D" "\2018" "\2019";
 }
@@ -19,7 +73,10 @@ cite {
   font-style: italic;
 }
 
-div.panel-body {
-  border: 1px solid lightgray;
-  min-height: 3em;
+
+footer {
+  margin-left: -2em;
+  margin-right: -2em;
+  padding-bottom: 1em;
+  text-align: center;
 }

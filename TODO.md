@@ -1,15 +1,16 @@
 # TO DO
 
 ## Style
-- add CSS styling
-    - especially for mobile users
+- (DONE) add CSS styling
+    - (DONE, basically) especially for mobile users
+    - add more
 
 ## Info
 - add more information 
     - about Kircher
     - about other research on the ark and other partial implementations
     - about the Haskell implementation
-- add Haskell library docs
+- (DONE) add Haskell library docs
 
 ## Function
 - add MIDI output
