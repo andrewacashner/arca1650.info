@@ -111,17 +111,17 @@ $mei = addslashes($rawMei);
                    Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
                    implementation by Andrew Cashner (Rochester, New York, 2021)" />
 <script>
-console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?$inputMeter?>]...");
+console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?=$inputMeter?>]...");
 
-console.log("Loading input file [<?=$inputFile?>]...");
+console.log("Loading input file [<?=$infileName?>]...");
 
-const mei           = '<?=$mei?>';
-console.log("Rendering output file beginning [%s]...", mei.substring(0,300);
+const mei = '<?=$mei?>';
+console.log("Rendering output file beginning [%s]...", mei.substring(0,300));
 </script>
     </head>
     <body>
     <header>
-      <h1>Arca musarithmica</h1>
+      <h1>ARCA MUSARITHMICA</h1>
       <h2>a device for automatic music composition from 1650</h1>
     </header>
       <nav>
