@@ -107,27 +107,23 @@ $mei = addslashes($rawMei);
     <title>Arca musarithmica</title>
     <meta name="description" 
           content="Display music generated automatically by Athanasius
-                   Kircher's device for automatic music composition from his
+                   Kircher’s device for automatic music composition from his
                    Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
                    implementation by Andrew Cashner (Rochester, New York, 2021)" />
-        <script>
-const inputText     = '<?=$inputText?>';
-const inputType     = '<?=$inputType?>';
-const inputStyle    = '<?=$inputStyle?>';
-const inputMode     = '<?=$inputMode?>';
-const inputMeter    = '<?=$inputMeter?>';
-const infileName    = '<?=$infileName?>';
+<script>
+console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?$inputMeter?>]...");
+
+console.log("Loading input file [<?=$inputFile?>]...");
+
 const mei           = '<?=$mei?>';
-console.log("Setting input text [%s] in method [%s]: style [%s], mode [%s], meter [%s]...", 
-    inputText, inputType, inputStyle, inputMode, inputMeter);
-console.log("Loading input file [%s]...", infileName);
-console.log("Rendering output file [%s]...", mei);
+console.log("Rendering output file beginning [%s]...", mei.substring(0,300);
 </script>
     </head>
     <body>
     <header>
       <h1>Arca musarithmica</h1>
       <h2>a device for automatic music composition from 1650</h1>
+    </header>
       <nav>
         <ul>
           <li><a href="index.html">Home</a></li>
@@ -135,7 +131,6 @@ console.log("Rendering output file [%s]...", mei);
           <li><a href="doc/index.html">Code</a></li>
         </ul>
       </nav>
-    </header>
     <main>
         <section>
             <h1><?=$title?></h1>
@@ -160,6 +155,9 @@ const app = new Verovio.App(document.getElementById("app"), options);
 const mei = '<?=$mei?>';
 app.loadData(mei);
 </script>
+<noscript>
+Javascript must be enabled in your browser to view this element.
+</noscript>
         </section>
     </main>
     <footer>

@@ -3,7 +3,8 @@
 
 
 -- | Please see the README on Bitbucket at
---   <a>https://bitbucket.org/andrewacashner/kircher/src/master/arca/README.md</a>
+--   <a>https://bitbucket.org/andrewacashner/kircher/src/master/arca/README.md</a>.
+--   The arca web app is at <a>http://www.arca1650.info</a>.
 @package arca
 @version 0.1.0.0
 
@@ -1116,7 +1117,50 @@ module Arca_musarithmica
 --   
 --   The other columns are constructed similarly with the data from
 --   Kircher.
+--   
+--   The arca also includes Kircher's list of notes in each mode with their
+--   accidentals, a list indicating which modes are <i>cantus durus</i>
+--   (all naturals in the signature) or <i>cantus mollis</i> (one B flat in
+--   the signature), a list of which modes are acceptable in each
+--   <i>pinax</i>, and a list of the acceptable ranges for each voice based
+--   on the most conventional clef combination.
 arca :: Arca
+
+-- | Range for each voice, based on SATB C-clef ranges, up to one note
+--   above and below the staff (Soprano C1, alto C3, tenor C4, bass f4
+--   clefs).
+--   
+--   Note that this makes the alto range lower than typical for a modern
+--   mixed choir, because Kircher has all-male choirs in mind.
+_vocalRanges :: VoiceRanges
+
+-- | Mode system (<a>Durus</a>, all naturals; or <a>Mollis</a>, one B flat)
+--   per mode
+_modeSystems :: ModeSystem
+
+-- | Notes in the scale for each mode, with accidentals:
+--   
+--   Kircher includes suggested flats and sharps on notes likely to be
+--   altered in <i>musica ficta</i> practice; in his mode tables he omits
+--   the B flats that would always be added in modes in <i>cantus
+--   mollis</i>
+--   
+--   We include both here, and elsewhere in the program we determine
+--   whether the B flat is from the signature or should be treated as
+--   <i>ficta</i>.
+_modeList :: ModeList
+
+-- | Set of all mode labels
+_allModes :: [Mode]
+
+-- | Exclude elements of list in arg1 from list in arg2
+listExclude :: (Foldable t, Eq a) => t a -> [a] -> [a]
+
+-- | Create a list of modes, excluding blacklist from <tt>_allModes</tt>
+allModesExcept :: [Mode] -> [Mode]
+
+-- | Modes appropriate for each pinax
+_pinaxModes :: PinaxModeList
 
 
 -- | This module reads (<i>lectio</i>, Latin, "I read") and process input
@@ -1610,7 +1654,9 @@ pLtEq :: Pitch -> Pitch -> Bool
 -- | Absolute diatonic pitch (octave + pitch)
 absPitch7 :: Pitch -> Int
 
--- | Difference between pitches, diatonic interval
+-- | Difference between pitches, diatonic interval Unison = 0, therefore
+--   results of this function are one less than the verbal names of
+--   intervals (<tt>p7diff = 4</tt> means a fifth)
 p7diff :: Pitch -> Pitch -> Int
 
 -- | Copy a <a>Pitch</a> (unchanged if <a>Rest</a>), with given function
@@ -1679,27 +1725,32 @@ adjustPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Pitch
 -- | Is the <a>Pitch</a> within the proper range for its voice?
 isPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Bool
 
--- | Go through list of pitches and reduce intervals that are more than a
---   seventh
+-- | Go through list of pitches and reduce intervals that are too large
 stepwiseInRange :: [Pitch] -> VoiceName -> VoiceRanges -> [Pitch]
 
 -- | Adjust a whole <a>Voice</a> stepwise
-stepwiseVoiceInRange :: Voice -> VoiceRanges -> Voice
+stepwiseVoiceInRange :: VoiceRanges -> Voice -> Voice
 
--- | Go through list of pitches and reduce intervals that are more than a
---   seventh
+-- | Go through list of pitches and reduce intervals that are too large
 stepwise :: [Pitch] -> [Pitch]
 
 -- | Adjust a whole <a>Voice</a> stepwise
 stepwiseVoice :: Voice -> Voice
 
--- | Reduce leap of more than a seventh by shifting octave of second note
---   up or down until the interval is within range
+-- | No leaps bigger than this interval This is based on 0 as unison so a
+--   _maxLeap of 4 is a fifth
+_maxLeap :: Int
+
+-- | Reduce leap of more than a <a>_maxLeap</a> by shifting octave of
+--   second note up or down until the interval is within range
+--   
+--   Octave leaps are okay, though.
 --   
 --   <b>TODO</b> : - but what if after adjusting for leaps, a note is out
 --   of range? - and what if there is a descending scale that goes out of
 --   range and the only way to adjust it is to make a seventh? need to
---   adjust a whole phrase
+--   adjust a whole phrase - But this may be going beyond what Kircher
+--   specifies as fully-automated algorithms.
 unleap :: Pitch -> Pitch -> Pitch
 
 -- | Return the highest pitch in a list of pitches.
@@ -1714,7 +1765,7 @@ pitchMin :: [Pitch] -> Maybe Pitch
 --   lowest notes in the list, compare to the range for the voice, and
 --   shift the whole thing by octave until all are in range; return error
 --   if it can't be done
-voiceInRange :: Voice -> VoiceRanges -> Voice
+voiceInRange :: VoiceRanges -> Voice -> Voice
 
 -- | Central functions of the ark: given all parameters required by Kircher
 --   (style, meter, syllable count, penultimate syllable length), select a
@@ -2183,12 +2234,6 @@ _AAC :: [Char]
 
 -- | MEI project description text
 _projectDesc :: [Char]
-
--- | MIDI tempo
-_midiBPM :: [Char]
-
--- | MIDI instrument
-_midiInstrument :: String
 
 -- | Plug in variables and musical content needed to boilerplate MEI
 --   document in all its baroque verbosity
