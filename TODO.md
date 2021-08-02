@@ -13,6 +13,7 @@
 - (DONE) add Haskell library docs
 
 ## Function
+- allow Unicode in MEI file
 - add MIDI output
 - add option to save music output as PDF
 
