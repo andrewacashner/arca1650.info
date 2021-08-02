@@ -65,6 +65,10 @@ $fileBasename = "$baseName[$inputText]";
 
 $arca = "./cgi-bin/arca-exe";
 
+# Set UTF-8 encoding to preserve Unicode in XML output of arca in standard
+# output of server's shell
+putenv('LANG=en_US.UTF-8');
+
 if ($inputType == "DIY") {
 
     # For DIY files, users set their own parameters for style, meter, and
@@ -93,6 +97,7 @@ if ($inputType == "DIY") {
     $rawMei = shell_exec("{$arca} {$infileName} -");
 }
 
+# Escape XML slashes for safe transfer to Javascript
 $mei = addslashes($rawMei);
 
 ?>

@@ -6,6 +6,7 @@
 # Delete extraneous files
 rsync -avuzh --delete \
     -e "ssh -p 7822 -i $HOME/.ssh/id_rsa-a2" \
+    --exclude="*.swp" \
     ./www/ arcainfo@arca1650.info:~/public_html/
 
 
