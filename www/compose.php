@@ -120,9 +120,35 @@ console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: s
 
 console.log("Loading input file [<?=$infileName?>]...");
 
+</script>
+
+<!--
+<script type="text/javascript" src="https://www.verovio.org/javascript/develop/verovio-toolkit.js"></script>
+
+<script type="text/javascript" src="https://www.midijs.net/lib/midi.js"></script>
+
+<script type="text/javascript">
+// Use Verovio toolkit to get MIDI data as string, add header
+const vrvToolkit = new verovio.toolkit();
+const base64midi = vrvToolkit.renderToMIDI('<?=$mei?>');
+const song = 'data:audio/midi;base64,' + base64midi;
+console.log("Ready to play MIDI data beginning %s...", song.substring(0,100));
+</script>
+-->
+
+<script type="module">
+// Put the Arca output from PHP into a variable and load it into Verovio
+import 'https://www.verovio.org/javascript/app/verovio-app.js';
 const mei = '<?=$mei?>';
 console.log("Rendering output file beginning [%s]...", mei.substring(0,300));
+
+const options = {
+defaultZoom : 3
+}
+const app = new Verovio.App(document.getElementById("app"), options);
+app.loadData(mei);
 </script>
+
     </head>
     <body>
     <header>
@@ -145,24 +171,19 @@ console.log("Rendering output file beginning [%s]...", mei.substring(0,300));
 
             <p><a href="compose.html">Compose more music</a></p>
 
+<!--
+            <div class="playback-controls">
+                <button onclick="MIDIjs.play(song);">Listen (MIDI)</button>
+            </div>
+-->
             <div class="panel-body">
                 <div id="app" class="panel">
-                </div>
-            </div>
-
-<script type="module">
-// Put the Arca output from PHP into a variable and load it into Verovio
-import 'https://www.verovio.org/javascript/app/verovio-app.js';
-const options = {
-defaultZoom : 3
-}
-const app = new Verovio.App(document.getElementById("app"), options);
-const mei = '<?=$mei?>';
-app.loadData(mei);
-</script>
 <noscript>
 Javascript must be enabled in your browser to view this element.
 </noscript>
+                </div>
+            </div>
+
         </section>
     </main>
     <footer>
