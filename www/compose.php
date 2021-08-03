@@ -116,27 +116,52 @@ $mei = addslashes($rawMei);
                    Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
                    implementation by Andrew Cashner (Rochester, New York, 2021)" />
 
-    <script type="text/javascript"
-            src="http://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js"
-            defer></script>
-
-    <script type="text/javascript" 
-            src="https://www.midijs.net/lib/midi.js"
-            defer></script>
+    <script 
+        type="text/javascript" 
+        src="https://www.verovio.org/javascript/jquery.min.js">
     </script>
-
-    <script type-"text/javascript"
-            src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.21.0/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.1.0">
+    <script 
+        type="text/javascript" 
+        src="https://www.verovio.org/javascript/midi-player/wildwebmidi.js">
+    </script>
+    <script 
+        type="text/javascript" 
+        src="https://www.verovio.org/javascript/midi-player/midiplayer.js">
+    </script>
+    <script 
+        type="text/javascript" 
+        src="http://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js">
     </script>
 
 <script>
 // Make XML available globally
-window.meiXML = '<?=$mei?>';
+const mei = '<?=$mei?>';
+window.meiXML = mei;
 
 // Check input
 console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?=$inputMeter?>]...");
 console.log("Loading input file [<?=$infileName?>]...");
 console.log("Rendering output file beginning [%s]...", window.meiXML.substring(0,300));
+
+let tk = new verovio.toolkit();
+console.log("Verovio Toolkit has loaded!");
+
+var base64midi = tk.renderToMIDI(mei);
+var song = 'data:audio/midi;base64,' + base64midi;
+window.song = song;
+console.log("Generated MIDI data beginning %s...", song.substring(0,100));
+
+var midiUpdate = function(time) {
+    console.log(time);
+}
+
+var midiStop = function() {
+    console.log("Stop");
+}
+
+function play_midi() {
+        $("#player").midiPlayer.play(song);
+}
 </script>
 
 <script type="module">
@@ -150,24 +175,8 @@ app.loadData(window.meiXML);
 </script>
 
 
-<script type="text/javascript">
-// Get MIDI data 
-document.addEventListener("DOMContentLoaded", (event) => {
-    Module.onRuntimeInitialized = async _ => {
-        let tk = new verovio.toolkit();
-        console.log("Verovio Toolkit has loaded!");
-
-        // let svg = tk.renderData(meiXML, {});
-        // document.getElementById("notation").innerHTML = svg;
-        const base64midi = tk.renderToMIDI(window.meiXML);
-        const song = 'data:audio/midi;base64,' + base64midi;
-        console.log("Generated MIDI data beginning %s...", song.substring(0,100));
-
-        console.log("MIDIjs audio status: %s", MIDIjs.get_audio_status());
-        window.song = song;
-    }
-});
 </script>
+
 
     </head>
     <body>
@@ -195,13 +204,22 @@ document.addEventListener("DOMContentLoaded", (event) => {
                 <noscript>
                 Javascript must be enabled in your browser to display the music.
                 </noscript>
-                <midi-player 
-                    src=""
-                    sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus"></midi-player>
                 <div class="playback-controls">
-                    <button onclick="MIDIjs.play(window.song);">Listen (MIDI)</button>
-                    <button onclick="MIDIjs.stop();">Stop playback</button>
+                    <button onclick="play_midi();">Play (MIDI)</button>
                 </div>
+                <div id="player" style="display: none;"></div>
+
+                <script type="text/javascript">
+                    $( document ).ready(function() {
+                        $("#player").midiPlayer({
+                            color: "grey",
+                            onUpdate: midiUpdate,
+                            onStop: midiStop,
+                            width: 250
+                        });
+                    });
+                </script>
+
                 <div class="panel-body">
                     <div id="app" class="panel"></div>
                 </div>
