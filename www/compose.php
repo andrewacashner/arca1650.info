@@ -69,7 +69,7 @@ $arca = "./cgi-bin/arca-exe";
 # output of server's shell
 putenv('LANG=en_US.UTF-8');
 
-if ($inputType == "DIY") {
+if ($inputType == "diy") {
 
     # For DIY files, users set their own parameters for style, meter, and
     # mode.  The input files have placeholder strings for these XML
@@ -116,67 +116,82 @@ $mei = addslashes($rawMei);
                    Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
                    implementation by Andrew Cashner (Rochester, New York, 2021)" />
 
-    <script 
-        type="text/javascript" 
-        src="https://www.verovio.org/javascript/jquery.min.js">
-    </script>
-    <script 
-        type="text/javascript" 
-        src="https://www.verovio.org/javascript/midi-player/wildwebmidi.js">
-    </script>
-    <script 
-        type="text/javascript" 
-        src="https://www.verovio.org/javascript/midi-player/midiplayer.js">
-    </script>
-    <script 
-        type="text/javascript" 
-        src="http://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js">
+    <!-- Bring in MEI data from PHP and check input parameters -->
+    <script>
+        var mei = '<?=$mei?>';
+        if (mei.length === 0) {
+            console.error("Empty MEI output from arca");
+        }
+        window.meiXML = mei;
+
+        console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?=$inputMeter?>]...");
+        console.log("Loading input file [<?=$infileName?>]...");
+        console.log("Rendering MEI output file beginning [%s]...", window.meiXML.substring(0,300));
     </script>
 
-<script>
-// Make XML available globally
-const mei = '<?=$mei?>';
-window.meiXML = mei;
+    <!-- Verovio toolkit for MIDI rendering -->
+    <script type="text/javascript" 
+            src="http://www.verovio.org/javascript/develop/verovio-toolkit.js">
+    </script>
 
-// Check input
-console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?=$inputMeter?>]...");
-console.log("Loading input file [<?=$infileName?>]...");
-console.log("Rendering output file beginning [%s]...", window.meiXML.substring(0,300));
+    <!-- MIDI player and needed resources -->
+    <script type="text/javascript" 
+            src="https://www.verovio.org/javascript/jquery.min.js">
+    </script>
 
-let tk = new verovio.toolkit();
-console.log("Verovio Toolkit has loaded!");
+    <script type="text/javascript" src="midi/019_church_organ.js"></script>
+    <script type="text/javascript" 
+            src="https://www.verovio.org/javascript/midi-player/midiplayer.js">
+    </script>
 
-var base64midi = tk.renderToMIDI(mei);
-var song = 'data:audio/midi;base64,' + base64midi;
-window.song = song;
-console.log("Generated MIDI data beginning %s...", song.substring(0,100));
+    <!-- Render music in Verovio Javascript app -->
+    <script type="module">
+        import 'https://www.verovio.org/javascript/app/verovio-app.js';
+        const options = {
+            defaultZoom : 3
+        }
+        console.time("Loading MEI into Verovio web app");
+        var app = new Verovio.App(document.getElementById("app"), options);
+        app.loadData(window.meiXML);
+        console.timeEnd("Loading MEI into Verovio web app");
+    </script>
 
-var midiUpdate = function(time) {
-    console.log(time);
-}
+    <!-- Render and play MIDI -->
+    <script type="text/javascript"/>
+        // Load
+        console.time("Loading Verovio Toolkit");
+        var tk = new verovio.toolkit();
+        console.timeEnd("Loading Verovio Toolkit");
 
-var midiStop = function() {
-    console.log("Stop");
-}
+        console.time("Loading MEI into Verovio");
+        tk.loadData(window.meiXML);
+        console.timeEnd("Loading MEI into Verovio");
 
-function play_midi() {
-        $("#player").midiPlayer.play(song);
-}
-</script>
+        // Render to MIDI
+        console.time("Generating MIDI");
+        var base64midi = tk.renderToMIDI();
+        var song = 'data:audio/midi;base64,' + base64midi;
+        console.timeEnd("Generating MIDI");
+        console.log("Generated MIDI data beginning [%s]...", song.substring(0,100));
 
-<script type="module">
-// Render music in Verovio Javascript app
-import 'https://www.verovio.org/javascript/app/verovio-app.js';
-const options = {
-    defaultZoom : 3
-}
-const app = new Verovio.App(document.getElementById("app"), options);
-app.loadData(window.meiXML);
-</script>
+        // MIDI player functions
+        var midiUpdate = function(time) {
+            console.log(time);
+            return true;
+        }
 
+        var midiStop = function() {
+            $("#player").midiPlayer.stop();
+            console.log("Stopped playback");
+            return true;
+        }
 
-</script>
-
+        function midiPlay() {
+            console.log("Playing MIDI file beginning %s...", song.substring(0,100));
+            $("#player").midiPlayer.play(song);
+            return true;
+        }
+    </script>
 
     </head>
     <body>
@@ -196,26 +211,25 @@ app.loadData(window.meiXML);
             <h1><?=$title?></h1>
             <h2>Composed by the Arca musarithmica</h2>
 
-            <p>Reload this page (and resend data) to produce a different setting</p>
-
-            <p><a href="compose.html">Compose more music</a></p>
+            <p><a href="compose.html">Compose more music</a> or reload this page to produce a different setting</p>
 
             <section>
                 <noscript>
                 Javascript must be enabled in your browser to display the music.
                 </noscript>
                 <div class="playback-controls">
-                    <button onclick="play_midi();">Play (MIDI)</button>
+                    <button onclick="midiPlay();">Play (MIDI)</button>
+                    <button onclick="midiStop();">Stop</button>
                 </div>
-                <div id="player" style="display: none;"></div>
+                <div id="player"></div>
 
                 <script type="text/javascript">
                     $( document ).ready(function() {
                         $("#player").midiPlayer({
-                            color: "grey",
+                        color: "red",
+                            onStop: null,
                             onUpdate: midiUpdate,
-                            onStop: midiStop,
-                            width: 250
+                            updateRate: 1000
                         });
                     });
                 </script>
@@ -226,8 +240,16 @@ app.loadData(window.meiXML);
             </section>
 
         </section>
+        <section>
+            <ul>
+                <li>MEI newly generated from user-selected options and prepared input texts in XML by <a href="https://www.bitbucket.org/andrewacashner/kircher.git"><code>arca</code></a> Haskell program by Andrew Cashner</li>
+                <li>MEI rendered into SVG graphics by RISM's <a href="https://www.verovio.org/">Verovio</a> <a href="https://www.verovio.org/app.html">Javascript app</a></li>
+                <li>MIDI generated by Verovio toolkit and played by Verovio midi player, which uses <a href="http://zz85.github.io/wild-web-midi/">Wild Web MIDI</a></li>
+                <li>The Verovio software is made freely available under the GNU Lesser General Public License v3.0.</li>
+            </ul>
+        </section>
     </main>
     <footer>
-      Copyright © 2021 Andrew A. Cashner. All rights reserved.
+      Copyright © 2021 Andrew A. Cashner. All rights reserved. (Except where other licenses are specified for third-party software.)
     </footer>
 </html>

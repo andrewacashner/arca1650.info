@@ -48,6 +48,9 @@ div.panel-body div.panel {
 div.playback-controls {
   padding: 0.5em;
 }
+div#player {
+  display: none;
+}
 
 footer {
   min-height: 2em;

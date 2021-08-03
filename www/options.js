@@ -143,7 +143,7 @@ function diyMeterOptions(style) {
             "TripleMajor": "Triple meter, three semibreves per unit (cut C3)"
         },
         "florid": {
-            unselected:  "Duple meter (C), only option in florid style",
+            "Duple":  "Duple meter (C), only option in florid style",
         }
     };
 
