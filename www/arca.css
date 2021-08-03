@@ -45,6 +45,10 @@ fieldset select {
 div.panel-body div.panel {
   min-height: 700px;
 }
+div.playback-controls {
+  padding: 0.5em;
+}
+
 footer {
   min-height: 2em;
   max-height: 4em;

@@ -116,41 +116,57 @@ $mei = addslashes($rawMei);
                    Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
                    implementation by Andrew Cashner (Rochester, New York, 2021)" />
 
-<script type="text/javascript" src="https://www.verovio.org/javascript/develop/verovio-toolkit.js"></script>
+    <script type="text/javascript"
+            src="http://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js"
+            defer></script>
 
-<script type="text/javascript" src="https://www.midijs.net/lib/midi.js"></script>
+    <script type="text/javascript" 
+            src="https://www.midijs.net/lib/midi.js"
+            defer></script>
+    </script>
+
+    <script type-"text/javascript"
+            src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.21.0/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.1.0">
+    </script>
 
 <script>
+// Make XML available globally
+window.meiXML = '<?=$mei?>';
+
+// Check input
 console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?=$inputMeter?>]...");
-
 console.log("Loading input file [<?=$infileName?>]...");
-
-</script>
-
-<script type="text/javascript">
-// Use Verovio toolkit to get MIDI data as string, add header
-const vrvToolkit = new verovio.toolkit();
-const base64midi = vrvToolkit.renderToMIDI('<?=$mei?>');
-const song = 'data:audio/midi;base64,' + base64midi;
-console.log("Ready to play MIDI data beginning %s...", song.substring(0,100));
-
-function doMidi() {
-    MIDIjs.play(song);
-}
-
+console.log("Rendering output file beginning [%s]...", window.meiXML.substring(0,300));
 </script>
 
 <script type="module">
-// Put the Arca output from PHP into a variable and load it into Verovio
+// Render music in Verovio Javascript app
 import 'https://www.verovio.org/javascript/app/verovio-app.js';
-const mei = '<?=$mei?>';
-console.log("Rendering output file beginning [%s]...", mei.substring(0,300));
-
 const options = {
-defaultZoom : 3
+    defaultZoom : 3
 }
 const app = new Verovio.App(document.getElementById("app"), options);
-app.loadData(mei);
+app.loadData(window.meiXML);
+</script>
+
+
+<script type="text/javascript">
+// Get MIDI data 
+document.addEventListener("DOMContentLoaded", (event) => {
+    Module.onRuntimeInitialized = async _ => {
+        let tk = new verovio.toolkit();
+        console.log("Verovio Toolkit has loaded!");
+
+        // let svg = tk.renderData(meiXML, {});
+        // document.getElementById("notation").innerHTML = svg;
+        const base64midi = tk.renderToMIDI(window.meiXML);
+        const song = 'data:audio/midi;base64,' + base64midi;
+        console.log("Generated MIDI data beginning %s...", song.substring(0,100));
+
+        console.log("MIDIjs audio status: %s", MIDIjs.get_audio_status());
+        window.song = song;
+    }
+});
 </script>
 
     </head>
@@ -175,16 +191,21 @@ app.loadData(mei);
 
             <p><a href="compose.html">Compose more music</a></p>
 
-            <div class="playback-controls">
-                <button onclick="doMidi();">Listen (MIDI)</button>
-            </div>
-            <div class="panel-body">
-                <div id="app" class="panel">
-<noscript>
-Javascript must be enabled in your browser to view this element.
-</noscript>
+            <section>
+                <noscript>
+                Javascript must be enabled in your browser to display the music.
+                </noscript>
+                <midi-player 
+                    src=""
+                    sound-font="https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus"></midi-player>
+                <div class="playback-controls">
+                    <button onclick="MIDIjs.play(window.song);">Listen (MIDI)</button>
+                    <button onclick="MIDIjs.stop();">Stop playback</button>
                 </div>
-            </div>
+                <div class="panel-body">
+                    <div id="app" class="panel"></div>
+                </div>
+            </section>
 
         </section>
     </main>
