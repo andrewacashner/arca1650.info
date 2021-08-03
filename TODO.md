@@ -3,7 +3,7 @@
 ## Style
 - (DONE) add CSS styling
     - (DONE, basically) especially for mobile users
-    - add more
+    - (DONE) add more
 
 ## Info
 - add more information 
@@ -13,9 +13,11 @@
 - (DONE) add Haskell library docs
 
 ## Function
-- allow Unicode in MEI file
-- add MIDI output
+- (DONE) allow Unicode in MEI file
+- (DONE) add MIDI output
 - add option to save music output as PDF
+- use Verovio toolkit throughout rather than using toolkit for MIDI but JS app
+  for display
 
 ## Debug
 - add link for filing bug reports
