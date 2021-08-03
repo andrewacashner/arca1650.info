@@ -85,7 +85,9 @@ if ($inputType == "diy") {
         array($style[$inputStyle], $inputMeter, $inputMode), 
         $fileString);
 
-    $rawMei = shell_exec("echo '{$fileString}' | {$arca} - -");
+    $fileString = escapeshellarg($fileString);
+
+    $rawMei = shell_exec("echo {$fileString} | {$arca} - -");
 
 } else {
 
