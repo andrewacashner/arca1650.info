@@ -2154,8 +2154,11 @@ sentence2mei :: (ListPosition, MusicSentence) -> String
 --   <a>VoiceName</a> enum Put a double bar at the end of sections and a
 --   final bar at the end of the piece.
 --   
---   <b> TODO </b> you could put more than one layer per staff if you
---   wanted a 2-staff choirstaff (e.g., SA on one, TB on the other)
+--   <b>TODO</b>: you could put more than one layer per staff if you wanted
+--   a 2-staff choirstaff (e.g., SA on one, TB on the other)
+--   
+--   <b>TODO</b>: Set MIDI tempo at start of section, just before layer;
+--   Verovio does not currently allow this so we skip it.
 section2mei :: Arca -> (ListPosition, MusicSection) -> String
 
 -- | Take a list of sections, one per SATB voice, and create a single MEI
@@ -2192,12 +2195,28 @@ meiMeterModern :: MusicMeter -> String
 --   <tt>proport.num</tt> attribute) for the number, which is the correct
 --   encoding. But putting <tt>num</tt> directly inside <tt>mensur</tt>
 --   works with Verovio.
+--   
+--   Also add MEI <tt>midi.bpm</tt> element to set the tempo.
 meiMeterMensural :: MusicMeter -> String
 
 -- | Mensural meter with proportion as a string of attributes (for use in
 --   <tt>staffDef</tt>, where the correct encoding also works with
 --   Verovio).
 meiMeterMensuralAttr :: MusicMeter -> String
+
+-- | MEI <tt>tempo</tt> element for MIDI speed: quarter-note (semiminim)
+--   beats per minute, different tempi for each mensuration
+meiMidiTempo :: MusicMeter -> String
+
+-- | MEI <tt>midi.bpm</tt> attribute appropriate for each mensuration This
+--   is how it should work, but Verovio does not accept a tempo element
+--   within staff, so I do not know how to do a tempo change mid-piece.
+--   Instead we'll just set a quarter-note pulse that makes it not too
+--   terribly slow.
+--   
+--   meiMidiBPM meter = attr "midi.bpm" $ show bpm where bpm = case meter
+--   of Duple -&gt; 120 TripleMinor -&gt; 180 TripleMajor -&gt; 320
+meiMidiBPM :: () => p -> String
 
 -- | Extract a simple list of <a>MusicSentence</a> from the four members of
 --   a <a>MusicChorus</a>
@@ -2235,9 +2254,15 @@ _AAC :: [Char]
 -- | MEI project description text
 _projectDesc :: [Char]
 
+-- | MEI element for MIDI instrument number (1-indexed)
+midiInstrumentNum :: Int -> String
+
+-- | MIDI instrument for playback ("Church Organ" sounds pretty good)
+_midiInstrument :: String
+
 -- | Plug in variables and musical content needed to boilerplate MEI
 --   document in all its baroque verbosity
-meiDocument :: String -> String -> String -> String -> String -> String
+meiDocument :: String -> String -> String -> String -> String -> String -> String
 instance GHC.Classes.Eq Scribo.MEI.ListPosition
 instance GHC.Show.Show Scribo.MEI.ListPosition
 instance GHC.Enum.Enum Scribo.MEI.ListPosition
