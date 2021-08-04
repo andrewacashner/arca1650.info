@@ -26,6 +26,290 @@
     </nav>
     <main>
       <section>
+        <h1>Inside Kircher’s Ark</h1>
+        <h2>Contents</h2>
+        <ol class="toc">
+          <li><a href="#structure">How the ark is structured</a></li>
+          <li><a href="#use">How to use the ark</a></li>
+          <li><a href="#implementation">Software implementation</a></li>
+        </ol>
+      </section>
+      <section id="structure">
+        <h1>How the ark is structured</h1>
+
+        <p><em>Arca</em> just means <q>box</q>, and as shown in Kircher’s
+        overall <a href="index.html#ark-image">illustration</a>, the ark
+        contains different kinds of data structures on the outside, on the
+        lid, and stored within. After preparing the input text 
+        (<a href="#use">see below</a>), the operator uses the
+        <em>pinakes</em> (rods) within to extract pre-arranged permutations of
+        numbers and rhythmic values. Then they use the table of modes on the
+        lid to match the numbers to pitch classes (that is, note names without
+        specifying an octave) and accidentals. Finally, the table on the front
+        specifies how to inscribe these notes on paper within acceptable
+        ranges for the four voices (thereby specifying the initial octave and any
+        later adjustments of octaves necessary to keep each voice's line
+        within range. Not included in this illustration are the other elements
+        of music notation for which Kircher provides tables in his text,
+        including the different possible note values.
+        </p>
+
+        <section>
+          <h2><em>Syntagmata</em> and <em>pinakes</em> (inside the box)</h2>
+          <p>
+          The box contains a bevy of <em>pinakes</em> (rods, singular
+          <em>pinax</em>), organized into groups called <em>syntagmata</em>
+          (singular <em>syntagma</em>).  The design of the rods would seem to
+          be inspired by Napier's bones and other similar calculating devices
+          of the time.  Each pinax lists sets of numeric permutations that
+          represent four-voice note combinations, and sets of rhythmic
+          permutations.
+          </p>
+          <p>
+          The pinakes match up with the metrical structure of
+          the poetry being set. Syntagma I, pinax I and II, allow for any
+          meter with lines up to six syllables long, as they are just based on
+          the length of the penultimate syllable. As a result, these may be
+          used to set prose texts as long as they are prepared in appropriate
+          groupings of syllables. The remaining pinakes provide for a set of
+          Classical Latin poetic meters, from <q>Archilocical Iambic</q> to
+          Sapphic meters.
+          </p>
+          <p>
+          There are three syntagmata: the first provides for simple
+          note-against-note (homorhythmic) counterpoint, and the second
+          provides for florid (melismatic, elaborate) counterpoint including
+          imitation and even fugal passages. The third contains a set of
+          modifications that can be applied to the previous two syntagmata in
+          order to better match prosodic and rhetorical features of the texts.
+          Kircher provides the full tables for syntagma I and II, but only an
+          outline of syntagma III without enough detail to implement it. (In
+          fact he says he has withheld some of the information from the
+          general public; though this may have been a bluff.) This software
+          fully implements syntagma I and II only, and it is not clear if
+          syntagma III could be fully automated based only on Kircher’s
+          specification.
+          </p>
+          <section>
+            <h3>Syntagma I: Simple counterpoint</h3>
+            <p>
+            In syntagma I, there are separate tables of pitch/voice
+            permutations (what I call <em>vperms</em>) and rhythm permutations
+            (<em>rperms</em>). The user is supposed to choose freely from
+            each set and then combine them.
+            </p>
+            <p>
+            This is the rod used to set the hymn <cite>Ave maris stella</cite>
+            in simple style: syntagma I, pinax IV, with details showing the
+            separate vperms and rperms.
+            </p>
+            <img id="s1p4"
+                 src="img/Kircher-s1p4.png"
+                 alt="Image: The original data tables on the rod in syntagma
+                      I, pinax IV, containing at the top, columns of numbers
+                      in matrixes for four voices (vperms); and at the bottom,
+                      columns of musical notes indicating rhythmic values
+                      (rperms)"
+                 title="Arca musarithmica, syntagma I, pinax IV, in Musurgia
+                        universalis (1650), book 2, fol. 83"
+                 max-width="400">
+            </img>
+            <p>
+            In many pinakes, the user is supposed to choose from a different
+            column based on the order of poetic lines (which Kircher
+            confusingly calls <em>strophae</em>, though he means lines not
+            stanzas). 
+            </p>
+            <img id="s1p4-vperm-detail"
+                 src="img/Kircher-s1p4-vperm-detail.png"
+                 alt="Image: Detail of syntagma I, pinax IV, showing the
+                      number tables for voice permutations"
+                 title="Detail of syntagma I, pinax IV: numbers for voice
+                        permutations"
+                 width="400px">
+            </img>
+            <p>
+            The rperms in this syntagma are divided into three sections by
+            meter: for duple meter, <q>triple major</q>, and <q>triple
+              minor</q>. These correspond to cut C, cut C3 (or cut C 3/2), and
+            C3 (or C 3/2) mensurations.
+            </p>
+            <img id="s1p4-rperm-detail"
+                 src="img/Kircher-s1p4-rperm-detail.png"
+                 alt="Image: Detail of syntagma I, pinax IV, showing the note
+                      tables for rhythm permutations"
+                 title="Detail of syntagma I, pinax IV: note values for rhythm
+                        permutations"
+                 width="400px">
+            </img>
+            <p>
+            Kircher does not distinguish systematically between duple-meter
+            permutations with a primary semibreve (whole note) subdivision
+            (which would be notated with cut C, <em>alla breve</em> time) and
+            those with a primary minim (half note) pulse. Perhaps this was
+            meant to increase the variety in duple meter, but it can create
+            absurd results when the pulse suddenly shifts. This would not be a
+            problem for someone choosing the permutations intelligently, but
+            since Kircher does not provide a way to distinguish automatically,
+            this implementation of the ark can produce some silly results in
+            duple meter.
+            </p>
+            <p>
+            The pinakes also include specifications of which modes are
+            acceptable.
+            </p>
+          </section>
+          <section>
+            <h3>Syntagma II: Florid counterpoint</h3>
+            <p>
+            In syntagma II, each <em>vperm</em> is matched with a single
+            <em>rperm</em> to allow for more complex contrapuntal textures.
+            </p>
+            <img id="s2p2a"
+                 src="img/Kircher-s2p2a.png"
+                 alt="Image: The original data tables for the rod in syntagma
+                      II, pinax II, containing columns of matched sets of
+                      voice and rhythm permutations"
+                 title="Arca musarithmica, syntagma II, pinax II, in Musurgia
+                        universalis (1650), book 2, fol. 106"
+                 max-width="400px">
+            </img>
+            <p>
+            This is the rod used to set the same hymn in florid style:
+            syntagama II, pinax II. The detail shows the pairs of voice and
+            rhythm permutations.
+            </p>
+            <img id="s2p2b-detail"
+                 src="img/Kircher-s2p2b-detail.png"
+                 alt="Image: Detail of syntagma II, pinax II, showing pairs of
+                      voice and rhythm permutations"
+                 title="Detail of syntagma II, pinax II: pairs of voice and
+                        rhythm permutations"
+                 width="500px">
+            </img>
+          </section>
+          <section>
+            <h3>Automating permutation selection: A problem of theologically
+              dangerous chance operations</h3>
+            <p>
+            To make the system automated, I generate a list of random numbers
+            to select the permutations. Kircher and his Jesuit superiors
+            probably would have considered this chance operation to be a
+            theologically dangerous act, removing human free will and in a
+            way, putting God's providence to the test. I have separated out
+            this part of the implementation in the <code>Fortuna</code>
+            module, with the necessary cautions in the documentation, and it
+            would be possible for a user to supply their own freely chosen
+            list of numbers instead, should they be concerned about an audit
+            by the Inquisition.
+            </p>
+          </section>
+        </section>
+        <section>
+          <h2>Palimpsest phonotacticum (front center)</h2>
+          <p>
+          In the center, adorned by images of ancient and exotic musical
+          instruments, the table on the front face shows the settings for the
+          <em>palimpsest phonotacticum</em> or music paper.  This chart gives
+          the permissible combinations of clefs that specifies the permissible
+          ranges for each voice.
+          </p>
+          <p>
+          It also shows the pitch-class values in both <em>cantus durus</em>
+          (all-natural accidental signature) and <em>cantus mollis</em>
+          (one-flat accidental signature). These were the only two signatures
+          used in conservative music of the mid-seventeenth century.
+          </p>
+        </section>
+        <section>
+          <h2>Mensa tonographica (underside of lid)</h2>
+          <p>
+          Under the lid is the <q>table for writing modes</q>, which allows
+          the user to look up the pitch names that correspond to the pitch
+          numbers in a given mode.  Kircher lists twelve modes, which he
+          usually calls <em>toni</em>.  Each mode includes a name, a
+          description of the emotional mood or character associated with that
+          mode, whether the mode is in <em>cantus durus</em> or
+          <em>mollis</em>, and a list of pitches, some with accidentals.
+          Kircher’s system of modes does not line up with the older systems
+          that most of us learned even in advanced studies of medieval music,
+          because it reflects the rapidly changing, chaotic state of modal
+          theory in the seventeenth century.
+          </p>
+
+          <section>
+          <h3>Kircher’s Concept of Mode or <em>Tonus</em></h3>
+          <p>
+          Many musicians had used a system of twelve church modes at least
+          since the time of the theorists Glareanus and Zarlino a century
+          earlier. In that system mode I meant that a plainchant melody ended
+          on D (the final) with a range from D to the D an octave higher
+          (authentic ambitus). Mode II also specified a D final but a range
+          from A to A (plagal ambitus). Modes III and IV had an E final with
+          authentic and plagal ranges, respectively; and so on, skipping B.
+          That system originally developed as a way of classifying traditional
+          monophonic (one note at a time) chant melodies.
+          </p>
+          <p>
+          When that system was applied to <em>polyphonic</em> music, it
+          usually referred to the final of the lowest voice and the ambitus
+          (range) of the Tenor voice. The rules for counterpoint worked
+          against some of the special characteristics of the modes: for
+          example, when two notes a sixth apart moved into an octave, one was
+          supposed to raise the top note or lower the bottom note of the sixth
+          (that is, make it a major sixth), which effectively meant that
+          <q>leading tones</q> were sharped in almost all modes. Such
+          alterations eroded the distinctions between modes until eventually
+          most of them sounded like either major or minor.
+          </p>
+          <p>
+          In between older modal practice and what would emerge as functional
+          tonality with major and minor keys, then, were various systems of
+          <q>church keys</q> and <em>tonoi</em>. Most of these described
+          practical ways that keyboardists in particular would match
+          improvised polyphonic music to traditional psalm tones (linked to
+          the modes but not identical with them). Kircher’s list of modes is
+          closer to these church keys.
+          </p>
+          </section>
+          <section>
+            <h3>Automating <em>musica ficta</em> accidentals: A problem of
+              performance practice</h3>
+            <p> 
+            In practice, the problem of accidentals is a major detriment to
+            making the ark fully automatic. Kircher does not list B flats in
+            the scales for modes that are in <em>cantus mollis</em>, because
+            these are specified by the signatures in the <em>palimpsest</em>
+            table below; the flats and sharps he does list are not meant to be
+            applied all the time but only in certain situations according to
+            the performance-practice traditions of <em>musica ficta</em>. Thus
+            a performer, seeing the gesture D–E–D in certain contexts would
+            use the rule <em>una nota super la semper est canendum fa</em> to
+            apply a flat to the E. Kircher does not provide enough information
+            in his specification to automate this aspect completely.
+            </p>
+            <p>
+            This problem is not necessarily a failing of his design, though,
+            since it would have been uncommmon to specify such things in
+            writing. His machine is designed for automatic
+            <em>composition</em>, not performance, and so it provides as much
+            information as competent performers would need to execute the
+            music. (In the same way the a document-processing program like
+            pdfLaTeX converts a source file into PostScript instructions that
+            a printer knows how to interpret in order to render the document
+            on paper.) This is why I have chosen to render the accidentals
+            from this mode table above the staff as suggested <em>musica
+              ficta</em>, and this is why the automated MIDI performances on
+            this website sometimes sound awful, because the MIDI player does
+            not know anything about seventeenth-century performance practice,
+            and teaching it that would be an entirely separate programming
+            challenge (one worthy to be taken up, though!). 
+            </p>
+          </section>
+        </section>
+
+      </section>
+      <section id="use">
         <h1>How to compose music using the ark</h1>
 
         <ol>
@@ -160,26 +444,99 @@
               </li>
         </ol>
       </section>
-      <section>
+      <section id="implementation">
         <h1>Digital Implementation</h1>
-        <p>In this software we implement only those parts of the ark which are
-        completely specified as automatic algorithms.</p>
-        <p>Instead of the user’s choice of vperms and rperms we choose to tempt
+        <p>
+        In this software we implement only those parts of the ark which are
+        completely specified as automatic algorithms. We have tried to follow
+        Kircher's own ways of structuring the data as closely as possible, as
+        may be clear from looking at the 
+        <a href="doc/index.html"><code>Arca</code> module</a>.
+        </p>
+        <p>
+        Instead of the user’s choice of vperms and rperms we choose to tempt
         fate (from a seventeenth-century Catholic perspective and roll the dice,
         a literally aleatoric method, by using computer-generated pseudo-random
         numbers.  Other elements that depend on the user’s taste and judgment,
         or elements under-specified by Kircher (like text underlay in
-        the melismatic Syntagma II) we leave up to our own users’ discretion.</p>
-        <p>We encode the data of the ark itself (syntagmata, pinakes, etc.) in a
-        set of tables in Haskell, technically nested vectors and lists.</p>
-        <p>We read the input text and parameters from an XML file and parse the
-        text into sections, sentences/stanzas, and phrases/lines.</p>
-        <p>We generate a list of random numbers to use for each phrase, then we
-        use these to select the correct vperms and rperms, and adjust these for
-        mode and range according to the rules. We then convert our internal data
-        types into MEI-XML output.</p>
-        <p>In the web app, we use the third-party Verovio app to render the
-        musical data to notation.</p>
+        the melismatic Syntagma II) we leave up to our own users’ discretion.
+        </p>
+        <p>
+        I have tried to write the program in a <q>literate programming</q>
+        style, and the full documentation and code are available 
+        <a href="doc/index.html">on this site</a>.
+        </p>
+        <p>
+        The program uses the following modules.
+        </p>
+        <dl>
+          <dt>Aedifico (<q>I build</q>)</dt>
+          <dd>
+            This module defines the software versions of these structures
+            and the basic methods for accessing them.
+          </dd>
+          <dt>Arca musarithmica (<q>Box of Musical Numbers,</q> more or less)</dt>
+          <dd>
+            This module stores the original data of Kircher’s ark in nested
+            vectors and lists of integer values and enumeration values
+            corresponding to the rhythmic durations, plus the lists of mode
+            scales and other information.
+          </dd>
+          <dt>Lectio (<q>I read</q>)</dt>
+          <dd>
+            This module creates the system for reading the input texts, which
+            are to be written in a custom XML format.
+            We extract the parameters like text meter, music meter, and mode;
+            and parse the text into sections, sentences, phrases, words, and
+            syllables.
+          </dd>
+          <dt>Fortuna (<q>Chance</q>)</dt>
+          <dd>
+            This module generates the pseudo-random numbers used to select
+            vperms and rperms.
+          </dd>
+          <dt>Cogito (<q>I think</q>)</dt>
+          <dd>
+            This module is where the actual <q>musarithmetic</q> occurs, where
+            vperm numbers are converted into pitches with accidentals, rperms
+            are converted into durations, and octaves are set and adjusted
+            according to Kircher’s rules.
+            The module stores all this data in internal data structures
+            that encode music sections, phrases, and pitches (with pitch
+            class, octave, accidental, duration, and syllables). 
+          </dd>
+          <dt>Scribo (<q>I write</q>)</dt>
+          <dd>
+            This module writes the data generated by the
+            <code>Cogito</code>module to a music-notation language that other
+            software can use to put the actual notes on the screen or paper.
+            The submodules output to either Lilypond or MEI, the XML format 
+            of the Music Encoding Initiative. The Lilypond module is still
+            available for testing, but I stopped developing it some time ago
+            when I shifted focus to MEI.
+          </dd>
+        </dl>
+        <section>
+          <h3>Web App</h3>
+          <p>
+          In the web app, we use Javascript to generate appropriate lists of
+          options to select permissible combinations of texts and parameters
+          (not every text can be set in every mode, for instance).
+          </p>
+          <p>
+          These selections are passed to a PHP file that selects the
+          appropriate pre-written input text. In <q>DIY</q> mode, where you
+          select all the parameters yourself, we also use PHP to insert those
+          values into the input file. Then we pass the input file to the ark
+          and save the MEI-XML output in a variable. 
+          </p>
+          <p>
+          Via Javascript we pass this data to the third-party Verovio app to
+          render the musical data to notation, and to the Verovio toolkit to
+          render it to MIDI. The Verovio MIDI player allows to make the music
+          audible.
+          </p>
+        </section>
       </section>
     </main>
     <footer>
