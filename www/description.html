@@ -9,8 +9,12 @@
     <title>Arca musarithmica</title>
     <meta name="description" 
           content="Description of how to compose using Athanasius
-                   Kircher’s 1650 device for automatic music composition
-                   implemented in Haskell by Andrew Cashner (2021)" />
+                    Kircher’s 1650 device for automatic music composition
+                    implemented in Haskell by Andrew Cashner (2021)" />
+
+    <link rel="stylesheet" href="highlight/styles/default.min.css" />
+    <script type="text/javascript" src="highlight/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
   </head>
   <body>
     <header>
@@ -32,6 +36,9 @@
           <li><a href="#structure">How the ark is structured</a></li>
           <li><a href="#use">How to use the ark</a></li>
           <li><a href="#implementation">Software implementation</a></li>
+          <li><a href="#reflections">What does this project tell us about
+              computing and composition?</a></li>
+          <li><a href="#biblio">Bibliography and related projects</a></li>
         </ol>
       </section>
       <section id="structure">
@@ -106,12 +113,12 @@
             <img id="s1p4"
                  src="img/Kircher-s1p4.png"
                  alt="Image: The original data tables on the rod in syntagma
-                      I, pinax IV, containing at the top, columns of numbers
-                      in matrixes for four voices (vperms); and at the bottom,
-                      columns of musical notes indicating rhythmic values
-                      (rperms)"
+                       I, pinax IV, containing at the top, columns of numbers
+                       in matrixes for four voices (vperms); and at the bottom,
+                       columns of musical notes indicating rhythmic values
+                       (rperms)"
                  title="Arca musarithmica, syntagma I, pinax IV, in Musurgia
-                        universalis (1650), book 2, fol. 83"
+                         universalis (1650), book 2, fol. 83"
                  max-width="400">
             </img>
             <p>
@@ -123,9 +130,9 @@
             <img id="s1p4-vperm-detail"
                  src="img/Kircher-s1p4-vperm-detail.png"
                  alt="Image: Detail of syntagma I, pinax IV, showing the
-                      number tables for voice permutations"
+                       number tables for voice permutations"
                  title="Detail of syntagma I, pinax IV: numbers for voice
-                        permutations"
+                         permutations"
                  width="400px">
             </img>
             <p>
@@ -137,9 +144,9 @@
             <img id="s1p4-rperm-detail"
                  src="img/Kircher-s1p4-rperm-detail.png"
                  alt="Image: Detail of syntagma I, pinax IV, showing the note
-                      tables for rhythm permutations"
+                       tables for rhythm permutations"
                  title="Detail of syntagma I, pinax IV: note values for rhythm
-                        permutations"
+                         permutations"
                  width="400px">
             </img>
             <p>
@@ -168,10 +175,10 @@
             <img id="s2p2a"
                  src="img/Kircher-s2p2a.png"
                  alt="Image: The original data tables for the rod in syntagma
-                      II, pinax II, containing columns of matched sets of
-                      voice and rhythm permutations"
+                       II, pinax II, containing columns of matched sets of
+                       voice and rhythm permutations"
                  title="Arca musarithmica, syntagma II, pinax II, in Musurgia
-                        universalis (1650), book 2, fol. 106"
+                         universalis (1650), book 2, fol. 106"
                  max-width="400px">
             </img>
             <p>
@@ -182,9 +189,9 @@
             <img id="s2p2b-detail"
                  src="img/Kircher-s2p2b-detail.png"
                  alt="Image: Detail of syntagma II, pinax II, showing pairs of
-                      voice and rhythm permutations"
+                       voice and rhythm permutations"
                  title="Detail of syntagma II, pinax II: pairs of voice and
-                        rhythm permutations"
+                         rhythm permutations"
                  width="500px">
             </img>
           </section>
@@ -238,39 +245,41 @@
           </p>
 
           <section>
-          <h3>Kircher’s Concept of Mode or <em>Tonus</em></h3>
-          <p>
-          Many musicians had used a system of twelve church modes at least
-          since the time of the theorists Glareanus and Zarlino a century
-          earlier. In that system mode I meant that a plainchant melody ended
-          on D (the final) with a range from D to the D an octave higher
-          (authentic ambitus). Mode II also specified a D final but a range
-          from A to A (plagal ambitus). Modes III and IV had an E final with
-          authentic and plagal ranges, respectively; and so on, skipping B.
-          That system originally developed as a way of classifying traditional
-          monophonic (one note at a time) chant melodies.
-          </p>
-          <p>
-          When that system was applied to <em>polyphonic</em> music, it
-          usually referred to the final of the lowest voice and the ambitus
-          (range) of the Tenor voice. The rules for counterpoint worked
-          against some of the special characteristics of the modes: for
-          example, when two notes a sixth apart moved into an octave, one was
-          supposed to raise the top note or lower the bottom note of the sixth
-          (that is, make it a major sixth), which effectively meant that
-          <q>leading tones</q> were sharped in almost all modes. Such
-          alterations eroded the distinctions between modes until eventually
-          most of them sounded like either major or minor.
-          </p>
-          <p>
-          In between older modal practice and what would emerge as functional
-          tonality with major and minor keys, then, were various systems of
-          <q>church keys</q> and <em>tonoi</em>. Most of these described
-          practical ways that keyboardists in particular would match
-          improvised polyphonic music to traditional psalm tones (linked to
-          the modes but not identical with them). Kircher’s list of modes is
-          closer to these church keys.
-          </p>
+            <h3>Kircher’s Concept of Mode or <em>Tonus</em></h3>
+            <p>
+            Many musicians had used a system of twelve church modes at least
+            since the time of the theorists Glareanus and Zarlino a century
+            earlier. In that system mode I meant that a plainchant melody ended
+            on D (the final) with a range from D to the D an octave higher
+            (authentic ambitus). Mode II also specified a D final but a range
+            from A to A (plagal ambitus). Modes III and IV had an E final with
+            authentic and plagal ranges, respectively; and so on, skipping B.
+            That system originally developed as a way of classifying traditional
+            monophonic (one note at a time) chant melodies.
+            </p>
+            <p>
+            When that system was applied to <em>polyphonic</em> music, it
+            usually referred to the final of the lowest voice and the ambitus
+            (range) of the Tenor voice. The rules for counterpoint worked
+            against some of the special characteristics of the modes: for
+            example, when two notes a sixth apart moved into an octave, one was
+            supposed to raise the top note or lower the bottom note of the sixth
+            (that is, make it a major sixth), which effectively meant that
+            <q>leading tones</q> were sharped in almost all modes. Such
+            alterations eroded the distinctions between modes until eventually
+            most of them sounded like either major or minor 
+            (<a href="#Chafe:ModesKeys">Chafe YEAR</a>).
+            </p>
+            <p>
+            In between older modal practice and what would emerge as functional
+            tonality with major and minor keys, then, were various systems of
+            <q>church keys</q> and <em>tonoi</em>
+            (<a href="#Barnett:ChurchKeys">Barnett YEAR</a>). 
+            Most of these described practical ways that keyboardists in
+            particular would match improvised polyphonic music to traditional
+            psalm tones (linked to the modes but not identical with them).
+            Kircher’s list of modes is closer to these church keys.
+            </p>
           </section>
           <section>
             <h3>Automating <em>musica ficta</em> accidentals: A problem of
@@ -513,11 +522,360 @@
               <code>Cogito</code>module to a music-notation language that other
               software can use to put the actual notes on the screen or paper.
               The submodules output to either Lilypond or MEI, the XML format 
-              of the Music Encoding Initiative. The Lilypond module is still
-              available for testing, but I stopped developing it some time ago
-              when I shifted focus to MEI.
+              of the <a href="https://www.music-encoding.org/">Music Encoding
+                Initiative</a>. 
+              The Lilypond module is still available for testing, but I
+              stopped developing it some time ago when I shifted focus to MEI.
             </dd>
           </dl>
+        </section>
+        <section>
+          <h2>A tour through the Haskell code</h2>
+          <p>
+          Let's get a taste for the Haskell code by following the process from
+          building the ark data through reading the input text, setting it to
+          music, and writing the output.
+          </p>
+          <section>
+            <h3>Building data structures for a pinax and the whole ark</h3>
+            <p>
+            This is how we define the data types for the <code>Pinax</code>
+            and the <code>Arca</code> itself, in the <code>Aedifico</code>
+            module.
+            </p>
+            <pre>
+            <code class="language-haskell">
+-- | The ark is a box containing rods (/pinakes/), each of which includes
+-- columns with voice and rhythm permutations. The rods are grouped according
+-- to style into /syntagmata/, where /syntagma/ 1 is simple homorhythmic
+-- counterpoint.
+--
+-- We implement the 'Column' as a structure with one 'VpermTable' and one
+-- 'RpermTable'. 
+data Column     = Column {
+    colVpermTable :: VpermTable, 
+    colRpermTable :: RpermTable
+}
+
+-- | A vector of 'Column' instances is a 'Pinax'.
+type Pinax      = Vector (Column)
+
+-- | A vector of 'Pinax' instances is a 'Syntagma'.
+type Syntagma   = Vector (Pinax)
+
+-- | A vector of 'Syntagma' instances makes up the full 'Arca'.
+data Arca = Arca {
+    perms      :: Vector (Syntagma),
+    modes      :: ModeList,
+    systems    :: ModeSystem,
+    pinaxModes :: PinaxModeList,
+    ranges     :: VoiceRanges
+}
+</code>
+            </pre>
+
+            <p>
+            This is how the first column of syntagma 1, pinax 4 (shown above) is
+            represented in the submodule
+            <code>Arca_musarithmica.Syntagma1.Pinax04</code>.
+            </p>
+            <pre>
+          <code class="language-haskell">
+module Arca_musarithmica.Syntagma1.Pinax04 (s1p4) where
+
+import Aedifico
+    ( Dur    (..)
+    , buildPinax
+    )
+
+-- | Pinax 4
+s1p4 = buildPinax [c0, c1, c2, c3]
+
+c0 = (c0v, c0r)
+
+c0v =     [
+        [ -- 0
+            [5, 5, 3, 2, 3, 3],
+            [8, 7, 5, 7, 7, 7],
+            [3, 2, 3, 4, 5, 5],
+            [8, 5, 8, 7, 3, 3]
+        ],
+        [ -- 1
+            [5, 5, 5, 5, 5, 5],
+            [8, 8, 8, 7, 8, 8],
+            [3, 3, 3, 2, 3, 3],
+            [1, 1, 1, 5, 1, 1]
+        ],
+        [ -- 2
+            [8, 2, 3, 6, 5, 5],
+            [5, 7, 8, 8, 7, 8],
+            [3, 4, 8, 4, 3, 2],
+            [8, 7, 6, 4, 5, 1]
+        ],
+        [ -- 3
+            [3, 2, 3, 2, 1, 7],
+            [8, 7, 7, 7, 5, 5],
+            [5, 5, 5, 4, 3, 2],
+            [1, 5, 3, 4, 8, 5]
+        ],
+        [ -- 4
+            [3, 2, 3, 4, 5, 5],
+            [8, 7, 8, 2, 7, 7],
+            [5, 5, 5, 2, 3, 3],
+            [8, 5, 1, 7, 3, 3]
+        ],
+        [ -- 5
+            [5, 5, 5, 4, 5, 5],
+            [8, 8, 7, 8, 7, 8],
+            [3, 3, 2, 1, 2, 3],
+            [1, 1, 5, 6, 5, 1]
+        ],
+        [ -- 6
+            [5, 5, 5, 5, 5, 5],
+            [8, 8, 8, 7, 8, 8],
+            [3, 3, 3, 2, 3, 3],
+            [8, 8, 8, 5, 8, 8]
+        ],
+        [ -- 7
+            [5, 5, 5, 5, 4, 4],
+            [7, 7, 7, 7, 7, 7],
+            [3, 3, 3, 3, 2, 2],
+            [3, 3, 3, 3, 7, 7]
+        ],
+        [ -- 8
+            [5, 5, 4, 4, 5, 5],
+            [7, 7, 6, 8, 7, 8],
+            [3, 3, 1, 1, 2, 3],
+            [3, 3, 4, 6, 5, 1]
+        ],
+        [ -- 9
+            [3, 4, 5, 4, 2, 3],
+            [8, 7, 7, 6, 5, 5],
+            [5, 4, 3, 8, 7, 8],
+            [1, 2, 3, 4, 5, 1]
+        ]
+    ]
+
+c0r = [
+        [ -- Duple
+            [[SbD, Mn, Mn, Mn, Sb, Sb]],
+            [[MnD, Sm, Mn, Mn, Sb, Sb]],
+            [[Mn, Mn, Mn, Mn, Sb, Sb]],
+            [[Sm, Sm, Sm, Sm, Sb, Sb]],
+            [[SmD, Fs, Sm, Sm, Mn, Mn]],
+            [[MnR, Sb, Mn, Mn, Mn, Sb, Sb]],
+            [[SmR, Mn, Sm, Sm, Sm, Mn, Sb]],
+            [[Sb, Mn, Sb, Mn, Sb, Sb]]
+        ],
+        [ -- TripleMajor
+            [[Br, Sb, Br, Sb, BrD, BrD]], -- assuming penultimate Br is perfect
+            [[SbR, Sb, Sb, Br, Sb, BrD, BrD]],
+            [[Sb, Sb, Sb, Sb, Br, BrD]]
+        ],
+        [ -- TripleMinor
+            [[Sb, Mn, Sb, Mn, SbD, SbD]], -- likewise for Sb
+            [[Mn, Mn, Mn, Mn, Sb, SbD]],
+            [[MnR, Mn, Mn, Sb, Mn, SbD, SbD]]
+        ]
+    ]
+</code>
+            </pre>
+            <p>
+            This is the code where we actually build the ark as an internal data
+            structure, using pinax data like that shown above along with the
+            list of modes, vocal ranges, and other information.
+            The values <code>s1</code> and <code>s2</code> contain the data for
+            syntagma I and II.
+            </p>
+            <pre>
+          <code class="language-haskell">
+arca :: Arca
+arca = Arca {
+    perms      = fromList [s1, s2],
+    modes      = _modeList,
+    systems    = _modeSystems,
+    pinaxModes = _pinaxModes,
+    ranges     = _vocalRanges
+}
+</code>
+            </pre>
+          </section>
+          <section>
+            <h3>Reading a phrase of input text</h3>
+            <p>
+            In the <code>Lectio</code> module, these are the functions that read
+            a string of input text and create a data structure to pass on to the
+            <code>Cogito</code> module for setting to music.
+            </p>
+            <pre>
+<code class="language-haskell">
+-- | Take a 'String' and create a 'Verbum' structure:
+--
+--  - strip the text of diacritics by removing 'hyphenChar' and 'accentChar' characters
+--  - extract syllables by stripping accents and splitting at hyphens
+--  - get syllable count from list created in previous step
+--  - get penultimate syllable length from list of syllables /including/
+--  accents, using 'penultValue'
+newVerbum :: String -> Verbum
+newVerbum s = Verbum {
+    verbumText   = plaintext, 
+    verbumSyl    = plainSyllables,
+    sylCount     = length plainSyllables,
+    penultLength = penultValue accentSyllables
+} where 
+    plaintext = filter (flip notElem [hyphenChar, accentChar]) s -- no accents or hyphens
+    noAccents = filter (/= accentChar) s
+    accentSyllables = wordsBy (== hyphenChar) s          -- list of syllables including accents
+    plainSyllables  = wordsBy (== hyphenChar) noAccents  -- list of syllables without accents
+
+-- | Take a simple list of 'Verbum' items and make a 'LyricPhrase' structure from
+-- it: the original list is stored as 'phraseText', and the 'phraseSylCount'
+-- and 'phrasePenultLength' are calculated from that list.
+-- The 'phraseSylCount' is the sum of all the 'sylCount's of the words in the
+-- list. The 'phrasePenultLength' is the 'penultLength' of the last list item.
+newLyricPhrase :: [Verbum] -> LyricPhrase
+newLyricPhrase ls = LyricPhrase {
+    phraseText = ls,
+    phraseSylCount = sum $ map sylCount ls,
+    phrasePenultLength = penultLength $ last ls,
+    phrasePosition = 0
+}
+</code>
+            </pre>
+          </section>
+          <section>
+            <h3>Setting that phrase to music</h3>
+            <p>
+            In the <code>Cogito</code> module, this is the function we use to
+            compose the music for single phrase of text.
+            </p>
+            <pre>
+<code class="language-haskell">
+-- | Compose the music for a whole 'LyricPhrase' with one permutation from the
+-- ark, and package it into a 'MusicPhrase'. Note that this is for a single
+-- voice only, not the four SATB voices. 
+-- Line up pitches and syllables, skipping rests. In Syntagma I, line up text
+-- and notes syllabically (one syllable per note); in syntagma II (florid),
+-- lump the text into a single syllable and put it as an incipit text at the
+-- beginning of the phrase. (See module description for why Kircher's
+-- specification makes this is necessary.)
+makeMusicPhrase :: Arca 
+                    -&gt; ArkConfig 
+                    -&gt; VoiceName
+                    -&gt; LyricPhrase 
+                    -&gt; Perm 
+                    -&gt; MusicPhrase
+makeMusicPhrase arca config voiceID phrase perm = MusicPhrase {
+        phraseVoiceID = voiceID,
+        notes = theseNotes
+    } where
+
+        -- Match up pitches and syllables, skipping rests
+        theseNotes = map (\(pitch, syllable) -&gt; Note pitch syllable)
+            $ zipFill (music voice) syllables isPitchRest blankSyllable
+
+        voice       = stepwiseVoiceInRange (ranges arca) voiceRaw :: Voice
+        voiceRaw    = ark2voice arca config penult sylCount lineCount voiceID perm
+
+        range       = ranges arca
+        penult      = phrasePenultLength phrase
+        sylCount    = phraseSylCount phrase
+        lineCount   = phrasePosition phrase
+
+        words = phraseText phrase
+
+        -- In Syntagma II, put the whole phrase of lyrics as a single
+        -- syllable under the first note
+        syllables = case arkStyle config of
+            Simple -&gt; concat $ map makeSyllables words
+            Florid -&gt; [Syllable {
+                        sylText = unwords $ map verbumText $ phraseText phrase,
+                        sylPosition = Only
+                       }]
+</code>
+            </pre>
+          </section>
+          <section>
+            <h3>Encoding the music output in MEI format</h3>
+            <p>
+            In the <code>Scribo.MEI</code> module, this is how we convert a single
+            <code>Note</code> structure to an MEI <code>note</code> element.
+            </p>
+            <pre>
+<code class="language-haskell">
+-- ** 'Note' becomes @note@ (pitch with syllable, or rest)
+
+-- | Create an MEI @note@ element from our @Note@ datatype, converting the
+-- attributes as needed. If the @Note@ actually contains a rest ('Pitch' with
+-- only a 'Dur' in the rest range), then produce a @rest@ element.
+note2mei :: Note -&gt; String
+note2mei note | isPitchRest pitch = meiRest
+              | otherwise         = meiNote 
+    where 
+        pitch    = notePitch note
+        syllable = noteSyllable note
+
+        meiRest  = elementAttr "rest" [meiDur pitch] []
+
+        meiNote  = elementAttr "note"
+                    [ fn pitch | fn &lt;- [meiPname, meiOct, meiDur] ]
+                    [ meiAccid pitch
+                    , element "verse" [meiSyllable syllable]
+                    ]
+</code>
+            </pre>
+            <p>
+            This, then, is how we render the whole <code>Phrase</code> (one line of
+            input text, set to music by the ark) into MEI.
+            </p>
+            <pre>
+<code class="language-haskell">
+ -- | Make an XML string containing a list of @note@ elements out of a
+-- 'MusicPhrase'; end each phrase with @barline@, except for last in the list.
+--
+-- Leave the barline of the last phrase up to the next-higher function (end of
+-- sentence gets regular bar; end of sentence, double bar; end of
+-- section, final bar).
+phrase2mei :: (ListPosition, MusicPhrase) -&gt; String
+phrase2mei (position, phrase) | position `elem` [ListEnd, ListOnly] 
+                                    = meiNotes
+                              | otherwise
+                                    = meiNotes ++ meiBarline ""
+    where meiNotes = concat $ map note2mei $ notes phrase
+</code>
+            </pre>
+          </section>
+          <section>
+            <h3>Running the ark</h3>
+            <p>
+            Here is the key part of the application’s main function
+            <code>Main.hs</code> (not included in the 
+            <a href="doc/index.html">library documentation</a>).
+            After importing all the modules and the <code>arca</code>
+            structure, the main function processes the command-line arguments
+            to get the input and output sources, then it parses and prepares
+            the input text (<code>readInput</code> and
+            <code>prepareInput</code>), and generates a list of random numbers
+            to select permutations for each phrase (<code>inputPerms</code>).
+            The key functions are <code>makeMusicScore</code> to generate the
+            music and then <code>score2mei</code> to produce the MEI output.
+            </p>
+            <pre>
+            <code class="language-haskell">
+let 
+    input       = readInput rawInput
+    sections    = prepareInput input 
+    lengths     = inputPhraseLengths sections
+    metadata    = arkMetadata input
+
+perms &lt;- inputPerms lengths
+
+let 
+    score = makeMusicScore arca sections perms 
+    mei   = score2mei arca metadata score
+              </code>
+            </pre>
+          </section>
         </section>
         <section>
           <h2>Input format</h2>
@@ -529,27 +887,29 @@
           includes the words to be set to music.
           </p>
           <p>Here is an input text for <cite>Ave Regina angelorum</cite>:</p>
-<xmp>
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE arkText SYSTEM "arkText.dtd">
-<arkText>
-  <head>
-    <title>Ave Regina Angelorum</title>
-    <wordsAuthor>Kircher?</wordsAuthor>
-  </head>
-  <text>
-    <section textMeter="IambicumEnneasyllabicum"
-      musicMeter="Duple" style="Simple" mode="Mode8">
-    <lg>
-      <l>`A-ve Re-`gi-na An-ge-`lo-rum,</l>
-      <l>`A-ve me-`de-la po-pu-`lo-rum,</l>
-      <l>`Sal-ve fons `vi-ta, `sal-ve `por-ta,</l>
-      <l>Ex qua lux `mun-di `no-bis `or-ta.</l>
-    </lg>
-  </section>
-</text>
-</arkText>
-</xmp>
+          <pre>
+<code class="language-xml">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!DOCTYPE arkText SYSTEM "arkText.dtd"&gt;
+&lt;arkText&gt;
+  &lt;head&gt;
+    &lt;title&gt;Ave Regina Angelorum&lt;/title&gt;
+    &lt;wordsAuthor&gt;Kircher?&lt;/wordsAuthor&gt;
+  &lt;/head&gt;
+  &lt;text&gt;
+    &lt;section textMeter="IambicumEnneasyllabicum"
+      musicMeter="Duple" style="Simple" mode="Mode8"&gt;
+    &lt;lg&gt;
+      &lt;l&gt;`A-ve Re-`gi-na An-ge-`lo-rum,&lt;/l&gt;
+      &lt;l&gt;`A-ve me-`de-la po-pu-`lo-rum,&lt;/l&gt;
+      &lt;l&gt;`Sal-ve fons `vi-ta, `sal-ve `por-ta,&lt;/l&gt;
+      &lt;l&gt;Ex qua lux `mun-di `no-bis `or-ta.&lt;/l&gt;
+    &lt;/lg&gt;
+  &lt;/section&gt;
+&lt;/text&gt;
+&lt;/arkText&gt;
+</code>
+          </pre>
           <p>
           The text should be divided into one or more sections, and
           subsequently into one or more line groups (<code>lg</code> elements
@@ -566,40 +926,40 @@
               <dl>
                 <dt>Prose</dt>
                 <dd>No meter, free, or irregular</dd>
-                
+
                 <dt>Adonium</dt>
                 <dd>5  syllables (<code>`--`-</code>)</dd>
-               
+
                 <dt>Dactylicum</dt>
                 <dd>6  syllables (<code>`--`--</code>)</dd>
-               
+
                 <dt>IambicumEuripidaeum</dt>
                 <dd>6  syllables (<code>`-`-`-</code>)</dd>
-               
+
                 <dt>Anacreonticum</dt>
                 <dd>7  syllables, penultimate long</dd>
-               
+
                 <dt>IambicumArchilochicum</dt>
                 <dd>8  syllables, penultimate short</dd>
-               
+
                 <dt>IambicumEnneasyllabicum</dt>
                 <dd>9  syllables, penultimate long</dd>
-               
+
                 <dt>Enneasyllabicum</dt>
                 <dd>9  syllables (generic)</dd>
-               
+
                 <dt>Decasyllabicum</dt>
                 <dd>10 syllables, penultimate short</dd>
-               
+
                 <dt>PhaleuciumHendecasyllabicum</dt>
                 <dd>11 syllables</dd>
-               
+
                 <dt>Hendecasyllabicum</dt>
                 <dd>11 syllables (generic)</dd>
-               
+
                 <dt>Sapphicum</dt>
                 <dd>11 syllables, three lines + 5-syllable tag</dd>
-               
+
                 <dt>Dodecasyllabicum</dt>
                 <dd>12 syllables, penultimate short</dd>
               </dl>
@@ -609,26 +969,112 @@
           </dl>
         </section>
         <section>
+          <section>
+            <h2>Web app</h2>
+            <p>
+            In the web app, we use Javascript to generate appropriate lists of
+            options to select permissible combinations of texts and parameters
+            (not every text can be set in every mode, for instance).
+            </p>
+            <p>
+            These selections are passed to a PHP file that selects the
+            appropriate pre-written input text. In <q>DIY</q> mode, where you
+            select all the parameters yourself, we also use PHP to insert those
+            values into the input file. Then we pass the input file to the ark
+            and save the MEI-XML output in a variable. 
+            </p>
+            <p>
+            Via Javascript we pass this data to the third-party 
+            <a href="https://www.verovio.org/">Verovio</a> app to render the
+            musical data to notation, and to the Verovio toolkit to render it
+            to MIDI. The Verovio MIDI player allows to make the music audible.
+            </p>
+          </section>
+        </section>
+      </section>
+      <section id="reflections">
+        <h1>What does this project tell us about computing and
+          composition?</h1>
+        <ol>
+          <li>Computing concepts at work in the ark
+            <ol>
+              <li>Turning things into numbers in order to manipulate them at a
+              more abstract level</li>
+              <li>Tables = data structures = algorithms = functions</li>
+              <li>Music encoding</li>
+            </ol>
+          </li>
+          <li>Concepts of composition in the ark
+            <ol>
+              <li>Composers as craftsmen not artists</li>
+              <li>Composers as assemblers of pre-existing conventional
+                structures (cf. schemata theory)</li>
+              <li>Music as combinatorics</li>
+              <li>Relevance to missionary field and colonialism: supposed
+                universality of European polyphony; determinism of music vs.
+                non-determinism of language</li>
+            </ol>
+          </li>
+          <li>Reception and use of Kircher's work</li>
+          <li>Comparison to today's machine-composition projects</li>
+          <li>Kircher, Knuth, and the cranks</li>
+        </ol>
+        <!-- TODO -->
+      </section>
+      <section id="biblio">
+        <h1>Bibliography and related projects</h1>
+
+        <p>
+        Jim Bumgardner (<a href="#Bumgardner:Kircher">YEAR</a>) 
+        implemented a different music-computing device by Kircher, the
+        <em>Organum mathematicum</em>.
+        That device was much simpler musically but had the virtue of also
+        being able to calculate the date of Easter and lots of other useful
+        functions.
+        That implementation in Perl allowed a user to set a very small set of
+        short texts in simple or florid style.
+        It could generate MIDI output, even using vocal synthesis to render
+        the actual syllable sounds.
+        There were some misunderstandings in the treatment of mode and rhythm.
+        <!-- citations and links -->
+        </p>
+        <p>
+        Agnes Cäcilie Bohnert’s dissertation 
+        (<a href="#Bohnert:Kircher">YEAR</a>) covers Book VIII of the
+        <cite>Musurgia</cite> in detail, focusing especially on the
+        mathematical treatment of combinatorics at the beginning.  It
+        identifies numerous errors in Kircher's calculations.  Bohnert
+        implemented a portion of the ark in Java, but could only
+        set short texts in simple style.
+        <!-- etc -->
+        </p>
+        <p>
+        Carlo Maria Chierotti’s dissertation and articles 
+        (<a href="#Chierotti:KircherDiss">YEAR</a>, 
+        <a href="#Chierotti:KircherBk8">YEAR</a>, and 
+        <a href="#Chierotti:KircherComponere">YEAR</a>) 
+        on the same subject provide a good overview of Kircher and his work,
+        and focus on the musical aspects of the ark, without modeling it in
+        software.
+        <!-- etc -->
+        </p>
+        
         <section>
-          <h2>Web app</h3>
-          <p>
-          In the web app, we use Javascript to generate appropriate lists of
-          options to select permissible combinations of texts and parameters
-          (not every text can be set in every mode, for instance).
-          </p>
-          <p>
-          These selections are passed to a PHP file that selects the
-          appropriate pre-written input text. In <q>DIY</q> mode, where you
-          select all the parameters yourself, we also use PHP to insert those
-          values into the input file. Then we pass the input file to the ark
-          and save the MEI-XML output in a variable. 
-          </p>
-          <p>
-          Via Javascript we pass this data to the third-party Verovio app to
-          render the musical data to notation, and to the Verovio toolkit to
-          render it to MIDI. The Verovio MIDI player allows to make the music
-          audible.
-          </p>
+          <h2>References</h2>
+
+          <ul class="bibliography">
+            <li id="Barnett:ChurchKeys">Barnett, Gregory. </li>
+            <li id="Bohnert:Kircher">Bohnert, Agnes Cäcilie. </li>
+            <li id="Bumgardner:Kircher">Bumgardner, Jim. </li>
+            <li id="Chafe:ModesKeys">Chafe, Eric. </li>
+            <li id="Chierotti:KircherDiss">Chierotti, Carlo Maria. </li>
+            <li id="Chierotti:KircherBk8">Chierotti, Carlo Mari. </li>
+            <li id="Chierotti:KircherComponere">Chierotti, Carlo Maria. </li>
+            <li id="Findlen:Kircher">Findlen, Paula, ed.</li>
+            <li id="Godwin:KircherArt">Godwin, Jocelyn. </li>
+            <li id="MEI">Music Encoding Initiative</li>
+            <li id="TEI">Text Encoding Initiative</li>
+          </ul>
         </section>
       </section>
     </main>

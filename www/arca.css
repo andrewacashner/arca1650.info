@@ -73,6 +73,12 @@ dl dt {
 dl dd {
   padding-top: 0.3em;
 }
+ul.bibliography {
+  list-style: none;
+}
+ul.bibliography li {
+  padding-bottom: 0.5em;
+}
 
 /* Font */
 body {
