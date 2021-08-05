@@ -106,17 +106,17 @@ $mei = addslashes($rawMei);
 <!DOCTYPE HTML>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" type="text/css" href="arca.css" />
-    <link rel="icon" type="image/png" href="img/panpipe.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="arca.css">
+    <link rel="icon" type="image/png" href="img/panpipe.png">
 
     <title>Arca musarithmica</title>
     <meta name="description" 
           content="Display music generated automatically by Athanasius
                    Kircher’s device for automatic music composition from his
                    Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
-                   implementation by Andrew Cashner (Rochester, New York, 2021)" />
+                   implementation by Andrew Cashner (Rochester, New York, 2021)">
 
     <!-- Bring in MEI data from PHP and check input parameters -->
     <script>
@@ -132,19 +132,13 @@ $mei = addslashes($rawMei);
     </script>
 
     <!-- Verovio toolkit for MIDI rendering -->
-    <script type="text/javascript" 
-            src="http://www.verovio.org/javascript/develop/verovio-toolkit.js">
-    </script>
+    <script src="http://www.verovio.org/javascript/develop/verovio-toolkit.js"></script>
 
     <!-- MIDI player and needed resources -->
-    <script type="text/javascript" 
-            src="https://www.verovio.org/javascript/jquery.min.js">
-    </script>
+    <script src="https://www.verovio.org/javascript/jquery.min.js"></script>
 
-    <script type="text/javascript" src="midi/019_church_organ.js"></script>
-    <script type="text/javascript" 
-            src="https://www.verovio.org/javascript/midi-player/midiplayer.js">
-    </script>
+    <script src="midi/019_church_organ.js"></script>
+    <script src="https://www.verovio.org/javascript/midi-player/midiplayer.js"></script>
 
     <!-- Render music in Verovio Javascript app -->
     <script type="module">
@@ -159,7 +153,7 @@ $mei = addslashes($rawMei);
     </script>
 
     <!-- Render and play MIDI -->
-    <script type="text/javascript"/>
+    <script>
         // Load
         console.time("Loading Verovio Toolkit");
         var tk = new verovio.toolkit();
@@ -225,7 +219,7 @@ $mei = addslashes($rawMei);
                 </div>
                 <div id="player"></div>
 
-                <script type="text/javascript">
+                <script>
                     $( document ).ready(function() {
                         $("#player").midiPlayer({
                         color: "red",

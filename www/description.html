@@ -1,20 +1,30 @@
 <!DOCTYPE HTML>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" type="text/css" href="arca.css" />
-    <link rel="icon" type="image/png" href="img/panpipe.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="arca.css">
+    <link rel="icon" type="image/png" href="img/panpipe.png">
 
     <title>Arca musarithmica</title>
     <meta name="description" 
           content="Description of how to compose using Athanasius
                       Kircher’s 1650 device for automatic music composition
-                      implemented in Haskell by Andrew Cashner (2021)" />
+                      implemented in Haskell by Andrew Cashner (2021)">
 
-    <link rel="stylesheet" href="highlight/styles/default.min.css" />
-    <script type="text/javascript" src="highlight/highlight.min.js"></script>
+    <!-- syntax highlighting -->
+    <link rel="stylesheet" href="highlight/styles/default.min.css">
+    <script src="highlight/highlight.min.js"></script>
     <script>hljs.highlightAll();</script>
+
+    <!-- math formatting -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async
+            src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- charts -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="img/iochart.js"></script>
   </head>
   <body>
     <header>
@@ -44,12 +54,12 @@
       <section id="structure">
         <h2>How the ark is structured</h2>
 
-        <p><em>Arca</em> just means <q>box</q>, and as shown in Kircher’s
+        <p><i>Arca</i> just means <q>box</q>, and as shown in Kircher’s
         overall <a href="index.html#ark-image">illustration</a>, the ark
         contains different kinds of data structures on the outside, on the
         lid, and stored within. After preparing the input text 
         (<a href="#use">see below</a>), the operator uses the
-        <em>pinakes</em> (rods) within to extract pre-arranged permutations of
+        <i>pinakes</i> (rods) within to extract pre-arranged permutations of
         numbers and rhythmic values. Then they use the table of modes on the
         lid to match the numbers to pitch classes (that is, note names without
         specifying an octave) and accidentals. Finally, the table on the front
@@ -62,11 +72,11 @@
         </p>
 
         <section>
-          <h3><em>Syntagmata</em> and <em>pinakes</em> (inside the box)</h3>
+          <h3><i>Syntagmata</i> and <i>pinakes</i> (inside the box)</h3>
           <p>
-          The box contains a bevy of <em>pinakes</em> (rods, singular
-          <em>pinax</em>), organized into groups called <em>syntagmata</em>
-          (singular <em>syntagma</em>).  The design of the rods would seem to
+          The box contains a bevy of <i>pinakes</i> (rods, singular
+          <i>pinax</i>), organized into groups called <i>syntagmata</i>
+          (singular <i>syntagma</i>).  The design of the rods would seem to
           be inspired by Napier’s bones and other similar calculating devices
           of the time.  Each pinax lists sets of numeric permutations that
           represent four-voice note combinations, and sets of rhythmic
@@ -101,8 +111,8 @@
             <h4>Syntagma I: Simple counterpoint</h4>
             <p>
             In syntagma I, there are separate tables of pitch/voice
-            permutations (what I call <em>vperms</em>) and rhythm permutations
-            (<em>rperms</em>). The user is supposed to choose freely from
+            permutations (what I call <i>vperms</i>) and rhythm permutations
+            (<i>rperms</i>). The user is supposed to choose freely from
             each set and then combine them.
             </p>
             <p>
@@ -110,49 +120,50 @@
             in simple style: syntagma I, pinax IV, with details showing the
             separate vperms and rperms.
             </p>
-            <img id="s1p4"
-                 src="img/Kircher-s1p4.png"
-                 alt="Image: The original data tables on the rod in syntagma
-                         I, pinax IV, containing at the top, columns of numbers
-                         in matrixes for four voices (vperms); and at the bottom,
-                         columns of musical notes indicating rhythmic values
-                         (rperms)"
-                 title="Arca musarithmica, syntagma I, pinax IV, in Musurgia
-                           universalis (1650), book 2, fol. 83"
-                 max-width="400">
-            </img>
+            <figure id="s1p4"> 
+              <img src="img/Kircher-s1p4.png"
+                   alt="Image: The original data tables on the rod in syntagma
+                          I, pinax IV, containing at the top, columns of numbers
+                          in matrixes for four voices (vperms); and at the bottom,
+                          columns of musical notes indicating rhythmic values
+                          (rperms)"
+                   max-width="400">
+              <figcaption>Arca musarithmica, syntagma I, pinax IV, in
+                <cite>Musurgia universalis</cite> (1650), book 2, fol.
+                83</figcaption>
+            </figure>
             <p>
             In many pinakes, the user is supposed to choose from a different
             column based on the order of poetic lines (which Kircher
-            confusingly calls <em>strophae</em>, though he means lines not
+            confusingly calls <i>strophae</i>, though he means lines not
             stanzas). 
             </p>
-            <img id="s1p4-vperm-detail"
-                 src="img/Kircher-s1p4-vperm-detail.png"
-                 alt="Image: Detail of syntagma I, pinax IV, showing the
-                         number tables for voice permutations"
-                 title="Detail of syntagma I, pinax IV: numbers for voice
-                           permutations"
-                 width="400px">
-            </img>
+            <figure id="s1p4-vperm-detail">
+              <img src="img/Kircher-s1p4-vperm-detail.png"
+                   alt="Image: Detail of syntagma I, pinax IV, showing the
+                          number tables for voice permutations"
+                   width="400px">
+              <figcaption>Detail of syntagma I, pinax IV: numbers for voice
+                permutations</figcaption>
+            </figure>
             <p>
             The rperms in this syntagma are divided into three sections by
             meter: for duple meter, <q>triple major</q>, and <q>triple
               minor</q>. These correspond to cut C, cut C3 (or cut C 3/2), and
             C3 (or C 3/2) mensurations.
             </p>
-            <img id="s1p4-rperm-detail"
-                 src="img/Kircher-s1p4-rperm-detail.png"
-                 alt="Image: Detail of syntagma I, pinax IV, showing the note
-                         tables for rhythm permutations"
-                 title="Detail of syntagma I, pinax IV: note values for rhythm
-                           permutations"
-                 width="400px">
-            </img>
+            <figure id="s1p4-rperm-detail">
+              <img src="img/Kircher-s1p4-rperm-detail.png"
+                   alt="Image: Detail of syntagma I, pinax IV, showing the note
+                          tables for rhythm permutations"
+                   width="400px">
+              <figcaption>Detail of syntagma I, pinax IV: note values for rhythm
+                permutations</figcaption>
+            </figure>
             <p>
             Kircher does not distinguish systematically between duple-meter
             permutations with a primary semibreve (whole note) subdivision
-            (which would be notated with cut C, <em>alla breve</em> time) and
+            (which would be notated with cut C, <i>alla breve</i> time) and
             those with a primary minim (half note) pulse. Perhaps this was
             meant to increase the variety in duple meter, but it can create
             absurd results when the pulse suddenly shifts. This would not be a
@@ -169,31 +180,32 @@
           <section>
             <h4>Syntagma II: Florid counterpoint</h4>
             <p>
-            In syntagma II, each <em>vperm</em> is matched with a single
-            <em>rperm</em> to allow for more complex contrapuntal textures.
+            In syntagma II, each <i>vperm</i> is matched with a single
+            <i>rperm</i> to allow for more complex contrapuntal textures.
             </p>
-            <img id="s2p2a"
-                 src="img/Kircher-s2p2a.png"
-                 alt="Image: The original data tables for the rod in syntagma
-                         II, pinax II, containing columns of matched sets of
-                         voice and rhythm permutations"
-                 title="Arca musarithmica, syntagma II, pinax II, in Musurgia
-                           universalis (1650), book 2, fol. 106"
-                 max-width="400px">
-            </img>
+            <figure id="s2p2a">
+              <img src="img/Kircher-s2p2a.png"
+                   alt="Image: The original data tables for the rod in syntagma
+                          II, pinax II, containing columns of matched sets of
+                          voice and rhythm permutations"
+                   max-width="400px">
+              <figcaption>Arca musarithmica, syntagma II, pinax II, in
+                <cite>Musurgia universalis</cite> (1650), book 2, fol. 106
+              </figcaption>
+            </figure>
             <p>
             This is the rod used to set the same hymn in florid style:
             syntagama II, pinax II. The detail shows the pairs of voice and
             rhythm permutations.
             </p>
-            <img id="s2p2b-detail"
-                 src="img/Kircher-s2p2b-detail.png"
-                 alt="Image: Detail of syntagma II, pinax II, showing pairs of
-                         voice and rhythm permutations"
-                 title="Detail of syntagma II, pinax II: pairs of voice and
-                           rhythm permutations"
-                 width="500px">
-            </img>
+            <figure id="s2p2b-detail">
+              <img src="img/Kircher-s2p2b-detail.png"
+                   alt="Image: Detail of syntagma II, pinax II, showing pairs of
+                          voice and rhythm permutations"
+                   width="500px">
+              <figcaption>Detail of syntagma II, pinax II: pairs of voice and
+                rhythm permutations</figcaption>
+            </figure>
           </section>
           <section>
             <h4>Automating permutation selection: A problem of theologically
@@ -217,13 +229,13 @@
           <p>
           In the center, adorned by images of ancient and exotic musical
           instruments, the table on the front face shows the settings for the
-          <em>palimpsest phonotacticum</em> or music paper.  This chart gives
+          <i>palimpsest phonotacticum</i> or music paper.  This chart gives
           the permissible combinations of clefs that specifies the permissible
           ranges for each voice.
           </p>
           <p>
-          It also shows the pitch-class values in both <em>cantus durus</em>
-          (all-natural accidental signature) and <em>cantus mollis</em>
+          It also shows the pitch-class values in both <i>cantus durus</i>
+          (all-natural accidental signature) and <i>cantus mollis</i>
           (one-flat accidental signature). These were the only two signatures
           used in conservative music of the mid-seventeenth century.
           </p>
@@ -234,10 +246,10 @@
           Under the lid is the <q>table for writing modes</q>, which allows
           the user to look up the pitch names that correspond to the pitch
           numbers in a given mode.  Kircher lists twelve modes, which he
-          usually calls <em>toni</em>.  Each mode includes a name, a
+          usually calls <i>toni</i>.  Each mode includes a name, a
           description of the emotional mood or character associated with that
-          mode, whether the mode is in <em>cantus durus</em> or
-          <em>mollis</em>, and a list of pitches, some with accidentals.
+          mode, whether the mode is in <i>cantus durus</i> or
+          <i>mollis</i>, and a list of pitches, some with accidentals.
           Kircher’s system of modes does not line up with the older systems
           that most of us learned even in advanced studies of medieval music,
           because it reflects the rapidly changing, chaotic state of modal
@@ -245,7 +257,7 @@
           </p>
 
           <section>
-            <h4>Kircher’s Concept of Mode or <em>Tonus</em></h4>
+            <h4>Kircher’s Concept of Mode or <i>Tonus</i></h4>
             <p>
             Many musicians had used a system of twelve church modes at least
             since the time of the theorists Glareanus and Zarlino a century
@@ -273,7 +285,7 @@
             <p>
             In between older modal practice and what would emerge as functional
             tonality with major and minor keys, then, were various systems of
-            <q>church keys</q> and <em>tonoi</em>
+            <q>church keys</q> and <i>tonoi</i>
             (<a href="#Barnett:TonalOrganization17C">Barnett 2002</a>). 
             Most of these described practical ways that keyboardists in
             particular would match improvised polyphonic music to traditional
@@ -282,18 +294,18 @@
             </p>
           </section>
           <section>
-            <h4>Automating <em>musica ficta</em> accidentals: A problem of
+            <h4>Automating <i>musica ficta</i> accidentals: A problem of
               performance practice</h4>
             <p> 
             In practice, the problem of accidentals is a major detriment to
             making the ark fully automatic. Kircher does not list B flats in
-            the scales for modes that are in <em>cantus mollis</em>, because
-            these are specified by the signatures in the <em>palimpsest</em>
+            the scales for modes that are in <i>cantus mollis</i>, because
+            these are specified by the signatures in the <i>palimpsest</i>
             table below; the flats and sharps he does list are not meant to be
             applied all the time but only in certain situations according to
-            the performance-practice traditions of <em>musica ficta</em>. Thus
+            the performance-practice traditions of <i>musica ficta</i>. Thus
             a performer, seeing the gesture D–E–D in certain contexts would
-            use the rule <em>una nota super la semper est canendum fa</em> to
+            use the rule <i>una nota super la semper est canendum fa</i> to
             apply a flat to the E. Kircher does not provide enough information
             in his specification to automate this aspect completely.
             </p>
@@ -307,8 +319,8 @@
             pdfLaTeX converts a source file into PostScript instructions that
             a printer knows how to interpret in order to render the document
             on paper.) This is why I have chosen to render the accidentals
-            from this mode table above the staff as suggested <em>musica
-              ficta</em>, and this is why the automated MIDI performances on
+            from this mode table above the staff as suggested <i>musica
+              ficta</i>, and this is why the automated MIDI performances on
             this website sometimes sound awful, because the MIDI player does
             not know anything about seventeenth-century performance practice,
             and teaching it that would be an entirely separate programming
@@ -348,7 +360,7 @@
               </li>
               <li>The <strong>mood</strong> or character of the text and its
                 setting, which determines the choice of one of twelve musical
-                modes (<em>tonoi</em>).  
+                modes (<i>tonoi</i>).  
                 <p>
                 Kircher’s <em>modes</em> are more like <q>church keys</q> and
                 don’t line up exactly with the older modes most musicians
@@ -379,7 +391,7 @@
           <li>If you are operating the ark by hand, you use these input
             parameters to select the proper tables. 
             <ul> 
-              <li><strong>Syntagma:</strong> There are three <em>syntagmata</em>
+              <li><strong>Syntagma:</strong> There are three <i>syntagmata</i>
                 or large divisions in the ark. For simple style, you select from
                 Syntagma I; for florid, use Syntagma II.
                 <p>
@@ -390,8 +402,8 @@
                 </p>
               </li>
               <li><strong>Pinax:</strong> Each syntagma containes a set of
-                <q>rods</q> or <em>pinakes</em> (singular, <em>pinax</em>). You
-                select the <em>pinax</em> based on the meter of the text.
+                <q>rods</q> or <i>pinakes</i> (singular, <i>pinax</i>). You
+                select the <i>pinax</i> based on the meter of the text.
               </li>
               <li><strong>Column:</strong> Each pinax contain
                 several columns of data. The column is either a free choice, or
@@ -421,12 +433,12 @@
             </ul>
               </li>
               <li><strong>Writing the  music down:</strong> Next you lay out what
-                Kircher calls the <em>palimpsest phontacticum</em>, or what the rest
+                Kircher calls the <i>palimpsest phontacticum</i>, or what the rest
                 of us call <q>music paper</q>.
                 You draw out four staves and put an appropriate combination of clefs
                 for the four voices. These determine the octave and range of the
                 musical output for each voice. You also add a flat in the key
-                signature if your mode is in <em>cantus mollis</em> according to the
+                signature if your mode is in <i>cantus mollis</i> according to the
                 table, and add the appropriate mensuration sign.
               </li>
               <li><strong>Matching pitches, rhythms, and syllables:</strong> For
@@ -445,7 +457,7 @@
                     below the staff), you may shift them up or down by octave as
                     needed.</li>
                   <li>The mode tables specify that you may add sharps or flats on
-                    certain notes according to <em>musica ficta</em> rules.</li>
+                    certain notes according to <i>musica ficta</i> rules.</li>
                   <li>You may also do more complicated things like swapping the
                     notes for adjacent voices, which require your own judgment.</li>
                 </ol>
@@ -999,13 +1011,202 @@ let
         <h2>What does this project tell us about computing and composition?</h2>
         <section>
           <h3>Concepts of computing in the ark</h3>
-          <!-- 
-            <li>Turning things into numbers in order to manipulate them at a
-            more abstract level</li>
-            <li>Tables = data structures = algorithms = functions</li>
-            <li>Music encoding</li>
-          -->
-          <section>
+          <section id="functions">
+            <h4>Tables, data structures, algorithms, and functions</h4>
+            <p>
+            Chierotti (<a href="#Chierotti:Comporre">1994</a>) says that
+            despite Kircher’s use terms like <i>mechanicus</i> and
+            <i>artificiosus</i> to describe the <i>arca</i>, the ark is
+            really just a container of rods with tables written on them.
+            Bumgardner (<a href="#Bumgardner:Kircher">2002</a>) says a related
+            device is basically just a <q>recipe box</q>.
+            It certainly is important to clarify for technology enthusiasts
+            that Kircher’s device, as specified and built in the seventeenth
+            century, is really a <em>system</em> for composition that requires
+            a human operator, not an automatic machine.
+            </p>
+            <p>
+            But a computation system does not depend for its definition on the
+            existence of a automatic mechanism.
+            In fact, the modern definitions of computers are independent from
+            physical implementation, such as Turing machines and Church's lambda
+            calculus. Instead, the key concept is that a computer provides a
+            way to convert inputs into outputs, solely through applying
+            a series of prescribed, fixed rules for manipulating and
+            transforming the data.
+            </p>
+            <!-- TODO more, sources -->
+            <p>
+            Even something as simple as a table really represents a mapping of
+            inputs to outputs, as in a multiplication table:
+            <table>
+              <tr><td>0</td><td>1</td><td>2</td></tr>
+              <tr><td>1</td><td>1</td><td>2</td></tr>
+              <tr><td>2</td><td>2</td><td>4</td></tr>
+            </table>
+            To multiply two numbers, you find the row of the first number and
+            the column of the second; the intersection gives the result.
+            </p>
+            <p>
+            This means that this table may also be understood as a
+            mathematical function.
+            The basic multiplication is expressed with the function 
+            \(f(a, b) = a * b\), which takes two input values and returns
+            their product.
+            If we feed this function the list of integers 0 through 2 for both
+            parameters, then the result is a matrix equivalent to the table above.
+            \[f(\{0, 1, 2\}, \{0, 1, 2\}) = \{ \{0, 1, 2\}, \{1, 1, 2\}, \{2,
+            2, 4\} \}\]
+            <!-- ?? -->
+            </p>
+            <p>
+            The table may also be understood as an embodiment of an algorithm:
+            it is produced by following a concrete series of steps, and the
+            data within it is accessed by following another set of steps.
+            </p>
+            <p>
+            Kircher’s <i>pinakes</i>, then, could be described in similar
+            terms. Just the tables by themselves are a way of structuring data
+            so as to map inputs to outputs, at several levels.
+            The input parameters of text meter, style, mode, and syllable
+            count determine which syntagma, pinax, and column the user must
+            choose. Then the user freely chooses a row from the list of vperms
+            and rperms, or chooses randomly. The vperms and rperms then
+            provide the user with values to input elsewhere. The pitch numbers
+            become inputs to the mode table, which returns pitch class names
+            and accidentals that can then be input to the table of note
+            positions on the staff.
+            </p>
+            <p>
+            We may chart the flow of inputs to outputs as follows. The chart
+            focuses on the output of a single note and ignoring the larger
+            structural divisions.
+            </p>
+
+            <figure id="ioflows">
+              <noscript>(You must have Javascript enabled to display this
+                chart.)</noscript>
+              <div id="sankey_basic"></div>
+              <figcaption>The entire ark system: Flows from inputs through
+                functions to outputs</figcaption>
+            </figure>
+
+            <p>
+            The chart does not account for the octave adjustments we make once
+            we have put together the whole series of notes, to avoid too-large
+            intervals.
+            For that we must compare one pitch to the next one.
+            In the current, rather straightforward, implementation of that
+            function, the octave of a pitch depends on the pitch class and
+            octave of the pitch preceding it.
+            </p>
+            <p>
+            The chart matches closely the way the code is actually written in
+            Haskell, where every function is written as a series of data types
+            moving from input to output. This, for another example, is the
+            primary function that takes as input the ark data, the processed
+            input text, and the random permutation numbers, and outputs a data
+            structure for the entire music score.
+            </p>
+            <pre>
+            <code class="language-haskell">
+-- | Compose the music for the whole document as a 'MusicScore', pulling the
+-- data from the 'Arca'.
+makeMusicScore :: Arca -&gt; [LyricSection] -&gt; [SectionPerm] -&gt; MusicScore
+makeMusicScore arca lyricSections sectionPerms = 
+    zipWith (makeMusicChorus arca) lyricSections sectionPerms 
+</code>
+            </pre>
+            <p>
+            Many of the flows in the chart can be seen clearly in this
+            function, which takes the pair of pitch and rhythm values from the
+            ark tables and returns a <code>Pitch</code> data structure that
+            includes pitch name, accidental, octave, and duration.
+            </p>
+<pre>
+<code class="language-haskell">
+-- | Make a pitch from duration and pitch number, getting octave based on voice
+-- name using 'voice2octave'. If the duration input is a rest type (e.g.,
+-- 'BrR'), then make a 'newRest'; otherwise a 'stdPitch'.
+--
+-- Adjust the pitch for mode (and thereby standardize it) ('pnumAccidInMode').
+-- Adjust the octave to put the pitch in the right range for the voice
+-- ('adjustPitchInRange').
+pair2Pitch :: VoiceName 
+            -&gt; VoiceRanges
+            -&gt; Mode
+            -&gt; ModeList
+            -&gt; ModeSystem
+            -&gt; (Dur, Int) -- ^ duration and pitch number 0-7
+            -&gt; Pitch
+pair2Pitch voice ranges mode modeList systems pair =
+    if isRest thisDur 
+        then newRest thisDur
+        else adjustPitchInRange pitch voice ranges
+        where
+            pitch = stdPitch RawPitch {
+                rawPnum      = fromEnum thisPnumInMode,
+                rawAccid     = thisAccid,
+                rawAccidType = thisAccidType,
+                rawOct       = oct $ pitchOffsetFromFinal,
+                rawDur       = thisDur
+            } 
+            
+            thisPnum  = (snd pair) - 1 -- adjust to 0 index
+            thisDur   = fst pair
+
+            thisPnumInMode = fst modePitch
+            thisAccid      = snd modePitch
+            modePitch      = pnumAccidInMode thisPnum mode modeList
+
+            thisAccidType 
+                | thisAccid == Na
+                    = Implicit
+                | thisAccid `elem` [FlFl, Sh, ShSh]
+                    = Suggested
+                | thisAccid == Fl
+                    = if isBflatInSignature thisPnumInMode thisAccid mode systems 
+                        then Implicit 
+                        else Suggested
+                | otherwise 
+                    = None
+                
+            pitchOffsetFromFinal = final `incPitch` thisPnum
+            final                = modalFinalInRange mode modeList voice ranges
+</code>
+</pre>
+            <p>
+            In conclusion, then, Kircher's entire ark may be represented as a
+            single mathematical function mapping an input text and parameters
+            (style, mode, etc.) to outputs.  The tables of the ark and the
+            rules governing how to use them constitute the transformation
+            functions used within that larger function.
+            </p>
+            <p>
+            This hypothesis is proven correct by the present implementation of
+            the system in the purely function programming language Haskell.
+            The program itself, like every program in Haskell, constitutes a
+            set of self-contained mathematical functions. No information is
+            passed through the program except by means of such a function.
+            This makes it possible to trace very clearly how the input is
+            transformed successively by stages into the output (because again,
+            functions and algorithms are equivalent).
+            This Haskell implementation, then, is more than just a way to
+            model or represent Kircher’s system; by rendering his system
+            completely in the symbolic language of functions, it stands as 
+            mathematical proof that the ark is in fact a coherent system of
+            computation.
+            Thus a <q>recipe box</q> full of tables, if taken along with
+            Kircher’s written specifications, turns out to constitute a
+            single, complete algorithm for computing music.
+            Certainly, we must exclude certain aspects of the ark that are
+            underspecified, but this implementation shows that the system
+            still generates (mostly) playable, intelligible music without
+            those extra elements.
+            </p>
+
+          </section>
+          <section id="encoding">
             <h4>Music encoding</h4>
             <p>
             Music encoding has become a fashionable topic in the era of
@@ -1134,32 +1335,36 @@ let
             that mathematicians of the time faced, to find unambiguous
             symbolic ways of representing concepts; their solutions were
             not complete in this regard, either.
+            In fact, even today we do not have a commonly accepted way of
+            manipulating music with abstract symbols alone, though XML
+            encoding allows us to use the XSLT language and other tools to
+            transform MEI-encoded music into other formats, or to extract
+            specific information from it.
             </p>
           </section>
         </section>
-      </section>
-      <section>
-        <h3>Concepts of composition in the ark</h3>
-        <!--
-          <li>Composers as craftsmen not artists</li>
-          <li>Composers as assemblers of pre-existing conventional
-          structures (cf. schemata theory)</li>
-          <li>Music as combinatorics</li>
-        -->
-      </section>
-      <section>
-        <h3>Reception and influence of the ark</h3>
-        <!--
-          <li>Reception and use of Kircher's work</li>
-          <li>Relevance to missionary field and colonialism: supposed
-          universality of European polyphony; determinism of music vs.
-          non-determinism of language</li>
-          <li>Comparison to today's machine-composition projects</li>
-        -->
-      </section>
-      <section>
-        <h3>Kircher, Knuth, and the cranks</h3>
-      </section>
+        <section id="composition">
+          <h3>Concepts of composition in the ark</h3>
+          <!--
+            <li>Composers as craftsmen not artists</li>
+            <li>Composers as assemblers of pre-existing conventional
+            structures (cf. schemata theory)</li>
+            <li>Music as combinatorics</li>
+          -->
+        </section>
+        <section id="influence">
+          <h3>Reception and influence of the ark</h3>
+          <!--
+            <li>Reception and use of Kircher's work</li>
+            <li>Relevance to missionary field and colonialism: supposed
+            universality of European polyphony; determinism of music vs.
+            non-determinism of language</li>
+            <li>Comparison to today's machine-composition projects</li>
+          -->
+        </section>
+        <section id="knuth">
+          <h3>Kircher, Knuth, and the cranks</h3>
+        </section>
       </section>
       <section id="biblio">
         <h2>Bibliography and related projects</h2>
@@ -1176,7 +1381,7 @@ let
           capture all musical knowledge and reduce it to simple rules, while on
           the other hand trying to provide users with a tool to <em>expand</em>
           their possibilities for musical creativity and rhetorical expression.
-          He does not view the <em>Arca musarithmica</em> as a machine or
+          He does not view the <i>Arca musarithmica</i> as a machine or
           consider its potential as an automatic system, emphasizing instead how
           much interaction is actually demanded from the user in order to
           produce good results.</p>
@@ -1214,7 +1419,7 @@ let
           <p>
           Jim Bumgardner (<a href="#Bumgardner:Kircher">2009</a>) 
           implemented a different music-computing device by Kircher, the
-          <em>Organum mathematicum</em>.
+          <cite>Organum mathematicum</cite>.
           That device was much simpler musically but had the virtue of also
           being able to calculate the date of Easter and lots of other useful
           functions.
