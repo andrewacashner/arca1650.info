@@ -77,7 +77,10 @@ ul.bibliography {
   list-style: none;
 }
 ul.bibliography li {
+  text-indent: -2em;
+  padding-left: 2em;
   padding-bottom: 0.5em;
+  
 }
 
 /* Font */

@@ -55,7 +55,7 @@
         specifying an octave) and accidentals. Finally, the table on the front
         specifies how to inscribe these notes on paper within acceptable
         ranges for the four voices (thereby specifying the initial octave and any
-        later adjustments of octaves necessary to keep each voice's line
+        later adjustments of octaves necessary to keep each voice’s line
         within range. Not included in this illustration are the other elements
         of music notation for which Kircher provides tables in his text,
         including the different possible note values.
@@ -67,7 +67,7 @@
           The box contains a bevy of <em>pinakes</em> (rods, singular
           <em>pinax</em>), organized into groups called <em>syntagmata</em>
           (singular <em>syntagma</em>).  The design of the rods would seem to
-          be inspired by Napier's bones and other similar calculating devices
+          be inspired by Napier’s bones and other similar calculating devices
           of the time.  Each pinax lists sets of numeric permutations that
           represent four-voice note combinations, and sets of rhythmic
           permutations.
@@ -203,7 +203,7 @@
             to select the permutations. Kircher and his Jesuit superiors
             probably would have considered this chance operation to be a
             theologically dangerous act, removing human free will and in a
-            way, putting God's providence to the test. I have separated out
+            way, putting God’s providence to the test. I have separated out
             this part of the implementation in the <code>Fortuna</code>
             module, with the necessary cautions in the documentation, and it
             would be possible for a user to supply their own freely chosen
@@ -268,13 +268,13 @@
             <q>leading tones</q> were sharped in almost all modes. Such
             alterations eroded the distinctions between modes until eventually
             most of them sounded like either major or minor 
-            (<a href="#Chafe:ModesKeys">Chafe YEAR</a>).
+            (<a href="#Judd:ReniassanceModalTheory">Judd 2002</a>).
             </p>
             <p>
             In between older modal practice and what would emerge as functional
             tonality with major and minor keys, then, were various systems of
             <q>church keys</q> and <em>tonoi</em>
-            (<a href="#Barnett:ChurchKeys">Barnett YEAR</a>). 
+            (<a href="#Barnett:TonalOrganization17C">Barnett 2002</a>). 
             Most of these described practical ways that keyboardists in
             particular would match improvised polyphonic music to traditional
             psalm tones (linked to the modes but not identical with them).
@@ -458,7 +458,7 @@
         <p>
         In this software we implement only those parts of the ark which are
         completely specified as automatic algorithms. We have tried to follow
-        Kircher's own ways of structuring the data as closely as possible, as
+        Kircher’s own ways of structuring the data as closely as possible, as
         may be clear from looking at the 
         <a href="doc/index.html"><code>Arca</code> module</a>.
         </p>
@@ -532,7 +532,7 @@
         <section>
           <h2>A tour through the Haskell code</h2>
           <p>
-          Let's get a taste for the Haskell code by following the process from
+          Let’s get a taste for the Haskell code by following the process from
           building the ark data through reading the input text, setting it to
           music, and writing the output.
           </p>
@@ -716,7 +716,7 @@ arca = Arca {
 --  - get syllable count from list created in previous step
 --  - get penultimate syllable length from list of syllables /including/
 --  accents, using 'penultValue'
-newVerbum :: String -> Verbum
+newVerbum :: String -&gt; Verbum
 newVerbum s = Verbum {
     verbumText   = plaintext, 
     verbumSyl    = plainSyllables,
@@ -733,7 +733,7 @@ newVerbum s = Verbum {
 -- and 'phrasePenultLength' are calculated from that list.
 -- The 'phraseSylCount' is the sum of all the 'sylCount's of the words in the
 -- list. The 'phrasePenultLength' is the 'penultLength' of the last list item.
-newLyricPhrase :: [Verbum] -> LyricPhrase
+newLyricPhrase :: [Verbum] -&gt; LyricPhrase
 newLyricPhrase ls = LyricPhrase {
     phraseText = ls,
     phraseSylCount = sum $ map sylCount ls,
@@ -1023,9 +1023,56 @@ let
       </section>
       <section id="biblio">
         <h1>Bibliography and related projects</h1>
-
+        <section>
         <p>
-        Jim Bumgardner (<a href="#Bumgardner:Kircher">YEAR</a>) 
+        Carlo Maria Chierotti’s dissertation and articles 
+        (<a href="#Chierotti:KircherDiss">n.d.</a>, 
+        <a href="#Chierotti:KircherMirifica">1992</a>, and 
+        <a href="#Chierotti:KircherComporre">1994</a>) 
+        on the same subject provide a good overview of Kircher’s work and the
+        structure and operation of the ark, with some detailed analysis of the
+        types of harmonies and cadences in the voice permutations.
+        Chierotti views the ark as one the one hand trying to encyclopedically
+        capture all musical knowledge and reduce it to simple rules, while on
+        the other hand trying to provide users with a tool to <em>expand</em>
+        their possibilities for musical creativity and rhetorical expression.
+        He does not view the <em>Arca musarithmica</em> as a machine or
+        consider its potential as an automatic system, emphasizing instead how
+        much interaction is actually demanded from the user in order to
+        produce good results.</p>
+        <p>
+        Like so much else about Kircher, the ark is indeed a contradictory
+        blend of nascent empirical/scientific and traditional faith-based ways
+        of viewing the world. 
+        The goal of my project was to test the extent to which the ark could
+        operate as a fully automated system, and therefore whether it could be
+        considered a computer. While certain aspects of Kircher’s
+        specification must be ignored (or await more advanced programming) to
+        eliminate human interventions after the initial inputs, this research
+        does demonstrate that it is possible to generate reasonably coherent
+        music using only the strict rule-based algorithms and data structures
+        of the ark.
+        A more discerning user could certainly take the music generated by
+        this implementation and apply the kinds of adjustments Kircher himself
+        suggests to improve the end product.
+        </p>
+        <p>
+        I view Kircher’s system as an incomplete specification for a fully
+        automated system: most of the parts that appear to require human
+        intervention are simply under-specified, and rules could be devised to
+        automate them.
+        Of course Kircher had no way of actually automating the system
+        mechanically, any more than Turing did in his initial mathematical
+        description of Turing machines.
+        The question of whether the device is a computer is not dependent on
+        whether there exists a working physical implementation.
+        In any case, such an implementation does now exist, in the present
+        software.
+        </p>
+        </section>
+        <section>
+        <p>
+        Jim Bumgardner (<a href="#Bumgardner:Kircher">2009</a>) 
         implemented a different music-computing device by Kircher, the
         <em>Organum mathematicum</em>.
         That device was much simpler musically but had the virtue of also
@@ -1035,45 +1082,102 @@ let
         short texts in simple or florid style.
         It could generate MIDI output, even using vocal synthesis to render
         the actual syllable sounds.
-        There were some misunderstandings in the treatment of mode and rhythm.
-        <!-- citations and links -->
         </p>
+        <p>
+        Bumgardner highlights both Kircher’s clear intent to build an
+        automatic, algorithmic system for composition, and the inconsistencies
+        and underspecified elements that undermine that goal. He also
+        recognizes Kircher’s ambivalence about the need for random choices in
+        order to automate the system fully.
+        Both Bumgardner and Chierotti approach Kircher's mode table
+        anachronistically rather than in light of newer research in
+        seventeenth-century tonal organization 
+        (<a href="#Barnett:TonalOrganization17C">Barnett 2002</a>).
+        </p>
+        </section>
+        <section>
         <p>
         Agnes Cäcilie Bohnert’s dissertation 
         (<a href="#Bohnert:Kircher">YEAR</a>) covers Book VIII of the
         <cite>Musurgia</cite> in detail, focusing especially on the
         mathematical treatment of combinatorics at the beginning.  It
-        identifies numerous errors in Kircher's calculations.  Bohnert
+        identifies numerous errors in Kircher’s calculations.  Bohnert
         implemented a portion of the ark in Java, but could only
         set short texts in simple style.
         <!-- etc -->
         </p>
-        <p>
-        Carlo Maria Chierotti’s dissertation and articles 
-        (<a href="#Chierotti:KircherDiss">YEAR</a>, 
-        <a href="#Chierotti:KircherBk8">YEAR</a>, and 
-        <a href="#Chierotti:KircherComponere">YEAR</a>) 
-        on the same subject provide a good overview of Kircher and his work,
-        and focus on the musical aspects of the ark, without modeling it in
-        software.
-        <!-- etc -->
-        </p>
-        
+        </section>
+       
         <section>
           <h2>References</h2>
 
           <ul class="bibliography">
-            <li id="Barnett:ChurchKeys">Barnett, Gregory. </li>
+            <li id="Barnett:TonalOrganization17C">Barnett, Gregory. 2002.
+                <q>Tonal Organization in Seventeenth-Century Music Theory.</q>
+                In <a href="#Cambridge:HistoryofTheory">Christensen, <cite>The
+                        Cambridge History of Western Music Theory</cite></a>,
+                407–455.
+            </li>
+
             <li id="Bohnert:Kircher">Bohnert, Agnes Cäcilie. </li>
-            <li id="Bumgardner:Kircher">Bumgardner, Jim. </li>
-            <li id="Chafe:ModesKeys">Chafe, Eric. </li>
-            <li id="Chierotti:KircherDiss">Chierotti, Carlo Maria. </li>
-            <li id="Chierotti:KircherBk8">Chierotti, Carlo Mari. </li>
-            <li id="Chierotti:KircherComponere">Chierotti, Carlo Maria. </li>
-            <li id="Findlen:Kircher">Findlen, Paula, ed.</li>
-            <li id="Godwin:KircherArt">Godwin, Jocelyn. </li>
-            <li id="MEI">Music Encoding Initiative</li>
-            <li id="TEI">Text Encoding Initiative</li>
+
+            <li id="Bumgardner:Kircher">Bumgardner, Jim. 2009. 
+              <a href="https://jbum.com/papers/kircher_paper.pdf">
+              <q>Kircher’s Mechanical Composer: A Software
+                Implementation.</q></a>
+              Paper presented at the Bridges Conference, Banff.
+            </li>
+
+            <li id="Chierotti:KircherDiss">Chierotti, Carlo Mario. n.d. 
+                <a href="http://www.kircher.chierotti.it/tesi">[Tesi di laurea
+                    sulla <cite>Musurgia Universalis</cite> di Athanasius
+                    Kircher]</a>.
+                Laureate thesis, University of Turin.
+            </li>
+
+            <li id="Chierotti:KircherMirifica">Chierotti, Carlo Mario. 1992.
+              <q>La musurgia mirifica di Athanasius Kircher: la composizione
+                musicale alla portata di tutti nell’età barocca.</q>
+              <cite>Musica/realtà</cite> 13, no. 37: 107–127.
+            </li>
+
+            <li id="Chierotti:KircherComporre">Chierotti, Carlo Mario. 1994.
+              <q>Comporre senza conoscere la musica: Athanasius Kircher e le
+                ‘Musica mirifica’: un singolare esempio di scienza musicale
+                nell’età barocca.</q>
+              <cite>Nuova rivista musicale italiana</cite> 28, no. 3: 382–410.
+            </li>
+
+            <li id="Cambridge:HistoryofTheory">Christensen, Thomas, ed. 2002.
+                <cite>The Cambridge History of Western Music Theory</cite>.
+                Cambridge: Cambridge University Press, 2002.
+            </li>
+
+            <li id="Findlen:Kircher">Findlen, Paula, ed. 2004.
+                <cite>Athanasius Kircher: The Last Man Who Knew
+                    Everything</cite>.
+                New York: Routledge.
+            </li>
+
+            <li id="Godwin:KircherTheater">Godwin, Joscelyn. 2009.
+                <cite>Athanasius Kircher’s Theater of the World: The Life and
+                    Work of the Last Man to Search for Universal
+                    Knowledge</cite>.
+                Rochester, VT: Inner Traditions.
+            </li>
+
+            <li id="Judd:RenaissanceModalTheory">Judd, Cristle Collins. 2002.
+                <q>Renaissance Modal Theory: Theoretical, Compositional, and
+                    Editorial Perspectives.</q>
+                In <a href="#Cambridge:HistoryofTheory">Christensen, <cite>The
+                        Cambridge History of Western Music Theory</cite></a>,
+                364–406.
+            <li id="Kircher:Musurgia">Kircher, Athanasius. 1650.
+                <cite>Musurgia universalis, sive Ars magna consoni et dissoni
+                    in X. libros digesta</cite>.
+                Rome.
+            </li>
+
           </ul>
         </section>
       </section>
