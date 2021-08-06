@@ -93,6 +93,9 @@ figcaption {
   font-size: 80%;
   text-align: center;
 }
+div.google-visualization-tooltip { 
+  display: none; 
+}
 
 /* Font */
 body {

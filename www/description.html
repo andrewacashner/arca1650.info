@@ -1082,7 +1082,6 @@ let
             focuses on the output of a single note and ignoring the larger
             structural divisions.
             </p>
-
             <figure id="ioflows">
               <noscript>(You must have Javascript enabled to display this
                 chart.)</noscript>
@@ -1090,10 +1089,11 @@ let
               <figcaption>
                 The entire ark system: Flows from inputs through
                 functions to outputs<br> 
-                (types: 1, calculated; 2, input by user)
+                (select a node to highlight its inputs and outputs;
+                thicker lines indicate data input by user rather than
+                calculated)
               </figcaption>
             </figure>
-
             <p>
             The chart does not account for the octave adjustments we make once
             we have put together the whole series of notes, to avoid too-large
@@ -1334,11 +1334,13 @@ pair2Pitch voice ranges mode modeList systems pair =
             imperfect (two minims long). Here I had to add information to
             Kircher’s tables that was not originally present, simply
             adding a dot to the perfect semibreves as they would be
-            notated in modern notation. Here we can see the same struggle
-            that mathematicians of the time faced, to find unambiguous
-            symbolic ways of representing concepts; their solutions were
-            not complete in this regard, either.
-            In fact, even today we do not have a commonly accepted way of
+            notated in modern notation.
+            </p>
+            <p>
+            Here we can see the same struggle that mathematicians of the time
+            faced, to find unambiguous symbolic ways of representing concepts;
+            their solutions were not complete in this regard, either.  In
+            fact, even today we do not have a commonly accepted way of
             manipulating music with abstract symbols alone, though XML
             encoding allows us to use the XSLT language and other tools to
             transform MEI-encoded music into other formats, or to extract
@@ -1349,11 +1351,43 @@ pair2Pitch voice ranges mode modeList systems pair =
         <section id="composition">
           <h3>Concepts of composition in the ark</h3>
           <!--
+            "artificiosus"
             <li>Composers as craftsmen not artists</li>
             <li>Composers as assemblers of pre-existing conventional
             structures (cf. schemata theory)</li>
             <li>Music as combinatorics</li>
           -->
+          <p>
+          When we face the prospect of artificial intelligence today we often
+          hear the concern that we maintain some distinction between the ways
+          machines do things and the way people do them.
+          Many would say, humans have free will and emotions, and can express
+          themselves through art; while machines are unfeeling automatons, and
+          cannot therefore produce art.
+          When we speak like this we manifest a modern conception of art and
+          creativity that would be largely unfamiliar to Kircher.
+          When Kircher says his goal is to create a system for
+          <q>artificial</q> (<i>artificiosus</i>) composition, he is using the
+          word in an early modern sense where <i>art</i> more readily connotes
+          a practice or technique. An artificial system would be one built on
+          artifice, one created by tools and ingenuity rather than a natural
+          part of the created world. The point of artifice was to imitate the
+          natural world, to draw out its latent patterns and order.
+          </p>
+          <p>
+          The seventeenth-century European or colonial composer was, in
+          modern terms, more an artisan than an artist. The basic principle of
+          the ark is to arrange pre-formulated patterns into a new
+          combination. As Chierotti (<a href="#Chierotti:Comporre">1994</a>)
+          argues, this practice is none other than the rhetorician’s art of
+          <i>dispositio</i>.
+          </p>
+        <!-- inventio already taken care of;
+          use of pre-existing conventions actually widespread, examples and cf
+          later schemata/topic practice;
+          originality/authorship less important
+        -->
+          
         </section>
         <section id="influence">
           <h3>Reception and influence of the ark</h3>
@@ -1455,7 +1489,7 @@ pair2Pitch voice ranges mode modeList systems pair =
           <!-- etc -->
           </p>
         </section>
-        <section>
+        <section id="references">
           <h3>References</h3>
 
           <ul class="bibliography">
@@ -1522,6 +1556,16 @@ pair2Pitch voice ranges mode modeList systems pair =
                 in X. libros digesta</cite>.
               Rome.
             </li>
+          </ul>
+        </section>
+        <section id="colophon">
+          <h1>Acknowledgments</h1>
+          <ul>
+            <li>Code syntax highlighting by 
+              <a href="https://highlightjs.org">HighlightJS</a></li>
+            <li>Math typography by <a href="http://www.mathjax.org">MathJax</a></li>
+            <li>Sankey flow diagram by 
+              <a href="https://developers.google.com/chart/interactive/docs/gallery/sankey">Google Charts</a></li>
           </ul>
         </section>
       </section>
