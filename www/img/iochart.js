@@ -3,21 +3,24 @@ google.charts.setOnLoadCallback(drawChart);
 
 function drawChart() {
     var data = new google.visualization.DataTable();
-    data.addColumn('string', 'From');
-    data.addColumn('string', 'To');
-    data.addColumn('number', 'Weight');
+    data.addColumn('string', 'from');
+    data.addColumn('string', 'to');
+    data.addColumn('number', 'type'); 
     data.addRows([
 
-        [ 'music meter',    'meter symbols',    1 ],
+        [ 'style',          'syntagma',         2 ],
+        [ 'text meter',     'pinax',            2 ],
+        [ 'syllable text',  'column',           2 ],
+        [ 'syllable length', 'column',          2 ],
+        [ 'line position',  'column',           1 ],
+        
+        [ 'music meter',    'meter symbols',    2 ],
+        [ 'music meter',    'rperm meters',     2 ], 
         [ 'meter symbols',  'meter signature',  1 ],
-
-        [ 'rperm index (random)', 'rperm',      1 ],
         
-        [ 'mode',           'mode systems',     1 ],
+        [ 'mode',           'mode systems',     2 ],
         [ 'mode systems',   'key signature',    1 ],
-        [ 'mode',           'mode scales',      1 ],
-        
-        [ 'vperm index (random)', 'vperm',      1 ],
+        [ 'mode',           'mode scales',      2 ],
         
         [ 'syntagma',       'pinax',            1 ],
         [ 'pinax',          'column',           1 ],
@@ -25,20 +28,12 @@ function drawChart() {
         [ 'column',         'rperm meters',     1 ],
         [ 'rperm meters',   'rperm',            1 ],
 
-        [ 'text meter',     'pinax',            1 ],
-        [ 'syllable text',  'column',           1 ],
-        [ 'syllable length', 'column',          1 ],
-        [ 'line position',  'column',           1 ],
-
+        [ 'vperm index (random)', 'vperm',      1 ],
+        [ 'rperm index (random)', 'rperm',      1 ],
         [ 'vperm',          'pitch class',      1 ],
         [ 'rperm',          'duration',         1 ],
 
-        [ 'style',          'syntagma',         1 ],
-        [ 'music meter',    'rperm meters',     1 ], 
-        
-        
         [ 'pitch class',    'mode scales',      1 ],
-        
         [ 'mode scales',    'accidental',       1 ],
 
         [ 'pitch class',    'pitch name',       1 ],
@@ -51,10 +46,8 @@ function drawChart() {
         width: 600,
         height: 400,
         sankey: {
-            node: { label: { bold: true 
-                            , labelPadding: 50
-                            }
-//                    , nodePadding : 20
+            node: { label: { bold: true }
+                    , nodePadding : 25
                   }
             , link: {
                 colorMode: 'gradient'
