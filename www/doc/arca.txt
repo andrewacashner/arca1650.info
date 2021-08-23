@@ -162,6 +162,9 @@ data Dur
 -- | unset
 DurNil :: Dur
 
+-- | longa
+Lg :: Dur
+
 -- | breve
 Br :: Dur
 
@@ -176,6 +179,9 @@ Sm :: Dur
 
 -- | fusa
 Fs :: Dur
+
+-- | dotted longa
+LgD :: Dur
 
 -- | dotted breve
 BrD :: Dur
@@ -1163,6 +1169,465 @@ allModesExcept :: [Mode] -> [Mode]
 _pinaxModes :: PinaxModeList
 
 
+-- | This module provides the tools used in the main <tt>Cogito</tt> module
+--   to adjust music created by the ark and to store it in internal
+--   structures that will then be used by the <tt>Scribo</tt> modules.
+module Cogito.Musarithmetic
+
+-- | A <a>RawPitch</a> is the same as a <a>Pitch</a> except instead of a
+--   <a>Pnum</a> it has an <a>Int</a>. This allows us to add and subtract
+--   from pitches and then use <a>stdPitch</a> to normalize them by
+--   adjusting the octave and pitch like the two digits of a base-7 number.
+data RawPitch
+RawPitch :: Int -> Int -> Dur -> Accid -> AccidType -> RawPitch
+[rawPnum] :: RawPitch -> Int
+[rawOct] :: RawPitch -> Int
+[rawDur] :: RawPitch -> Dur
+[rawAccid] :: RawPitch -> Accid
+[rawAccidType] :: RawPitch -> AccidType
+
+-- | A <a>Voice</a> is a list of pitches with an identifier for the voice
+--   type.
+data Voice
+Voice :: VoiceName -> [Pitch] -> Voice
+
+-- | Enum for Soprano, Alto, Tenor or Bass
+[voiceID] :: Voice -> VoiceName
+[music] :: Voice -> [Pitch]
+
+-- | Make a list of voices with same <a>voiceID</a> into one <a>Voice</a>
+--   (combine the lists of <a>Pitch</a>es into one)
+mergeVoices :: [Voice] -> Voice
+
+-- | A <a>Chorus</a> is a group (list) of four <a>Voice</a> items
+--   
+--   <b>TODO</b>: We don't actually define it as being four items.
+--   <b>TODO</b>: Do we still need this with new MEI setup?
+type Chorus = [Voice]
+
+-- | Create a rest (that is, a <a>Pitch</a> with duration only)
+--   
+--   We make a <a>Pitch</a> but set the <a>pnum</a> to <a>Rest</a>;
+--   <a>oct</a> and <a>accid</a> are set to special nil values
+--   (<a>OctNil</a>, <a>AccidNil</a>)
+--   
+--   <b>TODO</b>: We are setting the octave using <tt>fromEnum OctNil</tt>:
+--   Isn't this the same as just setting it to zero? Is there a better way
+--   to mark this?
+newRest :: Dur -> Pitch
+
+-- | Standardize pitch.
+--   
+--   A <a>Pitch</a> is like a two-digit number in base 7, where the first
+--   digit (the "7s") is the octave. If the second digit (the "1s") is over
+--   7, we must increment the octave. A "standardized pitch" in our
+--   implementation is one that conforms to this requirement, so the
+--   <a>stdPitch</a> method takes all the input for a <a>Pitch</a> and does
+--   the necessary conversions to set the octave.
+--   
+--   We need this because Kircher's tables include both pitch number 1 and
+--   pitch 8. If pitch input is Kircher's pitch 8, then set pitch num to
+--   PcC (0) and add one to octave.
+--   
+--   <b>TODO</b>: We don't check for values out of range because we know
+--   what input we are getting from the ark. Is this okay?
+stdPitch :: RawPitch -> Pitch
+
+-- | Increment a pitch by increasing its <a>Pnum</a> pitch number and its
+--   octave if necessary (using <a>Pitch</a> structure like a base-7
+--   number). Create a new <a>Pitch</a> with incremented <a>Pnum</a> and
+--   then standardize it with <a>stdPitch</a> to get correct octave and
+--   pitch number.
+incPitch :: Pitch -> Int -> Pitch
+
+-- | Is a mode in <i>cantus mollis</i>? Should there be a flat in the key
+--   signature?
+modeMollis :: Mode -> ModeSystem -> Bool
+
+-- | Adjust a pitch to be in a given mode.
+pnumAccidInMode :: Int -> ModeList -> Mode -> PnumAccid
+
+-- | Get the modal final for this mode. What pitch = 0 in this mode? (In
+--   Kircher's 1-indexed vperms, the final is 1 or 8.)
+modalFinal :: ModeList -> Mode -> Pitch
+
+-- | Get the modal final within range for this voice. What is the lowest
+--   octave of that pitch permissible in the range for that voice? Set all
+--   the other pitches with reference to that, within the octave between
+--   0--7
+modalFinalInRange :: ModeList -> Mode -> VoiceName -> VoiceRanges -> Pitch
+
+-- | What octave is the modal final in for this voice's range?
+modalOctaveBase :: ModeList -> Mode -> VoiceName -> VoiceRanges -> Int
+
+-- | Check to see if a rhythmic duration is a rest type (the rest enums
+--   begin with <a>LgR</a> so we compare with that)
+isRest :: Dur -> Bool
+
+-- | Is the <a>Pitch</a> a rest?
+isPitchRest :: Pitch -> Bool
+
+-- | Convert <a>Pitch</a> to absolute pitch number
+absPitch :: Pitch -> Int
+
+-- | Get chromatic offset from C for diatonic pitch classes
+dia2chrom :: Pnum -> Int
+
+-- | Are two <a>Pitch</a>es the same chromatic pitch, enharmonically
+--   equivalent?
+pEq :: Pitch -> Pitch -> Bool
+
+-- | Pitch greater than?
+pGt :: Pitch -> Pitch -> Bool
+
+-- | Pitch less than?
+pLt :: Pitch -> Pitch -> Bool
+
+-- | Pitch greater than or equal?
+pGtEq :: Pitch -> Pitch -> Bool
+
+-- | Pitch less than or equal?
+pLtEq :: Pitch -> Pitch -> Bool
+
+-- | Difference between pitches, chromatic interval
+p12diff :: Pitch -> Pitch -> Int
+
+-- | <a>p12diff</a> modulo 12 (= chromatic difference within one octave)
+p12diffMod :: Pitch -> Pitch -> Int
+
+-- | Absolute diatonic pitch (octave + pitch)
+absPitch7 :: Pitch -> Int
+
+-- | Difference between pitches, diatonic interval Unison = 0, therefore
+--   results of this function are one less than the verbal names of
+--   intervals (<tt>p7diff = 4</tt> means a fifth)
+p7diff :: Pitch -> Pitch -> Int
+
+-- | Diatonic difference between pitch classes (= pitch difference as
+--   though within a single octave); result is 0-indexed, so the interval
+--   of a "third" in speech has a <tt>p7diffMod</tt> of 2
+p7diffMod :: Pitch -> Pitch -> Int
+
+-- | Copy a <a>Pitch</a> (unchanged if <a>Rest</a>), with given function
+--   applied to the octave member
+octaveAdjust :: Pitch -> (Int -> Int) -> Pitch
+
+-- | Raise the octave by 1
+octaveUp :: Pitch -> Pitch
+
+-- | Lower the octave by 1
+octaveDown :: Pitch -> Pitch
+
+-- | Is the pitch below the bottom limit of the voice range?
+pitchTooLow :: Pitch -> VoiceName -> VoiceRanges -> Bool
+
+-- | Is the pitch above the upper limit of the voice range?
+pitchTooHigh :: Pitch -> VoiceName -> VoiceRanges -> Bool
+
+-- | Get the bottom limit of the voice range
+lowRange :: VoiceName -> VoiceRanges -> Pitch
+
+-- | Get the top limit of the voice range
+highRange :: VoiceName -> VoiceRanges -> Pitch
+
+-- | Adjust a pitch to be in the correct voice range (using
+--   <tt>Aedifico.vocalRanges</tt>). If it's in the right range for the
+--   voice, leave it alone; if it's too low raise it by an octave, or vice
+--   versa if it's too high; keep shifting octaves till it's in range.
+adjustPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Pitch
+
+-- | Is the <a>Pitch</a> within the proper range for its voice?
+isPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Bool
+
+-- | Go through list of pitches and reduce intervals that are too large
+stepwise :: [Pitch] -> [Pitch]
+
+-- | Adjust a whole <a>Voice</a> stepwise
+stepwiseVoice :: Voice -> Voice
+
+-- | No leaps bigger than this interval This is based on 0 as unison so a
+--   _maxLeap of 4 is a fifth
+_maxLeap :: Int
+
+-- | Reduce leap of more than a <a>_maxLeap</a> by shifting octave of
+--   second note up or down until the interval is within range
+--   
+--   Octave leaps are okay, though.
+--   
+--   <b>TODO</b> : - but what if after adjusting for leaps, a note is out
+--   of range? - and what if there is a descending scale that goes out of
+--   range and the only way to adjust it is to make a seventh? need to
+--   adjust a whole phrase - But this may be going beyond what Kircher
+--   specifies as fully-automated algorithms.
+unleap :: Pitch -> Pitch -> Pitch
+
+-- | Return the highest pitch in a list of pitches.
+pitchMax :: [Pitch] -> Maybe Pitch
+
+-- | Return the lowest pitch in a list of pitches.
+pitchMin :: [Pitch] -> Maybe Pitch
+
+-- | TODO write your own max/min functions for pitches that ignore Rests
+--   
+--   Go through list of pitches and reduce intervals that are too large
+stepwiseInRange :: [Pitch] -> VoiceName -> VoiceRanges -> [Pitch]
+
+-- | Adjust a whole <a>Voice</a> to be in range: check the highest and
+--   lowest notes in the list, compare to the range for the voice, and
+--   shift the whole thing by octave until all are in range; return error
+--   if it can't be done
+voiceInRange :: VoiceRanges -> Voice -> Voice
+
+-- | Adjust a whole <a>Voice</a> stepwise
+stepwiseVoiceInRange :: VoiceRanges -> Voice -> Voice
+
+-- | A <a>Note</a> contains a pitch and a syllable, equivalent to MEI
+--   <tt>note</tt>
+data Note
+Note :: Pitch -> Syllable -> Note
+[notePitch] :: Note -> Pitch
+[noteSyllable] :: Note -> Syllable
+
+-- | A <a>Syllable</a> is a single syllable to be paired with a
+--   <a>Pitch</a>, including its position in the word.
+data Syllable
+Syllable :: String -> SyllablePosition -> Syllable
+[sylText] :: Syllable -> String
+[sylPosition] :: Syllable -> SyllablePosition
+
+-- | What is the position of the syllable relative to the word? Beginning,
+--   middle, or end? This determines hyphenation.
+data SyllablePosition
+First :: SyllablePosition
+Middle :: SyllablePosition
+Last :: SyllablePosition
+Only :: SyllablePosition
+
+-- | no syllable
+Tacet :: SyllablePosition
+
+-- | A <a>MusicPhrase</a> contains all the notes set using one permutation
+--   drawn from the ark, for a single voice.
+data MusicPhrase
+MusicPhrase :: VoiceName -> [Note] -> MusicPhrase
+[phraseVoiceID] :: MusicPhrase -> VoiceName
+[notes] :: MusicPhrase -> [Note]
+
+-- | A list of <a>MusicPhrase</a> items
+type MusicSentence = [MusicPhrase]
+
+-- | A <a>MusicSection</a> contains all the music for one section in the
+--   input XML document, for a single voice, together with the parameters
+--   set in the input file.
+data MusicSection
+MusicSection :: VoiceName -> ArkConfig -> [MusicSentence] -> MusicSection
+[secVoiceID] :: MusicSection -> VoiceName
+[secConfig] :: MusicSection -> ArkConfig
+[secSentences] :: MusicSection -> [MusicSentence]
+
+-- | A <a>MusicChorus</a> is a four-voice SATB structure of
+--   <a>MusicSection</a> data. <b>TODO</b> do we really need it to be
+--   structured this way?
+data MusicChorus
+MusicChorus :: MusicSection -> MusicSection -> MusicSection -> MusicSection -> MusicChorus
+[soprano] :: MusicChorus -> MusicSection
+[alto] :: MusicChorus -> MusicSection
+[tenor] :: MusicChorus -> MusicSection
+[bass] :: MusicChorus -> MusicSection
+
+-- | The full <a>MusicScore</a> is a list of SATB <a>MusicChorus</a>
+--   structures.
+type MusicScore = [MusicChorus]
+instance GHC.Classes.Ord Cogito.Musarithmetic.MusicPhrase
+instance GHC.Classes.Eq Cogito.Musarithmetic.MusicPhrase
+instance GHC.Show.Show Cogito.Musarithmetic.MusicPhrase
+instance GHC.Classes.Ord Cogito.Musarithmetic.Note
+instance GHC.Classes.Eq Cogito.Musarithmetic.Note
+instance GHC.Show.Show Cogito.Musarithmetic.Note
+instance GHC.Classes.Ord Cogito.Musarithmetic.Syllable
+instance GHC.Classes.Eq Cogito.Musarithmetic.Syllable
+instance GHC.Show.Show Cogito.Musarithmetic.Syllable
+instance GHC.Classes.Ord Cogito.Musarithmetic.SyllablePosition
+instance GHC.Classes.Eq Cogito.Musarithmetic.SyllablePosition
+instance GHC.Enum.Enum Cogito.Musarithmetic.SyllablePosition
+instance GHC.Show.Show Cogito.Musarithmetic.SyllablePosition
+instance GHC.Classes.Ord Cogito.Musarithmetic.Voice
+instance GHC.Classes.Eq Cogito.Musarithmetic.Voice
+instance GHC.Show.Show Cogito.Musarithmetic.Voice
+instance GHC.Classes.Ord Cogito.Musarithmetic.RawPitch
+instance GHC.Classes.Eq Cogito.Musarithmetic.RawPitch
+instance GHC.Show.Show Cogito.Musarithmetic.RawPitch
+
+
+-- | This module provides functions to adjust music created by the ark to
+--   follow conventions of <i>musica ficta</i>.
+module Cogito.Ficta
+
+-- | Adjust the accidental either toward flats or toward sharps, within the
+--   <a>Accid</a> enum. If the accidental is unset we just return the
+--   original pitch. We are treating all accidental shifts as <i>musica
+--   ficta</i> and giving a <a>Suggested</a> <a>accidType</a>.
+accidentalShift :: Pitch -> Accid -> Pitch
+
+-- | Lower a pitch a semitone, but not past <a>FlFl</a>
+flatten :: Pitch -> Pitch
+
+-- | Raise a pitch a semitone, but not past <a>ShSh</a>
+sharpen :: Pitch -> Pitch
+
+-- | Copy pitch but change <a>accid</a> and <a>accidType</a>
+changeAccid :: Pitch -> Accid -> AccidType -> Pitch
+
+-- | Cancel an accidental (suggested)
+cancel :: Pitch -> Pitch
+
+-- | Cancel the <a>Pitch</a> within a <a>Note</a>.
+noteCancel :: Note -> Note
+
+-- | Make <a>accidType</a> <a>Suggested</a>
+fictaAccid :: Pitch -> Pitch
+
+-- | Make <a>accidType</a> <a>Written</a>
+writeAccid :: Pitch -> Pitch
+
+-- | Map a function across every two items in a list. For a function that
+--   takes each item of a list and the next item and returns the first
+--   (probably modified), apply it to each item. Append the last item
+--   unchanged.
+--   
+--   Example: combine x y = x + y ls = [1, 2, 3, 4] mapTwo combine ls =
+--   [combine 1 2, combine 2 3, combine 3 4, 4] =&gt; [3, 5, 7, 4]
+mapTwo :: (a -> a -> a) -> [a] -> [a]
+
+-- | Map a function across every two items in an indexed list. The function
+--   should take the index and the two items as input and return the first
+--   of the two items (modified) as output. Append the last item unchanged.
+imapTwo :: (Int -> a -> a -> a) -> [a] -> [a]
+
+-- | Do something to the <a>Note</a>s in every 'MusicPhrase within a
+--   <a>MusicSection</a>
+adjustNotesInSection :: ([Note] -> [Note]) -> MusicSection -> MusicSection
+
+-- | Apply a pitch-transformation function to every pitch in a
+--   <a>MusicSection</a>
+mapPitchesInSection :: (Pitch -> Pitch) -> MusicSection -> MusicSection
+
+-- | Apply a pitch-transformation function to every pair of pitches in each
+--   <a>MusicPhrase</a> of a <a>MusicSection</a>
+mapPitchPairsInSection :: (Pitch -> Pitch -> Pitch) -> MusicSection -> MusicSection
+
+-- | Apply a pitch-transformation function to every pair of pitches in each
+--   <a>MusicPhrase</a> of a <a>MusicSection</a>, but starting from end and
+--   moving to front: in other words, map in reverse but return the list in
+--   its original order (modified)
+mapPitchPairsInSectionReverse :: (Pitch -> Pitch -> Pitch) -> MusicSection -> MusicSection
+
+-- | Copy a <a>Note</a> but adjust just its <a>Pitch</a> according to a
+--   function.
+adjustNotePitch :: (Pitch -> Pitch) -> Note -> Note
+
+-- | Apply a function to groups of two <a>Note</a>s (not technically
+--   pairs), return a copy of the first note with <a>Pitch</a> modified by
+--   the function.
+adjustNotePitchPairs :: (Pitch -> Pitch -> Pitch) -> Note -> Note -> Note
+
+-- | Compare two <a>MusicPhrase</a>s and find the note in the one (lower)
+--   voice that coincides rhythmically with a given note in the other
+--   (upper) voice. Used to find harmonies and test them for bad intervals.
+--   
+--   We find the top note by index and add the durations up to that point,
+--   then we add the durations in the bottom voice up to each item (that
+--   is, a scan) and then stop at the first item that matches the elapsed
+--   duration of the top voice.
+findCounterpoint :: MusicPhrase -> MusicPhrase -> Int -> Note
+
+-- | What is the elapsed time of a <a>Dur</a> in units where <a>Fs</a>
+--   (fusa) = 1?
+durQuantity :: Dur -> Int
+
+-- | Adjust a chorus for <i>musica ficta</i>: adjust bass first, and then
+--   apply a function to each of the upper voices adjusting it relative to
+--   the revised bass.
+adjustFictaChorus :: ModeSystem -> ModeList -> MusicChorus -> MusicChorus
+
+-- | Map a function to the phrases in one section (upper voice) relative to
+--   the phrases in another section (lower voice).
+adjustPhrasesInSection :: (MusicPhrase -> MusicPhrase -> MusicPhrase) -> MusicSection -> MusicSection -> MusicSection
+
+-- | Apply <i>musica ficta</i> adjustments to a whole <a>MusicPhrase</a>.
+--   Some adjustments only involve this phrase, while others must be
+--   relative to the bass voice. The bass voice should be adjusted already
+--   before this function is called.
+--   
+--   Adjustments: (1) scale degree seven should be sharp if that is
+--   suggested in the mode table only if it is going up to eight and if the
+--   bass is on scale degree five; (2) scale degree six should be flat if
+--   that is suggested in the mode table only if it is going down to five;
+--   (3) repeated notes should match the last accidental in the series [as
+--   long as the harmonies with the bass are okay? TODO]; (4) there should
+--   be no cross-relations or augmented fifths.
+--   
+--   TODO active development; not everything working
+adjustFictaPhrase :: ModeList -> Mode -> MusicPhrase -> MusicPhrase -> MusicPhrase
+
+-- | Sharp highest scale degree in an upper voice (1) when it leads up to
+--   scale-degree eight, and (2) when the bass note is on scale degree
+--   five. (TODO or two?)
+--   
+--   Remember, these are all 0-indexed numbers instead of the 1-indexed
+--   numbers used in speech (degree 6 here is "scale degree 7" in speech).
+sharpLeadingTone :: ModeList -> Mode -> Note -> Note -> Note -> Note
+
+-- | Return the 0-indexed scale degree of a given pitch in a given mode
+--   (scale degree 0 is the modal final)
+scaleDegree :: ModeList -> Mode -> Pitch -> Int
+
+-- | If there are two subsequent accidental inflections of a note (e.g., F
+--   natural--F sharp or vice versa), make the first note match the second.
+--   This deals with a byproduct of <a>sharpLeadingTone</a> with repeated
+--   notes, where that function would turn F--F--G into F--F#--G. This
+--   function would make it F--G.
+matchRepeatedAccid :: Note -> Note -> Note
+
+-- | Copy a <a>Note</a> but change the <a>Pitch</a>
+changeNotePitch :: Note -> Pitch -> Note
+
+-- | If this note is suggested flat, and the next note is suggested sharp,
+--   make this note natural.
+adjustFlatSharpSequence :: Note -> Note -> Note
+
+-- | Does this <a>Pitch</a> have the given accidental as <a>Suggested</a>?
+isFictaAccid :: Accid -> Pitch -> Bool
+
+-- | No cross relations, augmented fifths, or tritones
+fixIntervals :: Note -> Note -> Note
+
+-- | Avoid cross relations (TODO other intervals?) between upper voices. If
+--   there is a cross relation on notes with <a>Suggested</a> accidentals,
+--   match the lower voice.
+fixUpperVoiceIntervals :: Note -> Note -> Note
+
+-- | Are these pitches the same pitch class but different accidentals?
+--   (E.g., F vs F#?)
+isCrossRelation :: Pitch -> Pitch -> Bool
+
+-- | Are these pitches an augmented fifth apart?
+isAugFifth :: Pitch -> Pitch -> Bool
+
+-- | Are these two notes a tritone apart chromatically?
+isTritone :: Pitch -> Pitch -> Bool
+
+-- | Adjust tritones after a B flat: (implemented by going through notes in
+--   reverse to find tritone <i>before</i> the B flat, probably not the
+--   best way)
+adjustTritoneAfterBflat :: ModeSystem -> ModeList -> Mode -> MusicSection -> MusicSection
+
+-- | Adjust <i>musica ficta</i> accidentals in the bass. Rules: - 7 8 =&gt;
+--   unchanged<tt>, </tt>#7 _ =&gt; n7 _<tt>) - </tt>b6 7<tt> - </tt>b6 _
+--   =&gt; unchanged@
+adjustBassFicta :: ModeSystem -> ModeList -> Mode -> MusicSection -> MusicSection
+
+
 -- | This module reads (<i>lectio</i>, Latin, "I read") and process input
 --   text to be set to music using the ark.
 --   
@@ -1530,151 +1995,10 @@ instance GHC.Show.Show Fortuna.Perm
 --   
 --   We previously set up this module to feed data into the
 --   <tt>Scribo.Lilypond</tt> module, using the main function
---   <a>getSymphonia</a>. It treated pitches and lyrics completely
+--   <tt>getSymphonia</tt>. It treated pitches and lyrics completely
 --   separately, which worked in Syntagma I but not in Syntagma II. These
---   functions are still here at the bottom of the file. The test module
---   still uses them, for now.
+--   functions are archived in the <tt>test/</tt> directory.
 module Cogito
-
--- | A <a>RawPitch</a> is the same as a <a>Pitch</a> except instead of a
---   <a>Pnum</a> it has an <a>Int</a>. This allows us to add and subtract
---   from pitches and then use <a>stdPitch</a> to normalize them by
---   adjusting the octave and pitch like the two digits of a base-7 number.
-data RawPitch
-RawPitch :: Int -> Int -> Dur -> Accid -> AccidType -> RawPitch
-[rawPnum] :: RawPitch -> Int
-[rawOct] :: RawPitch -> Int
-[rawDur] :: RawPitch -> Dur
-[rawAccid] :: RawPitch -> Accid
-[rawAccidType] :: RawPitch -> AccidType
-
--- | A <a>Voice</a> is a list of pitches with an identifier for the voice
---   type.
-data Voice
-Voice :: VoiceName -> [Pitch] -> Voice
-
--- | Enum for Soprano, Alto, Tenor or Bass
-[voiceID] :: Voice -> VoiceName
-[music] :: Voice -> [Pitch]
-
--- | Make a list of voices with same <a>voiceID</a> into one <a>Voice</a>
---   (combine the lists of <a>Pitch</a>es into one)
-mergeVoices :: [Voice] -> Voice
-
--- | A <a>Chorus</a> is a group (list) of four <a>Voice</a> items
---   
---   <b>TODO</b>: We don't actually define it as being four items.
---   <b>TODO</b>: Do we still need this with new MEI setup?
-type Chorus = [Voice]
-
--- | Create a rest (that is, a <a>Pitch</a> with duration only)
---   
---   We make a <a>Pitch</a> but set the <a>pnum</a> to <a>Rest</a>;
---   <a>oct</a> and <a>accid</a> are set to special nil values
---   (<a>OctNil</a>, <a>AccidNil</a>)
---   
---   <b>TODO</b>: We are setting the octave using <tt>fromEnum OctNil</tt>:
---   Isn't this the same as just setting it to zero? Is there a better way
---   to mark this?
-newRest :: Dur -> Pitch
-
--- | Standardize pitch.
---   
---   A <a>Pitch</a> is like a two-digit number in base 7, where the first
---   digit (the "7s") is the octave. If the second digit (the "1s") is over
---   7, we must increment the octave. A "standardized pitch" in our
---   implementation is one that conforms to this requirement, so the
---   <a>stdPitch</a> method takes all the input for a <a>Pitch</a> and does
---   the necessary conversions to set the octave.
---   
---   We need this because Kircher's tables include both pitch number 1 and
---   pitch 8. If pitch input is Kircher's pitch 8, then set pitch num to
---   PcC (0) and add one to octave.
---   
---   <b>TODO</b>: We don't check for values out of range because we know
---   what input we are getting from the ark. Is this okay?
-stdPitch :: RawPitch -> Pitch
-
--- | Increment a pitch by increasing its <a>Pnum</a> pitch number and its
---   octave if necessary (using <a>Pitch</a> structure like a base-7
---   number). Create a new <a>Pitch</a> with incremented <a>Pnum</a> and
---   then standardize it with <a>stdPitch</a> to get correct octave and
---   pitch number.
-incPitch :: Pitch -> Int -> Pitch
-
--- | Is a mode in <i>cantus mollis</i>? Should there be a flat in the key
---   signature?
-modeMollis :: Mode -> ModeSystem -> Bool
-
--- | Adjust a pitch to be in a given mode.
-pnumAccidInMode :: Int -> Mode -> ModeList -> PnumAccid
-
--- | Get the modal final within range for this voice. What pitch = 0 in
---   this mode? What is the lowest octave of that pitch permissible in the
---   range for that voice? Set all the other pitches with reference to
---   that, within the octave between 0--7
-modalFinalInRange :: Mode -> ModeList -> VoiceName -> VoiceRanges -> Pitch
-
--- | What octave is the modal final in for this voice's range?
-modalOctaveBase :: Mode -> ModeList -> VoiceName -> VoiceRanges -> Int
-
--- | Adjust the accidental either toward flats or toward sharps, within the
---   <a>Accid</a> enum. If the accidental is unset we just return the
---   original pitch.
-accidentalShift :: Pitch -> Accid -> Pitch
-
--- | Lower a pitch a semitone, but not past <a>FlFl</a>
-flatten :: Pitch -> Pitch
-
--- | Raise a pitch a semitone, but not past <a>ShSh</a>
-sharpen :: Pitch -> Pitch
-
--- | Convert <a>Pitch</a> to absolute pitch number
-absPitch :: Pitch -> Int
-
--- | Get chromatic offset from C for diatonic pitch classes
-dia2chrom :: Pnum -> Int
-
--- | Are two <a>Pitch</a>es the same chromatic pitch, enharmonically
---   equivalent?
-pEq :: Pitch -> Pitch -> Bool
-
--- | Pitch greater than?
-pGt :: Pitch -> Pitch -> Bool
-
--- | Pitch less than?
-pLt :: Pitch -> Pitch -> Bool
-
--- | Pitch greater than or equal?
-pGtEq :: Pitch -> Pitch -> Bool
-
--- | Pitch less than or equal?
-pLtEq :: Pitch -> Pitch -> Bool
-
--- | Absolute diatonic pitch (octave + pitch)
-absPitch7 :: Pitch -> Int
-
--- | Difference between pitches, diatonic interval Unison = 0, therefore
---   results of this function are one less than the verbal names of
---   intervals (<tt>p7diff = 4</tt> means a fifth)
-p7diff :: Pitch -> Pitch -> Int
-
--- | Copy a <a>Pitch</a> (unchanged if <a>Rest</a>), with given function
---   applied to the octave member
-octaveAdjust :: Pitch -> (Int -> Int) -> Pitch
-
--- | Raise the octave by 1
-octaveUp :: Pitch -> Pitch
-
--- | Lower the octave by 1
-octaveDown :: Pitch -> Pitch
-
--- | Check to see if a rhythmic duration is a rest type (the rest enums
---   begin with <a>LgR</a> so we compare with that)
-isRest :: Dur -> Bool
-
--- | Is the <a>Pitch</a> a rest?
-isPitchRest :: Pitch -> Bool
 
 -- | Take two lists and zip them together, that is, make a new list of
 --   ordered pairs constructed from sequential items of the two lists, BUT:
@@ -1694,7 +2018,7 @@ zipFill :: [a] -> [b] -> (a -> Bool) -> b -> [(a, b)]
 --   
 --   <b>TODO</b>: This could also be generalized; we are not checking
 --   inputs because we control data input.
-pair2Pitch :: VoiceName -> VoiceRanges -> Mode -> ModeList -> ModeSystem -> (Dur, Int) -> Pitch
+pair2Pitch :: VoiceName -> VoiceRanges -> ModeList -> Mode -> ModeSystem -> (Dur, Int) -> Pitch
 
 -- | Is this note a B flat, and if so, is the flat already in the key
 --   signature?
@@ -1703,69 +2027,6 @@ isBflatInSignature :: Pnum -> Accid -> Mode -> ModeSystem -> Bool
 -- | Get the right starting octave range for each voice type voice2octave
 --   :: VoiceName -&gt; Int
 voice2octave :: Num p => VoiceName -> p
-
--- | Is the pitch below the bottom limit of the voice range?
-pitchTooLow :: Pitch -> VoiceName -> VoiceRanges -> Bool
-
--- | Is the pitch above the upper limit of the voice range?
-pitchTooHigh :: Pitch -> VoiceName -> VoiceRanges -> Bool
-
--- | Get the bottom limit of the voice range
-lowRange :: VoiceName -> VoiceRanges -> Pitch
-
--- | Get the top limit of the voice range
-highRange :: VoiceName -> VoiceRanges -> Pitch
-
--- | Adjust a pitch to be in the correct voice range (using
---   <tt>Aedifico.vocalRanges</tt>). If it's in the right range for the
---   voice, leave it alone; if it's too low raise it by an octave, or vice
---   versa if it's too high; keep shifting octaves till it's in range.
-adjustPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Pitch
-
--- | Is the <a>Pitch</a> within the proper range for its voice?
-isPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Bool
-
--- | Go through list of pitches and reduce intervals that are too large
-stepwiseInRange :: [Pitch] -> VoiceName -> VoiceRanges -> [Pitch]
-
--- | Adjust a whole <a>Voice</a> stepwise
-stepwiseVoiceInRange :: VoiceRanges -> Voice -> Voice
-
--- | Go through list of pitches and reduce intervals that are too large
-stepwise :: [Pitch] -> [Pitch]
-
--- | Adjust a whole <a>Voice</a> stepwise
-stepwiseVoice :: Voice -> Voice
-
--- | No leaps bigger than this interval This is based on 0 as unison so a
---   _maxLeap of 4 is a fifth
-_maxLeap :: Int
-
--- | Reduce leap of more than a <a>_maxLeap</a> by shifting octave of
---   second note up or down until the interval is within range
---   
---   Octave leaps are okay, though.
---   
---   <b>TODO</b> : - but what if after adjusting for leaps, a note is out
---   of range? - and what if there is a descending scale that goes out of
---   range and the only way to adjust it is to make a seventh? need to
---   adjust a whole phrase - But this may be going beyond what Kircher
---   specifies as fully-automated algorithms.
-unleap :: Pitch -> Pitch -> Pitch
-
--- | Return the highest pitch in a list of pitches.
-pitchMax :: [Pitch] -> Maybe Pitch
-
--- | Return the lowest pitch in a list of pitches.
-pitchMin :: [Pitch] -> Maybe Pitch
-
--- | TODO write your own max/min functions for pitches that ignore Rests
---   
---   Adjust a whole <a>Voice</a> to be in range: check the highest and
---   lowest notes in the list, compare to the range for the voice, and
---   shift the whole thing by octave until all are in range; return error
---   if it can't be done
-voiceInRange :: VoiceRanges -> Voice -> Voice
 
 -- | Central functions of the ark: given all parameters required by Kircher
 --   (style, meter, syllable count, penultimate syllable length), select a
@@ -1782,64 +2043,6 @@ voiceInRange :: VoiceRanges -> Voice -> Voice
 --   rhythms accordingly using <a>zipFill</a> with the test <a>isRest</a>.
 ark2voice :: Arca -> ArkConfig -> PenultLength -> Int -> Int -> VoiceName -> Perm -> Voice
 
--- | A <a>Note</a> contains a pitch and a syllable, equivalent to MEI
---   <tt>note</tt>
-data Note
-Note :: Pitch -> Syllable -> Note
-[notePitch] :: Note -> Pitch
-[noteSyllable] :: Note -> Syllable
-
--- | A <a>Syllable</a> is a single syllable to be paired with a
---   <a>Pitch</a>, including its position in the word.
-data Syllable
-Syllable :: String -> SyllablePosition -> Syllable
-[sylText] :: Syllable -> String
-[sylPosition] :: Syllable -> SyllablePosition
-
--- | What is the position of the syllable relative to the word? Beginning,
---   middle, or end? This determines hyphenation.
-data SyllablePosition
-First :: SyllablePosition
-Middle :: SyllablePosition
-Last :: SyllablePosition
-Only :: SyllablePosition
-
--- | no syllable
-Tacet :: SyllablePosition
-
--- | A <a>MusicPhrase</a> contains all the notes set using one permutation
---   drawn from the ark, for a single voice.
-data MusicPhrase
-MusicPhrase :: VoiceName -> [Note] -> MusicPhrase
-[phraseVoiceID] :: MusicPhrase -> VoiceName
-[notes] :: MusicPhrase -> [Note]
-
--- | A list of <a>MusicPhrase</a> items
-type MusicSentence = [MusicPhrase]
-
--- | A <a>MusicSection</a> contains all the music for one section in the
---   input XML document, for a single voice, together with the parameters
---   set in the input file.
-data MusicSection
-MusicSection :: VoiceName -> ArkConfig -> [MusicSentence] -> MusicSection
-[secVoiceID] :: MusicSection -> VoiceName
-[secConfig] :: MusicSection -> ArkConfig
-[secSentences] :: MusicSection -> [MusicSentence]
-
--- | A <a>MusicChorus</a> is a four-voice SATB structure of
---   <a>MusicSection</a> data. <b>TODO</b> do we really need it to be
---   structured this way?
-data MusicChorus
-MusicChorus :: MusicSection -> MusicSection -> MusicSection -> MusicSection -> MusicChorus
-[soprano] :: MusicChorus -> MusicSection
-[alto] :: MusicChorus -> MusicSection
-[tenor] :: MusicChorus -> MusicSection
-[bass] :: MusicChorus -> MusicSection
-
--- | The full <a>MusicScore</a> is a list of SATB <a>MusicChorus</a>
---   structures.
-type MusicScore = [MusicChorus]
-
 -- | Take a <a>Verbum</a> read from the input file and turn it into a list
 --   of <a>Syllable</a>s for storage in <a>Note</a>s. Record the syllable's
 --   position within the word.
@@ -1850,19 +2053,17 @@ blankSyllable :: Syllable
 
 -- | Compose the music for a whole <a>LyricPhrase</a> with one permutation
 --   from the ark, and package it into a <a>MusicPhrase</a>. Note that this
---   is for a single voice only, not the four SATB voices. Line up pitches
---   and syllables, skipping rests. In Syntagma I, line up text and notes
---   syllabically (one syllable per note); in syntagma II (florid), lump
---   the text into a single syllable and put it as an incipit text at the
---   beginning of the phrase. (See module description for why Kircher's
---   specification makes this is necessary.)
+--   is for a single voice only, not the four SATB voices.
+--   
+--   Line up pitches and syllables, skipping rests. In Syntagma I, line up
+--   text and notes syllabically (one syllable per note); in syntagma II
+--   (florid), lump the text into a single syllable and put it as an
+--   incipit text at the beginning of the phrase. (See module description
+--   for why Kircher's specification makes this is necessary.)
 makeMusicPhrase :: Arca -> ArkConfig -> VoiceName -> LyricPhrase -> Perm -> MusicPhrase
 
 -- | Compose music for a <a>LyricSentence</a> for a single voice.
 makeMusicSentence :: Arca -> ArkConfig -> VoiceName -> LyricSentence -> SentencePerm -> MusicSentence
-
--- | Compose music for all four SATB voices for one <a>LyricSection</a>.
-makeMusicChorus :: Arca -> LyricSection -> SectionPerm -> MusicChorus
 
 -- | Put together all the music information for one <a>LyricSection</a>,
 --   for a single voice.
@@ -1885,73 +2086,13 @@ makeMusicChorus :: Arca -> LyricSection -> SectionPerm -> MusicChorus
 --   </ul>
 makeMusicSection :: Arca -> LyricSection -> SectionPerm -> VoiceName -> MusicSection
 
+-- | Compose music for all four SATB voices for one <a>LyricSection</a>.
+--   TODO experimental: also adjust for musica ficta
+makeMusicChorus :: Arca -> LyricSection -> SectionPerm -> MusicChorus
+
 -- | Compose the music for the whole document as a <a>MusicScore</a>,
 --   pulling the data from the <a>Arca</a>.
 makeMusicScore :: Arca -> [LyricSection] -> [SectionPerm] -> MusicScore
-
--- | Get music data for all four voices and pack them into a <a>Chorus</a>.
---   
---   <b>TODO</b>: Why do we use a <tt>Fortuna</tt> <a>Perm</a> here but
---   just two integers in the preceding function? Do we need to have all
---   these parameters for both of these functions?
---   
---   We should be getting a new <a>Perm</a> for each Chorus.
-getChorus :: Arca -> ArkConfig -> LyricPhrase -> Perm -> Chorus
-
--- | Set the starting note of a voice to be within the proper range
-setVoiceInitialRange :: Voice -> VoiceRanges -> Voice
-
--- | A <a>Symphonia</a> is the amalgamation of a list of <a>Chorus</a>es
---   into one <a>Chorus</a>
-data Symphonia
-Symphonia :: Chorus -> LyricSection -> Symphonia
-[chorus] :: Symphonia -> Chorus
-[lyricSection] :: Symphonia -> LyricSection
-
--- | Turn <tt>[[S, A, T, B], [S1, A1, T1, B1]]</tt> into <tt>[[S, S1], [A,
---   A1], [T, T1], [B, B1]]</tt>
-mergeChoruses :: [Chorus] -> Chorus
-
--- | To make a <a>Symphonia</a> we take a <a>LyricSentence</a> and list of
---   <a>Perm</a>s, use <a>getChorus</a> to get the ark data for each
---   <a>LyricPhrase</a> in the sentence, each using its own <a>Perm</a>;
---   then we use <a>transpose</a> to reorder the lists.
---   
---   Where we had <tt>[[S1, A1, T1, B1], [S2, A2, T2, B2], [S3, A3, T3,
---   B3]]</tt> we end with <tt>[[S1, S2, S3], [A1, A2, A3], [T1, T2, T3],
---   [B1, B2, B3]]</tt>. A list of four voices becomes four lists of
---   voices. We need to combine each of those voices into a single voice to
---   have a list of four (longer) voices.
---   
---   Adjust music of merged voices to avoid bad intervals
---   (<a>stepwise</a>).
---   
---   The <tt>Scribo</tt> module calls this function to get all the ark data
---   needed to set a whole <a>LyricSentence</a>, in the central function of
---   our implementation, <tt>Scribo.compose</tt>.
-getSymphonia :: Arca -> LyricSection -> SectionPerm -> Symphonia
-
--- | Get all the music for the sections from input
-getMasterMusic :: Arca -> [LyricSection] -> [SectionPerm] -> [Symphonia]
-instance GHC.Classes.Ord Cogito.MusicPhrase
-instance GHC.Classes.Eq Cogito.MusicPhrase
-instance GHC.Show.Show Cogito.MusicPhrase
-instance GHC.Classes.Ord Cogito.Note
-instance GHC.Classes.Eq Cogito.Note
-instance GHC.Show.Show Cogito.Note
-instance GHC.Classes.Ord Cogito.Syllable
-instance GHC.Classes.Eq Cogito.Syllable
-instance GHC.Show.Show Cogito.Syllable
-instance GHC.Classes.Ord Cogito.SyllablePosition
-instance GHC.Classes.Eq Cogito.SyllablePosition
-instance GHC.Enum.Enum Cogito.SyllablePosition
-instance GHC.Show.Show Cogito.SyllablePosition
-instance GHC.Classes.Ord Cogito.Voice
-instance GHC.Classes.Eq Cogito.Voice
-instance GHC.Show.Show Cogito.Voice
-instance GHC.Classes.Ord Cogito.RawPitch
-instance GHC.Classes.Eq Cogito.RawPitch
-instance GHC.Show.Show Cogito.RawPitch
 
 
 -- | This module is our implementation of Kircher's <i>palimpsest
@@ -1965,11 +2106,8 @@ instance GHC.Show.Show Cogito.RawPitch
 --   This module outputs to Lilypond, which could then be processed by that
 --   program to PDF, MIDI, or other formats.
 --   
---   This module also contains the central <a>compose</a> function that
---   takes in a text processed by the <tt>Lectio</tt> module, and does the
---   rest of the work of getting data from the ark, adjusting and
---   translating that data into music (using <tt>Cogito</tt>), and then
---   writing it.
+--   This is a stub of what used to be a full Lilypond writing module (now
+--   archived in test/). We just use this for testing.
 module Scribo.Lilypond
 
 -- | Write pitch as Lilypond music note. Look up needed string values for
@@ -1982,54 +2120,6 @@ module Scribo.Lilypond
 --   of commas or apostrophes to add (relative to Helmholtz octave 3 =
 --   <tt>c</tt>).
 pitch2ly :: Pitch -> String
-
--- | Put things inside enclosing parens, brackets, etc.
-enbrace :: String -> String -> String -> String
-
--- | Group string in curly braces <tt>{string}</tt> with added newlines
-lyMusicGroup :: String -> String
-
--- | Group string in double angle brackets <tt>&lt;&lt;string&gt;&gt;</tt>
---   with added newlines
-lySimultaneousGroup :: String -> String
-
--- | Write a <a>Voice</a> to a Lilypond music group:
---   
---   <pre>
---   \new Staff&lt;&lt; \new Voice { ... } &gt;&gt;
---   </pre>
---   
---   We have to include Lilypond <tt>midiInstrument</tt> here.
-voice2ly :: Voice -> ModeSystem -> LyricSection -> String
-
--- | Write a <a>LyricSection</a> to a Lilypond <tt>new Lyrics { }</tt>
---   statement for a particular voice (<tt>VoiceName</tt>). Separate --
---   syllables with <tt> -- </tt>.
-lyrics2ly :: LyricSection -> Voice -> String
-
--- | The opening string per voice
-voice2lyOpening :: Voice -> String
-
--- | The end of the music part of the voice and beginning of the lyrics
-voice2lyClosing :: Voice -> String
-
--- | The end of the voice and its lyrics (discards input)
-voiceClosing :: Voice -> String
-
--- | Convert all the music derived from input into notation output
-masterMusic2ly :: Arca -> [Symphonia] -> String
-
--- | Make Lilypond preamble of include commands
-makePreamble :: [String] -> String
-
--- | Make Lilypond header with the Arca as the author
-makeHeader :: ArkMetadata -> String
-
--- | Set a prepared <a>LyricSentence</a> to music in one go. Return the
---   text of a complete Lilypond file as a string. Write version number and
---   preamble, and put music into <tt>score</tt> and <tt>StaffGroup</tt>
---   (needed because we are doing <i>Mensurstriche</i>).
-compose :: Arca -> ArkMetadata -> [LyricSection] -> [SectionPerm] -> String
 
 
 -- | This module is our implementation of Kircher's <i>palimpsest
@@ -2156,9 +2246,6 @@ sentence2mei :: (ListPosition, MusicSentence) -> String
 --   
 --   <b>TODO</b>: you could put more than one layer per staff if you wanted
 --   a 2-staff choirstaff (e.g., SA on one, TB on the other)
---   
---   <b>TODO</b>: Set MIDI tempo at start of section, just before layer;
---   Verovio does not currently allow this so we skip it.
 section2mei :: Arca -> (ListPosition, MusicSection) -> String
 
 -- | Take a list of sections, one per SATB voice, and create a single MEI
@@ -2195,8 +2282,6 @@ meiMeterModern :: MusicMeter -> String
 --   <tt>proport.num</tt> attribute) for the number, which is the correct
 --   encoding. But putting <tt>num</tt> directly inside <tt>mensur</tt>
 --   works with Verovio.
---   
---   Also add MEI <tt>midi.bpm</tt> element to set the tempo.
 meiMeterMensural :: MusicMeter -> String
 
 -- | Mensural meter with proportion as a string of attributes (for use in
@@ -2211,12 +2296,7 @@ meiMidiTempo :: MusicMeter -> String
 -- | MEI <tt>midi.bpm</tt> attribute appropriate for each mensuration This
 --   is how it should work, but Verovio does not accept a tempo element
 --   within staff, so I do not know how to do a tempo change mid-piece.
---   Instead we'll just set a quarter-note pulse that makes it not too
---   terribly slow.
---   
---   meiMidiBPM meter = attr "midi.bpm" $ show bpm where bpm = case meter
---   of Duple -&gt; 120 TripleMinor -&gt; 180 TripleMajor -&gt; 320
-meiMidiBPM :: () => p -> String
+meiMidiBPM :: MusicMeter -> String
 
 -- | Extract a simple list of <a>MusicSentence</a> from the four members of
 --   a <a>MusicChorus</a>
@@ -2257,7 +2337,16 @@ _projectDesc :: [Char]
 -- | MEI element for MIDI instrument number (1-indexed)
 midiInstrumentNum :: Int -> String
 
--- | MIDI instrument for playback ("Church Organ" sounds pretty good)
+-- | Midi "Church Organ"
+_midiOrgan :: Integer
+
+-- | Midi Trombone
+_midiTrombone :: Integer
+
+-- | Midi Oboe
+_midiOboe :: Int
+
+-- | MIDI instrument for playback
 _midiInstrument :: String
 
 -- | Plug in variables and musical content needed to boilerplate MEI
