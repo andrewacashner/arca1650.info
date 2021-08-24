@@ -1463,6 +1463,13 @@ instance GHC.Show.Show Cogito.Musarithmetic.RawPitch
 --   follow conventions of <i>musica ficta</i>.
 module Cogito.Ficta
 
+-- | Copy a <a>Note</a> but change the <a>Pitch</a>
+changeNotePitch :: Note -> Pitch -> Note
+
+-- | Copy a <a>Note</a> but adjust just its <a>Pitch</a> according to a
+--   function.
+adjustNotePitch :: (Pitch -> Pitch) -> Note -> Note
+
 -- | Adjust the accidental either toward flats or toward sharps, within the
 --   <a>Accid</a> enum. If the accidental is unset we just return the
 --   original pitch. We are treating all accidental shifts as <i>musica
@@ -1490,46 +1497,24 @@ fictaAccid :: Pitch -> Pitch
 -- | Make <a>accidType</a> <a>Written</a>
 writeAccid :: Pitch -> Pitch
 
--- | Map a function across every two items in a list. For a function that
---   takes each item of a list and the next item and returns the first
---   (probably modified), apply it to each item. Append the last item
---   unchanged.
---   
---   Example: combine x y = x + y ls = [1, 2, 3, 4] mapTwo combine ls =
---   [combine 1 2, combine 2 3, combine 3 4, 4] =&gt; [3, 5, 7, 4]
-mapTwo :: (a -> a -> a) -> [a] -> [a]
-
--- | Map a function across every two items in an indexed list. The function
---   should take the index and the two items as input and return the first
---   of the two items (modified) as output. Append the last item unchanged.
-imapTwo :: (Int -> a -> a -> a) -> [a] -> [a]
-
--- | Do something to the <a>Note</a>s in every 'MusicPhrase within a
+-- | Do something to the <a>Note</a>s in every <a>MusicPhrase</a> within a
 --   <a>MusicSection</a>
 adjustNotesInSection :: ([Note] -> [Note]) -> MusicSection -> MusicSection
 
--- | Apply a pitch-transformation function to every pitch in a
---   <a>MusicSection</a>
-mapPitchesInSection :: (Pitch -> Pitch) -> MusicSection -> MusicSection
+-- | Copy a <a>MusicPhrase</a> but with new notes
+changeNotesInPhrase :: MusicPhrase -> [Note] -> MusicPhrase
 
--- | Apply a pitch-transformation function to every pair of pitches in each
---   <a>MusicPhrase</a> of a <a>MusicSection</a>
-mapPitchPairsInSection :: (Pitch -> Pitch -> Pitch) -> MusicSection -> MusicSection
+-- | Do something to the <a>Note</a> list in a <a>MusicPhrase</a>
+adjustNotesInPhrase :: ([Note] -> [Note]) -> MusicPhrase -> MusicPhrase
 
--- | Apply a pitch-transformation function to every pair of pitches in each
---   <a>MusicPhrase</a> of a <a>MusicSection</a>, but starting from end and
---   moving to front: in other words, map in reverse but return the list in
---   its original order (modified)
-mapPitchPairsInSectionReverse :: (Pitch -> Pitch -> Pitch) -> MusicSection -> MusicSection
+-- | Fold a ficta-adjusting function over a <a>MusicSection</a>
+fixFictaInSection :: ([Note] -> Note -> [Note]) -> MusicSection -> MusicSection
 
--- | Copy a <a>Note</a> but adjust just its <a>Pitch</a> according to a
---   function.
-adjustNotePitch :: (Pitch -> Pitch) -> Note -> Note
+-- | Fold a ficta-adjusting function over a <a>MusicPhrase</a>
+fixFictaInPhrase :: ([Note] -> Note -> [Note]) -> MusicPhrase -> MusicPhrase
 
--- | Apply a function to groups of two <a>Note</a>s (not technically
---   pairs), return a copy of the first note with <a>Pitch</a> modified by
---   the function.
-adjustNotePitchPairs :: (Pitch -> Pitch -> Pitch) -> Note -> Note -> Note
+-- | Generate a stack folding function to process a list
+foldStack :: ([a] -> a -> [a]) -> [a] -> [a]
 
 -- | Compare two <a>MusicPhrase</a>s and find the note in the one (lower)
 --   voice that coincides rhythmically with a given note in the other
@@ -1570,36 +1555,18 @@ adjustPhrasesInSection :: (MusicPhrase -> MusicPhrase -> MusicPhrase) -> MusicSe
 --   TODO active development; not everything working
 adjustFictaPhrase :: ModeList -> Mode -> MusicPhrase -> MusicPhrase -> MusicPhrase
 
--- | Sharp highest scale degree in an upper voice (1) when it leads up to
---   scale-degree eight, and (2) when the bass note is on scale degree
---   five. (TODO or two?)
---   
---   Remember, these are all 0-indexed numbers instead of the 1-indexed
---   numbers used in speech (degree 6 here is "scale degree 7" in speech).
-sharpLeadingTone :: ModeList -> Mode -> Note -> Note -> Note -> Note
-
 -- | Return the 0-indexed scale degree of a given pitch in a given mode
 --   (scale degree 0 is the modal final)
 scaleDegree :: ModeList -> Mode -> Pitch -> Int
 
--- | If there are two subsequent accidental inflections of a note (e.g., F
---   natural--F sharp or vice versa), make the first note match the second.
---   This deals with a byproduct of <a>sharpLeadingTone</a> with repeated
---   notes, where that function would turn F--F--G into F--F#--G. This
---   function would make it F--G.
-matchRepeatedAccid :: Note -> Note -> Note
-
--- | Copy a <a>Note</a> but change the <a>Pitch</a>
-changeNotePitch :: Note -> Pitch -> Note
-
--- | If this note is suggested flat, and the next note is suggested sharp,
---   make this note natural.
-adjustFlatSharpSequence :: Note -> Note -> Note
-
 -- | Does this <a>Pitch</a> have the given accidental as <a>Suggested</a>?
 isFictaAccid :: Accid -> Pitch -> Bool
 
--- | No cross relations, augmented fifths, or tritones
+-- | Apply <a>isFictaAccid</a> to a <a>Note</a>
+isFictaAccidNote :: Accid -> Note -> Bool
+
+-- | No cross relations, augmented fifths, or tritones between upper and
+--   lower note
 fixIntervals :: Note -> Note -> Note
 
 -- | Avoid cross relations (TODO other intervals?) between upper voices. If
@@ -1617,15 +1584,43 @@ isAugFifth :: Pitch -> Pitch -> Bool
 -- | Are these two notes a tritone apart chromatically?
 isTritone :: Pitch -> Pitch -> Bool
 
--- | Adjust tritones after a B flat: (implemented by going through notes in
---   reverse to find tritone <i>before</i> the B flat, probably not the
---   best way)
-adjustTritoneAfterBflat :: ModeSystem -> ModeList -> Mode -> MusicSection -> MusicSection
-
--- | Adjust <i>musica ficta</i> accidentals in the bass. Rules: - 7 8 =&gt;
---   unchanged<tt>, </tt>#7 _ =&gt; n7 _<tt>) - </tt>b6 7<tt> - </tt>b6 _
---   =&gt; unchanged@
+-- | Adjust <i>musica ficta</i> accidentals in the bass.
 adjustBassFicta :: ModeSystem -> ModeList -> Mode -> MusicSection -> MusicSection
+
+-- | Fix melodic tritone before or after B (fold function)
+fixMelodicTritone :: ModeSystem -> Mode -> [Note] -> Note -> [Note]
+
+-- | Fix descending scale-degree sevens and ascending sixes (fold function)
+fixSixSeven :: ModeList -> Mode -> [Note] -> Note -> [Note]
+
+-- | Cancel the <a>Pitch</a> in a <a>Note</a>
+cancelNote :: Note -> Note
+
+-- | If this note is suggested flat, and the next note is suggested sharp,
+--   make this note natural.
+fixFlatSharp :: [Note] -> Note -> [Note]
+
+-- | If there are two subsequent accidental inflections of a note (e.g., F
+--   natural--F sharp or vice versa), make the first note match the second.
+--   This deals with a byproduct of <a>sharpLeadingTone</a> with repeated
+--   notes, where that function would turn F--F--G into F--F#--G. This
+--   function would make it F--G.
+fixAccidRepeat :: [Note] -> Note -> [Note]
+
+-- | Fix the leading tones of a <a>MusicPhrase</a>.
+fixLeadingTonesInPhrase :: ModeList -> Mode -> MusicPhrase -> MusicPhrase -> MusicPhrase
+
+-- | Fold function for adjusting the leading tones in the upper voice of a
+--   list of (upper, lower) <a>Note</a> pairs
+fixLeadingTonePairs :: ModeList -> Mode -> [(Note, Note)] -> (Note, Note) -> [(Note, Note)]
+
+-- | Sharp highest scale degree in an upper voice (1) when it leads up to
+--   scale-degree eight, and (2) when the bass note is on scale degree
+--   five. (TODO or two?)
+--   
+--   Remember, these are all 0-indexed numbers instead of the 1-indexed
+--   numbers used in speech (degree 6 here is "scale degree 7" in speech).
+sharpLeadingTone :: ModeList -> Mode -> Note -> Note -> Note -> Note
 
 
 -- | This module reads (<i>lectio</i>, Latin, "I read") and process input
