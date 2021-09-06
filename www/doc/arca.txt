@@ -114,9 +114,6 @@ toPnum :: Int -> Pnum
 -- | Accidentals
 data Accid
 
--- | double flat
-FlFl :: Accid
-
 -- | flat
 Fl :: Accid
 
@@ -125,9 +122,6 @@ Na :: Accid
 
 -- | sharp
 Sh :: Accid
-
--- | double sharp
-ShSh :: Accid
 
 -- | when note is a rest
 AccidNil :: Accid
@@ -151,7 +145,21 @@ Tenor :: VoiceName
 Bass :: VoiceName
 
 -- | Vocal Ranges
-type VoiceRanges = [(Pitch, Pitch)]
+data VoiceRange
+VoiceRange :: Pitch -> Pitch -> VoiceRange
+[low] :: VoiceRange -> Pitch
+[high] :: VoiceRange -> Pitch
+
+-- | Set of <a>VoiceRange</a> data for each <a>VoiceName</a>
+data VoiceRanges
+VoiceRanges :: VoiceRange -> VoiceRange -> VoiceRange -> VoiceRange -> VoiceRanges
+[sopranoRange] :: VoiceRanges -> VoiceRange
+[altoRange] :: VoiceRanges -> VoiceRange
+[tenorRange] :: VoiceRanges -> VoiceRange
+[bassRange] :: VoiceRanges -> VoiceRange
+
+-- | Access data from <a>VoiceRanges</a> by <a>VoiceName</a>
+getRange :: VoiceName -> VoiceRanges -> VoiceRange
 
 -- | Duration values
 --   
@@ -669,6 +677,9 @@ instance GHC.Show.Show Aedifico.TextMeter
 instance GHC.Classes.Ord Aedifico.MusicMeter
 instance GHC.Classes.Eq Aedifico.MusicMeter
 instance GHC.Enum.Enum Aedifico.MusicMeter
+instance GHC.Classes.Ord Aedifico.VoiceRange
+instance GHC.Classes.Eq Aedifico.VoiceRange
+instance GHC.Show.Show Aedifico.VoiceRange
 instance GHC.Classes.Ord Aedifico.Pitch
 instance GHC.Classes.Eq Aedifico.Pitch
 instance GHC.Show.Show Aedifico.Pitch
@@ -740,6 +751,10 @@ s1p2 :: Pinax
 --   for Adonic; Column 1, for Dactylic meter.
 --   
 --   It may be used with any mode, especially 2 and 6.
+--   
+--   TODO -- Kircher actually says on p. 79 that the four columns are to
+--   allow you to set successive <i>strophae</i> to different music, so our
+--   one-column implementation is no good.
 module Arca_musarithmica.Syntagma1.Pinax03
 
 -- | Pinax 3
@@ -1136,8 +1151,9 @@ arca :: Arca
 --   above and below the staff (Soprano C1, alto C3, tenor C4, bass f4
 --   clefs).
 --   
---   Note that this makes the alto range lower than typical for a modern
---   mixed choir, because Kircher has all-male choirs in mind.
+--   I have adapted these ranges to those of a modern mixed choir, because
+--   Kircher has all-male choirs in mind and the alto clef gives a much
+--   lower range.
 _vocalRanges :: VoiceRanges
 
 -- | Mode system (<a>Durus</a>, all naturals; or <a>Mollis</a>, one B flat)
@@ -1172,19 +1188,11 @@ _pinaxModes :: PinaxModeList
 -- | This module provides the tools used in the main <tt>Cogito</tt> module
 --   to adjust music created by the ark and to store it in internal
 --   structures that will then be used by the <tt>Scribo</tt> modules.
+--   
+--   The <a>stepwiseVoiceInRange</a> function tests all the possible
+--   permutations of octaves for the pitches in a phrase and finds the best
+--   path, with the minimum of large leaps and notes out of range.
 module Cogito.Musarithmetic
-
--- | A <a>RawPitch</a> is the same as a <a>Pitch</a> except instead of a
---   <a>Pnum</a> it has an <a>Int</a>. This allows us to add and subtract
---   from pitches and then use <a>stdPitch</a> to normalize them by
---   adjusting the octave and pitch like the two digits of a base-7 number.
-data RawPitch
-RawPitch :: Int -> Int -> Dur -> Accid -> AccidType -> RawPitch
-[rawPnum] :: RawPitch -> Int
-[rawOct] :: RawPitch -> Int
-[rawDur] :: RawPitch -> Dur
-[rawAccid] :: RawPitch -> Accid
-[rawAccidType] :: RawPitch -> AccidType
 
 -- | A <a>Voice</a> is a list of pitches with an identifier for the voice
 --   type.
@@ -1195,191 +1203,11 @@ Voice :: VoiceName -> [Pitch] -> Voice
 [voiceID] :: Voice -> VoiceName
 [music] :: Voice -> [Pitch]
 
--- | Make a list of voices with same <a>voiceID</a> into one <a>Voice</a>
---   (combine the lists of <a>Pitch</a>es into one)
-mergeVoices :: [Voice] -> Voice
-
 -- | A <a>Chorus</a> is a group (list) of four <a>Voice</a> items
 --   
 --   <b>TODO</b>: We don't actually define it as being four items.
 --   <b>TODO</b>: Do we still need this with new MEI setup?
 type Chorus = [Voice]
-
--- | Create a rest (that is, a <a>Pitch</a> with duration only)
---   
---   We make a <a>Pitch</a> but set the <a>pnum</a> to <a>Rest</a>;
---   <a>oct</a> and <a>accid</a> are set to special nil values
---   (<a>OctNil</a>, <a>AccidNil</a>)
---   
---   <b>TODO</b>: We are setting the octave using <tt>fromEnum OctNil</tt>:
---   Isn't this the same as just setting it to zero? Is there a better way
---   to mark this?
-newRest :: Dur -> Pitch
-
--- | Standardize pitch.
---   
---   A <a>Pitch</a> is like a two-digit number in base 7, where the first
---   digit (the "7s") is the octave. If the second digit (the "1s") is over
---   7, we must increment the octave. A "standardized pitch" in our
---   implementation is one that conforms to this requirement, so the
---   <a>stdPitch</a> method takes all the input for a <a>Pitch</a> and does
---   the necessary conversions to set the octave.
---   
---   We need this because Kircher's tables include both pitch number 1 and
---   pitch 8. If pitch input is Kircher's pitch 8, then set pitch num to
---   PcC (0) and add one to octave.
---   
---   <b>TODO</b>: We don't check for values out of range because we know
---   what input we are getting from the ark. Is this okay?
-stdPitch :: RawPitch -> Pitch
-
--- | Increment a pitch by increasing its <a>Pnum</a> pitch number and its
---   octave if necessary (using <a>Pitch</a> structure like a base-7
---   number). Create a new <a>Pitch</a> with incremented <a>Pnum</a> and
---   then standardize it with <a>stdPitch</a> to get correct octave and
---   pitch number.
-incPitch :: Pitch -> Int -> Pitch
-
--- | Is a mode in <i>cantus mollis</i>? Should there be a flat in the key
---   signature?
-modeMollis :: Mode -> ModeSystem -> Bool
-
--- | Adjust a pitch to be in a given mode.
-pnumAccidInMode :: Int -> ModeList -> Mode -> PnumAccid
-
--- | Get the modal final for this mode. What pitch = 0 in this mode? (In
---   Kircher's 1-indexed vperms, the final is 1 or 8.)
-modalFinal :: ModeList -> Mode -> Pitch
-
--- | Get the modal final within range for this voice. What is the lowest
---   octave of that pitch permissible in the range for that voice? Set all
---   the other pitches with reference to that, within the octave between
---   0--7
-modalFinalInRange :: ModeList -> Mode -> VoiceName -> VoiceRanges -> Pitch
-
--- | What octave is the modal final in for this voice's range?
-modalOctaveBase :: ModeList -> Mode -> VoiceName -> VoiceRanges -> Int
-
--- | Check to see if a rhythmic duration is a rest type (the rest enums
---   begin with <a>LgR</a> so we compare with that)
-isRest :: Dur -> Bool
-
--- | Is the <a>Pitch</a> a rest?
-isPitchRest :: Pitch -> Bool
-
--- | Convert <a>Pitch</a> to absolute pitch number
-absPitch :: Pitch -> Int
-
--- | Get chromatic offset from C for diatonic pitch classes
-dia2chrom :: Pnum -> Int
-
--- | Are two <a>Pitch</a>es the same chromatic pitch, enharmonically
---   equivalent?
-pEq :: Pitch -> Pitch -> Bool
-
--- | Pitch greater than?
-pGt :: Pitch -> Pitch -> Bool
-
--- | Pitch less than?
-pLt :: Pitch -> Pitch -> Bool
-
--- | Pitch greater than or equal?
-pGtEq :: Pitch -> Pitch -> Bool
-
--- | Pitch less than or equal?
-pLtEq :: Pitch -> Pitch -> Bool
-
--- | Difference between pitches, chromatic interval
-p12diff :: Pitch -> Pitch -> Int
-
--- | <a>p12diff</a> modulo 12 (= chromatic difference within one octave)
-p12diffMod :: Pitch -> Pitch -> Int
-
--- | Absolute diatonic pitch (octave + pitch)
-absPitch7 :: Pitch -> Int
-
--- | Difference between pitches, diatonic interval Unison = 0, therefore
---   results of this function are one less than the verbal names of
---   intervals (<tt>p7diff = 4</tt> means a fifth)
-p7diff :: Pitch -> Pitch -> Int
-
--- | Diatonic difference between pitch classes (= pitch difference as
---   though within a single octave); result is 0-indexed, so the interval
---   of a "third" in speech has a <tt>p7diffMod</tt> of 2
-p7diffMod :: Pitch -> Pitch -> Int
-
--- | Copy a <a>Pitch</a> (unchanged if <a>Rest</a>), with given function
---   applied to the octave member
-octaveAdjust :: Pitch -> (Int -> Int) -> Pitch
-
--- | Raise the octave by 1
-octaveUp :: Pitch -> Pitch
-
--- | Lower the octave by 1
-octaveDown :: Pitch -> Pitch
-
--- | Is the pitch below the bottom limit of the voice range?
-pitchTooLow :: Pitch -> VoiceName -> VoiceRanges -> Bool
-
--- | Is the pitch above the upper limit of the voice range?
-pitchTooHigh :: Pitch -> VoiceName -> VoiceRanges -> Bool
-
--- | Get the bottom limit of the voice range
-lowRange :: VoiceName -> VoiceRanges -> Pitch
-
--- | Get the top limit of the voice range
-highRange :: VoiceName -> VoiceRanges -> Pitch
-
--- | Adjust a pitch to be in the correct voice range (using
---   <tt>Aedifico.vocalRanges</tt>). If it's in the right range for the
---   voice, leave it alone; if it's too low raise it by an octave, or vice
---   versa if it's too high; keep shifting octaves till it's in range.
-adjustPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Pitch
-
--- | Is the <a>Pitch</a> within the proper range for its voice?
-isPitchInRange :: Pitch -> VoiceName -> VoiceRanges -> Bool
-
--- | Go through list of pitches and reduce intervals that are too large
-stepwise :: [Pitch] -> [Pitch]
-
--- | Adjust a whole <a>Voice</a> stepwise
-stepwiseVoice :: Voice -> Voice
-
--- | No leaps bigger than this interval This is based on 0 as unison so a
---   _maxLeap of 4 is a fifth
-_maxLeap :: Int
-
--- | Reduce leap of more than a <a>_maxLeap</a> by shifting octave of
---   second note up or down until the interval is within range
---   
---   Octave leaps are okay, though.
---   
---   <b>TODO</b> : - but what if after adjusting for leaps, a note is out
---   of range? - and what if there is a descending scale that goes out of
---   range and the only way to adjust it is to make a seventh? need to
---   adjust a whole phrase - But this may be going beyond what Kircher
---   specifies as fully-automated algorithms.
-unleap :: Pitch -> Pitch -> Pitch
-
--- | Return the highest pitch in a list of pitches.
-pitchMax :: [Pitch] -> Maybe Pitch
-
--- | Return the lowest pitch in a list of pitches.
-pitchMin :: [Pitch] -> Maybe Pitch
-
--- | TODO write your own max/min functions for pitches that ignore Rests
---   
---   Go through list of pitches and reduce intervals that are too large
-stepwiseInRange :: [Pitch] -> VoiceName -> VoiceRanges -> [Pitch]
-
--- | Adjust a whole <a>Voice</a> to be in range: check the highest and
---   lowest notes in the list, compare to the range for the voice, and
---   shift the whole thing by octave until all are in range; return error
---   if it can't be done
-voiceInRange :: VoiceRanges -> Voice -> Voice
-
--- | Adjust a whole <a>Voice</a> stepwise
-stepwiseVoiceInRange :: VoiceRanges -> Voice -> Voice
 
 -- | A <a>Note</a> contains a pitch and a syllable, equivalent to MEI
 --   <tt>note</tt>
@@ -1438,6 +1266,233 @@ MusicChorus :: MusicSection -> MusicSection -> MusicSection -> MusicSection -> M
 -- | The full <a>MusicScore</a> is a list of SATB <a>MusicChorus</a>
 --   structures.
 type MusicScore = [MusicChorus]
+
+-- | Create a rest (that is, a <a>Pitch</a> with duration only)
+--   
+--   We make a <a>Pitch</a> but set the <a>pnum</a> to <a>Rest</a>;
+--   <a>oct</a> and <a>accid</a> are set to special nil values
+--   (<a>OctNil</a>, <a>AccidNil</a>)
+--   
+--   <b>TODO</b>: We are setting the octave using <tt>fromEnum OctNil</tt>:
+--   Isn't this the same as just setting it to zero? Is there a better way
+--   to mark this?
+newRest :: Dur -> Pitch
+
+-- | Is a mode in <i>cantus mollis</i>? Should there be a flat in the key
+--   signature?
+modeMollis :: Mode -> ModeSystem -> Bool
+
+-- | Adjust a pitch to be in a given mode.
+pnumAccidInMode :: Int -> ModeList -> Mode -> PnumAccid
+
+-- | Get the modal final for this mode. What pitch = 0 in this mode? (In
+--   Kircher's 1-indexed vperms, the final is 1 or 8.)
+modalFinal :: ModeList -> Mode -> Pitch
+
+-- | Check to see if a rhythmic duration is a rest type (the rest enums
+--   begin with <a>LgR</a> so we compare with that)
+isRest :: Dur -> Bool
+
+-- | Is the <a>Pitch</a> a rest?
+isPitchRest :: Pitch -> Bool
+
+-- | Are any of these pitches rests?
+anyRests :: [Pitch] -> Bool
+
+-- | Convert <a>Pitch</a> to absolute pitch number, using chromatic
+--   calculations (base 12). Raise an error if it is a rest.
+absPitch :: Pitch -> Int
+
+-- | Get chromatic offset from C for diatonic pitch classes (<tt>PCc -&gt;
+--   0</tt>, <tt>PCd -&gt; 2</tt>, <tt>PCe -&gt; 4</tt>, etc.)
+dia2chrom :: Pnum -> Int
+
+-- | Absolute diatonic pitch (base 7). Raise an error if it is a rest.
+absPitch7 :: Pitch -> Int
+
+-- | Do mathematical operations on pitches (using their chromatic
+--   <a>absPitch</a> values)
+pitchMath :: (Int -> Int -> Int) -> Pitch -> Pitch -> Int
+
+-- | Do mathematical operations on pitches (using their diatonic
+--   <a>absPitch7</a> values)
+pitchMath7 :: (Int -> Int -> Int) -> Pitch -> Pitch -> Int
+
+-- | Do boolean tests on pitches (using their 'absPitch values)
+pitchTest :: (Int -> Int -> Bool) -> Pitch -> Pitch -> Bool
+
+-- | Are two <a>Pitch</a>es the same chromatic pitch, enharmonically
+--   equivalent?
+pEq :: Pitch -> Pitch -> Bool
+
+-- | Pitch greater than?
+pGt :: Pitch -> Pitch -> Bool
+
+-- | Pitch less than?
+pLt :: Pitch -> Pitch -> Bool
+
+-- | Pitch greater than or equal?
+pGtEq :: Pitch -> Pitch -> Bool
+
+-- | Pitch less than or equal?
+pLtEq :: Pitch -> Pitch -> Bool
+
+-- | Difference between pitches, chromatic interval
+p12diff :: Pitch -> Pitch -> Int
+
+-- | Chromatic difference between pitch classes (within one octave);
+--   <a>p12diff</a> modulo 12
+p12diffMod :: Pitch -> Pitch -> Int
+
+-- | Difference between pitches, diatonic interval Unison = 0, therefore
+--   results of this function are one less than the verbal names of
+--   intervals (<tt>p7diff = 4</tt> means a fifth)
+p7diff :: Pitch -> Pitch -> Int
+
+-- | Diatonic difference between pitch classes (= pitch difference as
+--   though within a single octave); result is 0-indexed, so the interval
+--   of a "third" in speech has a <tt>p7diffMod</tt> of 2
+p7diffMod :: Pitch -> Pitch -> Int
+
+-- | Take the absolute value of an intervals, the difference between
+--   pitches. The interval between any note and a rest is zero.
+absInterval :: Pitch -> Pitch -> Int
+
+-- | Change the pitch class and octave of an existing <a>Pitch</a> to that
+--   of an absolute diatonic pitch number. Return rests unchanged.
+changePnumOctave :: Int -> Pitch -> Pitch
+
+-- | Increase a pitch diatonically by a given interval (0-indexed diatonic,
+--   e.g., <tt>p7inc p 4</tt> raises <tt>p</tt> by a diatonic third).
+--   Return rests unchanged.
+p7inc :: Pitch -> Int -> Pitch
+
+-- | Just change the octave to a given number, no calculation required
+octaveChange :: Pitch -> Int -> Pitch
+
+-- | Increase the octave number by the given amount
+octaveInc :: Pitch -> Int -> Pitch
+
+-- | Raise the octave by 1
+octaveUp :: Pitch -> Pitch
+
+-- | Lower the octave by 1
+octaveDown :: Pitch -> Pitch
+
+-- | Is the pitch below the bottom limit of the voice range?
+pitchTooLow :: VoiceRange -> Pitch -> Bool
+
+-- | Is the pitch above the upper limit of the voice range?
+pitchTooHigh :: VoiceRange -> Pitch -> Bool
+
+-- | Is the <a>Pitch</a> within the proper range for its voice? Rests
+--   automatically count as valid.
+pitchInRange :: VoiceRange -> Pitch -> Bool
+
+-- | Is this an acceptable leap? Only intervals up to a sixth, or an octave
+--   are okay. If either note is a rest, then that also passes the test.
+--   
+--   TODO: Ignoring rests like this is a bit of a cop-out, but Kircher
+--   usually puts rests at the beginning of a phrase, so they affect the
+--   interval <i>between</i> phrases, which we are not adjusting anyway. In
+--   an ideal scenario, we would.
+legalLeap :: Pitch -> Pitch -> Bool
+
+-- | Find the lowest valid instance of a given <a>Pitch</a> within the
+--   <a>VoiceRange</a>. This is used to calculate an optimal path through
+--   the possible pitches in a phrase, and means that in most cases the
+--   melody will end up in the lower end of the voice's range.
+lowestInRange :: VoiceRange -> Pitch -> Pitch
+
+-- | List all the octaves within a voice range.
+octavesInRange :: VoiceRange -> [Int]
+
+-- | List all the valid instances of a given pitch within a voice range.
+pitchesInRange :: VoiceRange -> Pitch -> [Pitch]
+
+-- | Given a list of pitches (taken from the vperms in the ark), return a
+--   list of list of all the valid instances of those pitches within a
+--   particular voice range. This determines the candidate pitches that we
+--   will test to find the optimal melody.
+pitchCandidates :: VoiceRange -> [Pitch] -> [[Pitch]]
+
+-- | Binary tree. We use a left-child/right-sibling binary tree to evaluate
+--   any number of candidates for each element in the series.
+data Btree a
+Empty :: Btree a
+Node :: a -> Btree a -> Btree a -> Btree a
+
+-- | Build a general tree, implemented as left-child/right-sibling binary
+--   tree that can take more than two options at each level
+tree :: [[a]] -> Btree a
+
+-- | Build a left-child/right-sibling tree from a list of the options at
+--   each level, only including options that pass a test function; the test
+--   function compares each parent to its child. If the value of the parent
+--   (previous good value) is <a>Nothing</a> then we know it is the
+--   beginning of the tree, there is no previous value to compare.
+testTree :: (a -> a -> Bool) -> Maybe a -> [[a]] -> Btree a
+
+-- | Make a list of all good paths in an LCRS tree. If no good paths are
+--   found, the result will be <tt>[]</tt>.
+paths :: [[a]] -> Btree a -> [[a]]
+
+-- | Are all the elements of a list the same length?
+sameLengths :: [[a]] -> Bool
+
+-- | Prune out paths that are shorter than the original list of items. If
+--   none are left after pruning (no viable paths), return <a>Nothing</a>.
+fullPaths :: [a] -> [[b]] -> Maybe [[b]]
+
+-- | The ambitus is the widest range of pitches used; the difference
+--   between the highest and lowest pitches. Ignore rests.
+ambitus :: [Pitch] -> Int
+
+-- | Calculate and list intervals between pitches in a list. The list will
+--   be one item shorter than the list of inputs.
+intervals :: [Pitch] -> [Int]
+
+-- | Add up all the intervals larger than a fourth (where p7diff &gt; 3
+--   with 0-indexed intervals).
+sumBigIntervals :: [Pitch] -> Int
+
+-- | Find all the pitches that exceed a given range, and add up the
+--   interval by which they go above or below the limits.
+sumBeyondRange :: VoiceRange -> [Pitch] -> Int
+
+-- | Calculate weighted "badness" score for a list of pitches. Sum of
+--   ambitus, sum of large intervals (x 2), sum of degrees of notes out of
+--   range (x 10).
+badness :: VoiceRange -> [Pitch] -> Int
+
+-- | Find the best path (first with lowest "badness"), or raise error if
+--   none found
+bestPath :: VoiceRange -> [Pitch] -> [[Pitch]] -> [Pitch]
+
+-- | Choose the path with the lowest "badness"; if there are multiple with
+--   the same score, choose the first
+leastBadPath :: VoiceRange -> [[Pitch]] -> [Pitch]
+
+-- | Build a tree of all pitch sequences with appropriate leaps
+stepwiseTree :: [[Pitch]] -> Btree Pitch
+
+-- | Find a melody for a voice with an optimal blend of avoiding bad leaps
+--   and staying within range. This is the main function used in
+--   <tt>Cogito</tt>.
+--   
+--   Avoid large or illegal leaps and stay as much in range as possible.
+--   For example, some melodies have long stepwise ascents or descents
+--   which, in certain modes, will take the voice out of range, and if we
+--   adjust them in the middle, we will get an illegal seventh interval.
+--   
+--   We build a list of candidate pitches within the range, then we build a
+--   tree of the ordered permutations of those pitches and test the paths
+--   according to a subjective "badness" rating, including the ambitus or
+--   total range of highest to lowest notes, the number and size of large
+--   intervals, and the number of notes out of range (and how much out of
+--   range they are). The first path with the lowest score wins.
+stepwiseVoiceInRange :: VoiceRanges -> Voice -> Voice
+instance GHC.Show.Show a => GHC.Show.Show (Cogito.Musarithmetic.Btree a)
 instance GHC.Classes.Ord Cogito.Musarithmetic.MusicPhrase
 instance GHC.Classes.Eq Cogito.Musarithmetic.MusicPhrase
 instance GHC.Show.Show Cogito.Musarithmetic.MusicPhrase
@@ -1454,9 +1509,6 @@ instance GHC.Show.Show Cogito.Musarithmetic.SyllablePosition
 instance GHC.Classes.Ord Cogito.Musarithmetic.Voice
 instance GHC.Classes.Eq Cogito.Musarithmetic.Voice
 instance GHC.Show.Show Cogito.Musarithmetic.Voice
-instance GHC.Classes.Ord Cogito.Musarithmetic.RawPitch
-instance GHC.Classes.Eq Cogito.Musarithmetic.RawPitch
-instance GHC.Show.Show Cogito.Musarithmetic.RawPitch
 
 
 -- | This module provides functions to adjust music created by the ark to
@@ -1476,14 +1528,15 @@ adjustNotePitch :: (Pitch -> Pitch) -> Note -> Note
 --   ficta</i> and giving a <a>Suggested</a> <a>accidType</a>.
 accidentalShift :: Pitch -> Accid -> Pitch
 
--- | Lower a pitch a semitone, but not past <a>FlFl</a>
+-- | Lower a pitch a semitone
 flatten :: Pitch -> Pitch
 
--- | Raise a pitch a semitone, but not past <a>ShSh</a>
+-- | Raise a pitch a semitone
 sharpen :: Pitch -> Pitch
 
 -- | Copy pitch but change <a>accid</a> and <a>accidType</a>
-changeAccid :: Pitch -> Accid -> AccidType -> Pitch
+changeAccid :: Accid -> AccidType -> Pitch -> Pitch
+changeNoteAccid :: Accid -> AccidType -> Note -> Note
 
 -- | Cancel an accidental (suggested)
 cancel :: Pitch -> Pitch
@@ -1565,6 +1618,9 @@ isFictaAccid :: Accid -> Pitch -> Bool
 -- | Apply <a>isFictaAccid</a> to a <a>Note</a>
 isFictaAccidNote :: Accid -> Note -> Bool
 
+-- | Fix bad intervals against a lower voice in a <a>MusicPhrase</a>
+fixIntervalsInPhrase :: MusicPhrase -> MusicPhrase -> MusicPhrase
+
 -- | No cross relations, augmented fifths, or tritones between upper and
 --   lower note
 fixIntervals :: Note -> Note -> Note
@@ -1589,6 +1645,10 @@ adjustBassFicta :: ModeSystem -> ModeList -> Mode -> MusicSection -> MusicSectio
 
 -- | Fix melodic tritone before or after B (fold function)
 fixMelodicTritone :: ModeSystem -> Mode -> [Note] -> Note -> [Note]
+
+-- | Test the <a>Pnum</a> and <a>Accid</a> of a <a>Note</a> against given
+--   values
+testPitchAccid :: Pnum -> Accid -> Note -> Bool
 
 -- | Fix descending scale-degree sevens and ascending sixes (fold function)
 fixSixSeven :: ModeList -> Mode -> [Note] -> Note -> [Note]
@@ -2002,18 +2062,13 @@ module Cogito
 --   of the corresponding element from the second list.
 zipFill :: [a] -> [b] -> (a -> Bool) -> b -> [(a, b)]
 
--- | Make a pitch from duration and pitch number, getting octave based on
---   voice name using <a>voice2octave</a>. If the duration input is a rest
---   type (e.g., <a>BrR</a>), then make a <a>newRest</a>; otherwise a
---   <a>stdPitch</a>.
---   
---   Adjust the pitch for mode (and thereby standardize it)
---   (<a>pnumAccidInMode</a>). Adjust the octave to put the pitch in the
---   right range for the voice (<a>adjustPitchInRange</a>).
+-- | Make a pitch from duration and pitch number. Start with zero octave;
+--   we'll set it later using <a>stepwiseVoiceInRange</a>. Adjust the pitch
+--   for mode (<a>pnumAccidInMode</a>).
 --   
 --   <b>TODO</b>: This could also be generalized; we are not checking
 --   inputs because we control data input.
-pair2Pitch :: VoiceName -> VoiceRanges -> ModeList -> Mode -> ModeSystem -> (Dur, Int) -> Pitch
+pair2Pitch :: ModeList -> ModeSystem -> Mode -> (Dur, Int) -> Pitch
 
 -- | Is this note a B flat, and if so, is the flat already in the key
 --   signature?
@@ -2331,15 +2386,6 @@ _projectDesc :: [Char]
 
 -- | MEI element for MIDI instrument number (1-indexed)
 midiInstrumentNum :: Int -> String
-
--- | Midi "Church Organ"
-_midiOrgan :: Integer
-
--- | Midi Trombone
-_midiTrombone :: Integer
-
--- | Midi Oboe
-_midiOboe :: Int
 
 -- | MIDI instrument for playback
 _midiInstrument :: String

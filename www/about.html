@@ -164,24 +164,37 @@
       </section>
       <section>
         <h1>Digital Implementation</h1>
-        <p>In this software we implement only those parts of the ark which are
-        completely specified as automatic algorithms.</p>
+        <p>In this software we implement all those parts of the ark which are
+        completely specified as automatic algorithms. This includes how to
+        pull pitches and rhythms from the ark and match them with words.</p>
         <p>Instead of the user’s choice of vperms and rperms we choose to tempt
         fate (from a seventeenth-century Catholic perspective and roll the dice,
         a literally aleatoric method, by using computer-generated pseudo-random
         numbers.  Other elements that depend on the user’s taste and judgment,
         or elements under-specified by Kircher (like text underlay in
         the melismatic Syntagma II) we leave up to our own users’ discretion.</p>
+        <p>Kircher does not provide a complete set of instructions, though,
+        for the essential task of fitting the notes within vocal ranges while
+        avoiding unwieldy leaps; I have written my own algorithm (using binary
+        decision trees and weighted <q>badness</q> scores) to do this.</p>
+        <p>Kircher also does not provide a full specification for applying
+        <em>musica ficta</em> accidentals based on his mode tables and other
+        rules. Human performers who know the conventions of Kircher’s day
+        could probably adjust the music in performance, but to make the music
+        sound good automatically, as in the MIDI renditions on this website,
+        requires more complicated adjustments. The current implementation is
+        incomplete and does not cover all the difficult edge cases that
+        arise.</p>
         <p>We encode the data of the ark itself (syntagmata, pinakes, etc.) in a
-        set of tables in Haskell, technically nested vectors and lists.</p>
-        <p>We read the input text and parameters from an XML file and parse the
-        text into sections, sentences/stanzas, and phrases/lines.</p>
-        <p>We generate a list of random numbers to use for each phrase, then we
+        set of tables in Haskell, technically nested vectors and lists.
+        We read the input text and parameters from an XML file and parse the
+        text into sections, sentences/stanzas, and phrases/lines.
+        We generate a list of random numbers to use for each phrase, then we
         use these to select the correct vperms and rperms, and adjust these for
         mode and range according to the rules. We then convert our internal data
         types into MEI-XML output.</p>
         <p>In the web app, we use the third-party Verovio app to render the
-        musical data to notation.</p>
+        musical data to notation and MIDI format for automatic playback.</p>
       </section>
       <section id="biblio">
         <h2>Bibliography and related projects</h2>
