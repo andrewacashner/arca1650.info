@@ -352,47 +352,58 @@ Florid :: Style
 -- | Select style by string (used in processing XML input)
 toStyle :: String -> Style
 
--- | Mode
+-- | Tone
 --   
---   Kircher's table of modes is different from the traditional chant
---   modes. They are more like "church keys" or <i>toni</i> for psalm
---   intonations.
-data Mode
-Mode1 :: Mode
-Mode2 :: Mode
-Mode3 :: Mode
-Mode4 :: Mode
-Mode5 :: Mode
-Mode6 :: Mode
-Mode7 :: Mode
-Mode8 :: Mode
-Mode9 :: Mode
-Mode10 :: Mode
-Mode11 :: Mode
-Mode12 :: Mode
-ModeUnset :: Mode
+--   Kircher's table of tones is a hybrid of <i>toni ecclesiastici</i> or
+--   "church keys" which were matched to the eight traditional psalm tones
+--   in Gregorian chant, and the twelve modes of Zarlino.
+data Tone
+Tone1 :: Tone
+Tone2 :: Tone
+Tone3 :: Tone
+Tone4 :: Tone
+Tone5 :: Tone
+Tone6 :: Tone
+Tone7 :: Tone
+Tone8 :: Tone
+Tone9 :: Tone
+Tone10 :: Tone
+Tone11 :: Tone
+Tone12 :: Tone
+ToneUnset :: Tone
 
--- | Select mode by string (e.g., <a>Mode1</a> or <a>Mode12</a> in XML
+-- | Select tone by string (e.g., <a>Tone1</a> or <a>Tone12</a> in XML
 --   input)
-toMode :: String -> Mode
+toTone :: String -> Tone
 
--- | Mode system, <i>durus</i> (natural) or <i>mollis</i> (one flat in the
+-- | Tone system, <i>durus</i> (natural) or <i>mollis</i> (one flat in the
 --   key signature)
 data System
 Durus :: System
 Mollis :: System
 
--- | The series of <a>System</a> values for the modes
-type ModeSystem = Vector (System)
+-- | The series of <a>System</a> values for the tones
+type ToneSystem = Vector (System)
 
 -- | Combination <a>Pnum</a> and <a>Accid</a> used to set a Pitch
 type PnumAccid = (Pnum, Accid)
 
 -- | A list of scales, including some notes with accidentals, from Kircher
-type ModeList = Vector (Vector PnumAccid)
+type ToneList = Vector (Vector PnumAccid)
 
--- | List of modes appropriate for each pinax within each syntagma (style)
-type PinaxModeList = Vector (Vector [[Mode]])
+-- | List of tones appropriate for each pinax within each syntagma (style):
+--   association list mapping style to sets of <i>pinakes</i>, and then
+--   <i>pinakes</i> to tones
+type PinaxLegalTones = AssocList PinaxLabel [[Tone]]
+type PinaxToneList = AssocList Style PinaxLegalTones
+
+-- | Lookup a value by equality in an association list, or raise an error
+--   if not found
+assocLookup :: Eq a => a -> AssocList a b -> String -> b
+
+-- | Get a list of legal tones for a given <a>Style</a> and
+--   <a>PinaxLabel</a>
+tonesPerStyle :: Style -> PinaxLabel -> PinaxToneList -> [[Tone]]
 
 -- | Penultimate Syllable Length
 --   
@@ -407,6 +418,8 @@ data PinaxLabel
 Pinax1 :: PinaxLabel
 Pinax2 :: PinaxLabel
 Pinax3 :: PinaxLabel
+Pinax3a :: PinaxLabel
+Pinax3b :: PinaxLabel
 Pinax4 :: PinaxLabel
 Pinax5 :: PinaxLabel
 Pinax6 :: PinaxLabel
@@ -416,16 +429,17 @@ Pinax9 :: PinaxLabel
 Pinax10 :: PinaxLabel
 Pinax11 :: PinaxLabel
 PinaxNil :: PinaxLabel
+arca2pinax :: Arca -> Style -> PinaxLabel -> Pinax
 
 -- | Get pinax from textual meter; this depends on the <a>Style</a> because
 --   the <i>syntagmata</i> differ in the order of meters, so
---   <a>IambicumEuripidaeum</a> meter in Syntagma 1 is <a>Pinax3</a>, but
+--   <a>IambicumEuripidaeum</a> meter in Syntagma 1 is <a>Pinax4</a>, but
 --   in Syntagma 2 it is <a>Pinax2</a>.
 meter2pinax :: Style -> TextMeter -> PinaxLabel
 
--- | Is this mode acceptable to use for this pinax in this syntagma, for
+-- | Is this tone acceptable to use for this pinax in this syntagma, for
 --   this line number ("stropha")?
-isModeLegalInPinax :: PinaxModeList -> Style -> PinaxLabel -> Int -> Mode -> Bool
+isToneLegalInPinax :: PinaxToneList -> Style -> PinaxLabel -> Int -> Tone -> Bool
 
 -- | In prose, determine <a>TextMeter</a> based on penultimate syllable
 --   length
@@ -435,12 +449,12 @@ proseMeter :: PenultLength -> TextMeter
 --   configuration settings through many functions down to the core level
 --   of pulling data from the ark.
 data ArkConfig
-ArkConfig :: Style -> Mode -> Mode -> MusicMeter -> TextMeter -> ArkConfig
+ArkConfig :: Style -> Tone -> Tone -> MusicMeter -> TextMeter -> ArkConfig
 [arkStyle] :: ArkConfig -> Style
-[arkMode] :: ArkConfig -> Mode
+[arkTone] :: ArkConfig -> Tone
 
--- | optional second mode (only used in syntagma 2, pinax 4)
-[arkModeB] :: ArkConfig -> Mode
+-- | optional second tone (only used in syntagma 2, pinax 4)
+[arkToneB] :: ArkConfig -> Tone
 [arkMusicMeter] :: ArkConfig -> MusicMeter
 [arkTextMeter] :: ArkConfig -> TextMeter
 
@@ -527,19 +541,22 @@ type Syntagma = Vector (Pinax)
 
 -- | A vector of <a>Syntagma</a> instances makes up the full <a>Arca</a>.
 data Arca
-Arca :: Vector Syntagma -> ModeList -> ModeSystem -> PinaxModeList -> VoiceRanges -> Arca
+Arca :: Vector Syntagma -> ToneList -> ToneSystem -> PinaxToneList -> VoiceRanges -> Arca
 [perms] :: Arca -> Vector Syntagma
-[modes] :: Arca -> ModeList
-[systems] :: Arca -> ModeSystem
-[pinaxModes] :: Arca -> PinaxModeList
+[tones] :: Arca -> ToneList
+[systems] :: Arca -> ToneSystem
+[pinaxTones] :: Arca -> PinaxToneList
 [ranges] :: Arca -> VoiceRanges
 
 -- | Just get a vector value by index, safely (combining <a>fromJust</a>
 --   and <a>!?</a>)
 getVectorItem :: String -> Vector a -> Int -> a
 
--- | Getting a <a>Column</a> just requires indexing through nested vectors.
-column :: Arca -> Int -> PinaxLabel -> Int -> Column
+-- | Getting a <a>Column</a> requires indexing through nested vectors. But
+--   because there are two parts of pinax 3 in syntagma 1, we can't just
+--   use the pinax label as an enum; we have to look up the number with
+--   <tt>syntagma2pinax</tt>.
+column :: Arca -> Style -> PinaxLabel -> Int -> Column
 
 -- | Getting a <a>VpermChoir</a> means taking the first of the
 --   <a>Column</a> 2-tuple; we select which one using a random number (from
@@ -560,10 +577,10 @@ rperm :: Column -> MusicMeter -> Int -> RpermChoir
 --   fate and use a random number.
 getVperm :: Arca -> ArkConfig -> Int -> Int -> Int -> VpermChoir
 
--- | Use <tt>modeB</tt> attribute if needed, otherwise <tt>mode</tt> (We
---   only use <tt>modeB</tt> for florid pinax 4, every third and fourth
+-- | Use <tt>toneB</tt> attribute if needed, otherwise <tt>tone</tt> (We
+--   only use <tt>toneB</tt> for florid pinax 4, every third and fourth
 --   line!)
-modeOrModeB :: ArkConfig -> Int -> Mode
+toneOrToneB :: ArkConfig -> Int -> Tone
 
 -- | Select the rhythm values for a single phrase from the ark's rhythm
 --   permutations (Rperms).
@@ -578,9 +595,15 @@ getRperm :: Arca -> ArkConfig -> Int -> Int -> Int -> RpermChoir
 -- | The rule for selecting the column index varies depending on the
 --   <i>pinax</i>. Pinax 1 and 2 are determined by whether the penultimate
 --   syllables is long or short, respectively, and then the column is based
---   on the number of syllables in the phrase. Pinax 3 columns are based on
---   whether the meter is Adonic or Dactylic (5 or six syllables
---   respectively).
+--   on the number of syllables in the phrase.
+--   
+--   For the other <i>pinaces</i> we are supposed to choose successive
+--   columns for each "stropha" (verse line), so here we select based on
+--   the position within a quatrain.
+--   
+--   (TODO Kircher doesn't provide clear guidance about how to deal with
+--   poetry that cannot or should not be grouped in quatrains, and neither
+--   do we.)
 --   
 --   There are different rules for each syntagma, hence the need for Style
 --   input.
@@ -653,7 +676,6 @@ instance GHC.Classes.Ord Aedifico.ArkConfig
 instance GHC.Classes.Eq Aedifico.ArkConfig
 instance GHC.Classes.Eq Aedifico.PinaxLabel
 instance GHC.Classes.Ord Aedifico.PinaxLabel
-instance GHC.Enum.Enum Aedifico.PinaxLabel
 instance GHC.Show.Show Aedifico.PinaxLabel
 instance GHC.Classes.Ord Aedifico.PenultLength
 instance GHC.Classes.Eq Aedifico.PenultLength
@@ -662,10 +684,10 @@ instance GHC.Show.Show Aedifico.PenultLength
 instance GHC.Classes.Ord Aedifico.System
 instance GHC.Classes.Eq Aedifico.System
 instance GHC.Enum.Enum Aedifico.System
-instance GHC.Classes.Ord Aedifico.Mode
-instance GHC.Classes.Eq Aedifico.Mode
-instance GHC.Enum.Enum Aedifico.Mode
-instance GHC.Show.Show Aedifico.Mode
+instance GHC.Classes.Ord Aedifico.Tone
+instance GHC.Classes.Eq Aedifico.Tone
+instance GHC.Enum.Enum Aedifico.Tone
+instance GHC.Show.Show Aedifico.Tone
 instance GHC.Classes.Ord Aedifico.Style
 instance GHC.Classes.Eq Aedifico.Style
 instance GHC.Enum.Enum Aedifico.Style
@@ -714,7 +736,7 @@ instance GHC.Show.Show Aedifico.VoiceName
 --   ark. This <i>pinax</i> (<a>s1p1</a>) is for phrases with long
 --   penultimate syllables. It contains five columns.
 --   
---   It may be used with any mode except for IV and V. II and VI are
+--   It may be used with any tone except for IV and V. II and VI are
 --   especially recommended.
 module Arca_musarithmica.Syntagma1.Pinax01
 
@@ -732,7 +754,7 @@ s1p1 :: Pinax
 --   ark. This <i>pinax</i> (<a>s1p2</a>) is for phrases with short
 --   penultimate syllables. It contains five columns.
 --   
---   It may be used with any mode except IV and V. II and VI are especially
+--   It may be used with any tone except IV and V. II and VI are especially
 --   recommended.
 module Arca_musarithmica.Syntagma1.Pinax02
 
@@ -743,22 +765,29 @@ s1p2 :: Pinax
 
 
 -- | Sub-structures used by <tt>Arca_musarithmica</tt> to build Kircher's
---   ark. This <i>pinax</i> (<a>s1p3</a>) is for poetry in Adonic meter
---   (<tt>`--`-</tt>) or Dactylic (<tt>`--`--</tt>). On paper it contains
---   four columns for each meter (eight total), but there is only one rperm
---   for each side, repeated for each column. So we implement the
---   <i>pinax</i> as having two columns, each 40 vperms long. Column 0 is
---   for Adonic; Column 1, for Dactylic meter.
+--   ark. This <i>pinax</i> (<a>s1p3a</a>) is for poetry in Adonic meter
+--   (<tt>`--`-</tt>). It contains four columns, one for each successive
+--   verse line ("Kircher's stropha") of a quatrain. There is only one
+--   rperm for each side, repeated for each column.
 --   
---   It may be used with any mode, especially 2 and 6.
---   
---   TODO -- Kircher actually says on p. 79 that the four columns are to
---   allow you to set successive <i>strophae</i> to different music, so our
---   one-column implementation is no good.
-module Arca_musarithmica.Syntagma1.Pinax03
+--   It may be used with any tone, especially 2 and 6.
+module Arca_musarithmica.Syntagma1.Pinax03a
 
 -- | Pinax 3
-s1p3 :: Pinax
+s1p3a :: Pinax
+
+
+-- | Sub-structures used by <tt>Arca_musarithmica</tt> to build Kircher's
+--   ark. This <i>pinax</i> (<a>s1p3b</a>) is for poetry in Dactylic meter
+--   (<tt>`--`--</tt>). It contains four columns, one for each successive
+--   verse line ("Kircher's stropha") of a quatrain. There is only one
+--   rperm for each side, repeated for each column.
+--   
+--   It may be used with any tone, especially 2 and 6.
+module Arca_musarithmica.Syntagma1.Pinax03b
+
+-- | Pinax 3
+s1p3b :: Pinax
 
 
 -- | Sub-structures used by <tt>Arca_musarithmica</tt> to build Kircher's
@@ -768,7 +797,7 @@ s1p3 :: Pinax
 --   four-line strophe (though each column is confusingly labeled
 --   "stropha"). There is only one <a>RpermTable</a> for all four columns.
 --   
---   Acceptable modes are I, II, III, IV, IX, and X.
+--   Acceptable tones are I, II, III, IV, IX, and X.
 module Arca_musarithmica.Syntagma1.Pinax04
 
 -- | Pinax 4
@@ -782,7 +811,7 @@ s1p4 :: Pinax
 --   lines 1--4 as in <tt>Pinax4</tt>. There is only one <a>RpermTable</a>
 --   for all four columns.
 --   
---   It may be used with Mode I, II, III, IV, IX, and X.
+--   It may be used with tone I, II, III, IV, IX, and X.
 module Arca_musarithmica.Syntagma1.Pinax05
 
 -- | Pinax 5
@@ -796,7 +825,7 @@ s1p5 :: Pinax
 --   columns, one for each successive line (but called "strophes"). There
 --   is only one <a>RpermTable</a> for all four columns.
 --   
---   It may be used with mode V, VI, VIII, and XII.
+--   It may be used with tone V, VI, VIII, and XII.
 module Arca_musarithmica.Syntagma1.Pinax06
 
 -- | Pinax 6
@@ -810,7 +839,7 @@ s1p6 :: Pinax
 --   successive line (but called "strophes"). There is only one
 --   <a>RpermTable</a> for all four columns.
 --   
---   It may be used with mode V, VI, VIII, X, and XII.
+--   It may be used with tone V, VI, VIII, X, and XII.
 module Arca_musarithmica.Syntagma1.Pinax07
 
 -- | Pinax 7
@@ -824,7 +853,7 @@ s1p7 :: Pinax
 --   line (but called "strophes"). There is only one <a>RpermTable</a> for
 --   all four columns.
 --   
---   It may be used with mode V, VI, VII, VIII, XI, and XII.
+--   It may be used with tone V, VI, VII, VIII, XI, and XII.
 module Arca_musarithmica.Syntagma1.Pinax08
 
 -- | Pinax 8
@@ -844,7 +873,7 @@ s1p8 :: Pinax
 --   major (cut C), duple minor (compasillo, C), and triple major (cut C
 --   3). There is actually no rperm for triple minor (C3).
 --   
---   It may be used with mode I, II, III, IV, and VII.
+--   It may be used with tone I, II, III, IV, and VII.
 module Arca_musarithmica.Syntagma1.Pinax09
 
 -- | Pinax 9
@@ -861,7 +890,7 @@ s1p9 :: Pinax
 --   There is only one <a>RpermTable</a> for the three 11-syllable columns,
 --   and a separate one for the Adonic column.
 --   
---   It may be used with modes I, II, III, IV, IX, and X.
+--   It may be used with tones I, II, III, IV, IX, and X.
 module Arca_musarithmica.Syntagma1.Pinax10
 
 -- | Pinax 10
@@ -875,7 +904,7 @@ s1p10 :: Pinax
 --   for each successive line (but called "strophes"). There is only one
 --   <a>RpermTable</a> for all four columns.
 --   
---   It may be used with mode V, VI, VII, VIII, XI, and XII.
+--   It may be used with tone V, VI, VII, VIII, XI, and XII.
 module Arca_musarithmica.Syntagma1.Pinax11
 
 -- | Pinax 11
@@ -933,7 +962,7 @@ s2p1 :: Pinax
 --   PINAX II. "Musarithmi Melothesias Floridae siue Artificiose pro metris Iambicis, Euripedaeis, Hectasyllabis"
 --   </pre>
 --   
---   He does not give any limitations of modes.
+--   He does not give any limitations of tones.
 module Arca_musarithmica.Syntagma2.Pinax02
 
 -- | Pinax 2
@@ -951,7 +980,7 @@ s2p2 :: Pinax
 --   Pro metris Anacreonticis."
 --   </pre>
 --   
---   This pinax is for <i>toni</i> (modes) 1, 2, 3, 4, 9, and 10.
+--   This pinax is for <i>toni</i> (tones) 1, 2, 3, 4, 9, and 10.
 module Arca_musarithmica.Syntagma2.Pinax03
 
 -- | Pinax 3
@@ -970,7 +999,7 @@ s2p3 :: Pinax
 --   "PINAX IV. Melothesiae [-as?] floridae &amp; artificiosae Musarithmos continens PreIambicis Archilochijs."
 --   </pre>
 --   
---   This pinax is for these <i>toni</i> (modes):
+--   This pinax is for these <i>toni</i> (tones):
 --   
 --   <ul>
 --   <li>strophes 1--2: 5, 6, 7, 8, 11, and 12</li>
@@ -996,7 +1025,7 @@ s2p4 :: Pinax
 --   "PINAX V. Melothesiae [-as?] Floridae &amp; artificiosae Musarithmos continens. Pro metris Enneasyllabis &amp; Decasyllabis."
 --   </pre>
 --   
---   This pinax is for <i>toni</i> (modes) 1, 2, 3, 4, 9, and 10.
+--   This pinax is for <i>toni</i> (tones) 1, 2, 3, 4, 9, and 10.
 module Arca_musarithmica.Syntagma2.Pinax05
 
 -- | Pinax 5
@@ -1019,7 +1048,7 @@ s2p5 :: Pinax
 --   
 --   metris sapphicis quibuslibet Hendecasyllabis."
 --   
---   This pinax is for <i>toni</i> (modes) 1, 2, 3, 4, 9, and 10 in all
+--   This pinax is for <i>toni</i> (tones) 1, 2, 3, 4, 9, and 10 in all
 --   three "strophes."
 --   
 --   <b>TODO</b>: The problem is that in Sapphic meter there are stanzas of
@@ -1139,50 +1168,63 @@ module Arca_musarithmica
 --   The other columns are constructed similarly with the data from
 --   Kircher.
 --   
---   The arca also includes Kircher's list of notes in each mode with their
---   accidentals, a list indicating which modes are <i>cantus durus</i>
+--   The arca also includes Kircher's list of notes in each tone with their
+--   accidentals, a list indicating which tones are <i>cantus durus</i>
 --   (all naturals in the signature) or <i>cantus mollis</i> (one B flat in
---   the signature), a list of which modes are acceptable in each
+--   the signature), a list of which tones are acceptable in each
 --   <i>pinax</i>, and a list of the acceptable ranges for each voice based
 --   on the most conventional clef combination.
 arca :: Arca
 
--- | Range for each voice, based on SATB C-clef ranges, up to one note
---   above and below the staff (Soprano C1, alto C3, tenor C4, bass f4
---   clefs).
+-- | Range for each voice, based on SATB C-clef ranges, generally up to one
+--   note above and below the staff (Soprano C1, alto C3, tenor C4, bass f4
+--   clefs), as shown on the front of the ark in Iconismus XIV. We are
+--   using the untransposed ranges. These are notably different from those
+--   of a modern mixed choir, as Kircher as all-male choirs in mind and the
+--   alto clef gives a much lower range.
 --   
---   I have adapted these ranges to those of a modern mixed choir, because
---   Kircher has all-male choirs in mind and the alto clef gives a much
---   lower range.
+--   NB (unimplemented part of specification):
+--   
+--   Kircher says that if a voice goes out of range, one option to fix it
+--   is to switch to the transposing set of clefs shown on the ark. We are
+--   not implementing this, because (1) nobody ever switched to transposing
+--   clefs for a single phrase and then back, (2) we have a better
+--   algorithm for setting the melodies within range than the incomplete
+--   specification provided by Kircher
+--   (<tt>Cogito.Musarithmia.stepwiseVoiceInRange</tt>).
 _vocalRanges :: VoiceRanges
 
--- | Mode system (<a>Durus</a>, all naturals; or <a>Mollis</a>, one B flat)
---   per mode
-_modeSystems :: ModeSystem
+-- | Tone system (<a>Durus</a>, all naturals; or <a>Mollis</a>, one B flat)
+--   per tone
+_toneSystems :: ToneSystem
 
--- | Notes in the scale for each mode, with accidentals:
+-- | Notes in the scale for each tone, with accidentals:
 --   
 --   Kircher includes suggested flats and sharps on notes likely to be
---   altered in <i>musica ficta</i> practice; in his mode tables he omits
---   the B flats that would always be added in modes in <i>cantus
+--   altered in <i>musica ficta</i> practice; in his tone tables he omits
+--   the B flats that would always be added in tones in <i>cantus
 --   mollis</i>
 --   
 --   We include both here, and elsewhere in the program we determine
 --   whether the B flat is from the signature or should be treated as
 --   <i>ficta</i>.
-_modeList :: ModeList
+--   
+--   The tones on p. 51 and on the Iconismus illustration do not agree. We
+--   follow the (presumably later) version on the Iconismus, which corrects
+--   errors in the <i>mensa tonographica</i> of p. 51.
+_toneList :: ToneList
 
--- | Set of all mode labels
-_allModes :: [Mode]
+-- | Set of all tone labels
+_allTones :: [Tone]
 
 -- | Exclude elements of list in arg1 from list in arg2
 listExclude :: (Foldable t, Eq a) => t a -> [a] -> [a]
 
--- | Create a list of modes, excluding blacklist from <tt>_allModes</tt>
-allModesExcept :: [Mode] -> [Mode]
+-- | Create a list of tones, excluding blacklist from <tt>_allTones</tt>
+allTonesExcept :: [Tone] -> [Tone]
 
--- | Modes appropriate for each pinax
-_pinaxModes :: PinaxModeList
+-- | Tones appropriate for each pinax
+_pinaxTones :: PinaxToneList
 
 
 -- | This module provides the tools used in the main <tt>Cogito</tt> module
@@ -1192,6 +1234,25 @@ _pinaxModes :: PinaxModeList
 --   The <a>stepwiseVoiceInRange</a> function tests all the possible
 --   permutations of octaves for the pitches in a phrase and finds the best
 --   path, with the minimum of large leaps and notes out of range.
+--   
+--   Kircher's specification for how to put voices in range is incomplete,
+--   and his own implementation is inconsistent, as demonstrated by his
+--   examples. He says to find the next closest pitch "within the octave"
+--   among the notes on the staff (i.e., the notes within range), but he
+--   doesn't define "within the octave." Sometimes he leaps a fifth instead
+--   of a fourth, which would break that rule.
+--   
+--   Sometimes a gesture requires the voice to go out of range. Kircher
+--   says in that case you can switch clefs. But that doesn't change the
+--   notes a singer can sing. If he means to change to transposing clefs,
+--   that might work, but no one ever changed to transposing clefs for only
+--   a single phrase and then went back.
+--   
+--   Instead, this module provides an algorithm that works every time to
+--   produce an optimal melody with a small ambitus, minimum number of
+--   notes outside of range, and small leaps. This seems very close to what
+--   Kircher probably thought musicians would do intuitively, but did not
+--   fully specify programmatically.
 module Cogito.Musarithmetic
 
 -- | A <a>Voice</a> is a list of pitches with an identifier for the voice
@@ -1278,16 +1339,16 @@ type MusicScore = [MusicChorus]
 --   to mark this?
 newRest :: Dur -> Pitch
 
--- | Is a mode in <i>cantus mollis</i>? Should there be a flat in the key
+-- | Is a tone in <i>cantus mollis</i>? Should there be a flat in the key
 --   signature?
-modeMollis :: Mode -> ModeSystem -> Bool
+toneMollis :: Tone -> ToneSystem -> Bool
 
--- | Adjust a pitch to be in a given mode.
-pnumAccidInMode :: Int -> ModeList -> Mode -> PnumAccid
+-- | Adjust a pitch to be in a given tone.
+pnumAccidInTone :: Int -> ToneList -> Tone -> PnumAccid
 
--- | Get the modal final for this mode. What pitch = 0 in this mode? (In
+-- | Get the modal final for this tone. What pitch = 0 in this tone? (In
 --   Kircher's 1-indexed vperms, the final is 1 or 8.)
-modalFinal :: ModeList -> Mode -> Pitch
+modalFinal :: ToneList -> Tone -> Pitch
 
 -- | Check to see if a rhythmic duration is a rest type (the rest enums
 --   begin with <a>LgR</a> so we compare with that)
@@ -1482,7 +1543,7 @@ stepwiseTree :: [[Pitch]] -> Btree Pitch
 --   
 --   Avoid large or illegal leaps and stay as much in range as possible.
 --   For example, some melodies have long stepwise ascents or descents
---   which, in certain modes, will take the voice out of range, and if we
+--   which, in certain tones, will take the voice out of range, and if we
 --   adjust them in the middle, we will get an illegal seventh interval.
 --   
 --   We build a list of candidate pitches within the range, then we build a
@@ -1536,6 +1597,8 @@ sharpen :: Pitch -> Pitch
 
 -- | Copy pitch but change <a>accid</a> and <a>accidType</a>
 changeAccid :: Accid -> AccidType -> Pitch -> Pitch
+
+-- | Change the <a>Accid</a> of the <a>Pitch</a> within a <a>Note</a>
 changeNoteAccid :: Accid -> AccidType -> Note -> Note
 
 -- | Cancel an accidental (suggested)
@@ -1583,34 +1646,51 @@ findCounterpoint :: MusicPhrase -> MusicPhrase -> Int -> Note
 --   (fusa) = 1?
 durQuantity :: Dur -> Int
 
--- | Adjust a chorus for <i>musica ficta</i>: adjust bass first, and then
---   apply a function to each of the upper voices adjusting it relative to
---   the revised bass.
-adjustFictaChorus :: ModeSystem -> ModeList -> MusicChorus -> MusicChorus
+-- | Apply <i>ficta</i> adjustments to whole <tt>MusicPhrase</tt>s. Adjust
+--   bass voice first; then adjust the upper voices individually, then
+--   adjust them again relative to the bass.
+adjustFictaChorus :: ToneSystem -> ToneList -> MusicChorus -> MusicChorus
+
+-- | Adjust <i>musica ficta</i> for all the notes for one voice in a
+--   'MusicSection.'
+--   
+--   These rules are based on Kircher but had to be expanded as he doesn't
+--   account for some important and common cases.
+--   
+--   TODO they still don't deal with every problem. Some would be
+--   automatically corrected by competent performers.
+--   
+--   #^7: - If the tone table has 8, keep the sharp - If it has #^7 and it
+--   is the last note in the phrase, and it is not the bass voice, keep the
+--   sharp - Otherwise make it natural
+--   
+--   b^6: - If the tone table has b^6, cancel the flat if the next note is
+--   #^7
+--   
+--   After making either of the above adjustments, go through and check for
+--   repeated notes: make them match the next accidental (G♮-G# should be
+--   G).
+adjustFictaVoice :: ToneList -> Tone -> MusicSection -> MusicSection
+
+-- | Adjust <i>musica ficta</i> in an upper voice relative to the bass.
+--   Avoid cross relations and augmented fifths. (I guess tritones are
+--   okay?)
+adjustRelBass :: ToneList -> Tone -> MusicSection -> MusicSection -> MusicSection
 
 -- | Map a function to the phrases in one section (upper voice) relative to
 --   the phrases in another section (lower voice).
 adjustPhrasesInSection :: (MusicPhrase -> MusicPhrase -> MusicPhrase) -> MusicSection -> MusicSection -> MusicSection
 
--- | Apply <i>musica ficta</i> adjustments to a whole <a>MusicPhrase</a>.
---   Some adjustments only involve this phrase, while others must be
---   relative to the bass voice. The bass voice should be adjusted already
---   before this function is called.
---   
---   Adjustments: (1) scale degree seven should be sharp if that is
---   suggested in the mode table only if it is going up to eight and if the
---   bass is on scale degree five; (2) scale degree six should be flat if
---   that is suggested in the mode table only if it is going down to five;
---   (3) repeated notes should match the last accidental in the series [as
---   long as the harmonies with the bass are okay? TODO]; (4) there should
---   be no cross-relations or augmented fifths.
---   
---   TODO active development; not everything working
-adjustFictaPhrase :: ModeList -> Mode -> MusicPhrase -> MusicPhrase -> MusicPhrase
+-- | Apply <i>musica ficta</i> adjustments to a whole <a>MusicPhrase</a>
+--   relative to the bass phrase.
+adjustFictaPhrase :: ToneList -> Tone -> MusicPhrase -> MusicPhrase -> MusicPhrase
 
--- | Return the 0-indexed scale degree of a given pitch in a given mode
+-- | Return the 0-indexed scale degree of a given pitch in a given tone
 --   (scale degree 0 is the modal final)
-scaleDegree :: ModeList -> Mode -> Pitch -> Int
+scaleDegree :: ToneList -> Tone -> Pitch -> Int
+
+-- | 1-indexed scale degree (more intelligible to the musical programmer)
+scaleDegree1 :: ToneList -> Tone -> Pitch -> Int
 
 -- | Does this <a>Pitch</a> have the given accidental as <a>Suggested</a>?
 isFictaAccid :: Accid -> Pitch -> Bool
@@ -1621,14 +1701,9 @@ isFictaAccidNote :: Accid -> Note -> Bool
 -- | Fix bad intervals against a lower voice in a <a>MusicPhrase</a>
 fixIntervalsInPhrase :: MusicPhrase -> MusicPhrase -> MusicPhrase
 
--- | No cross relations, augmented fifths, or tritones between upper and
---   lower note
+-- | No cross relations or augmented fifths between upper and lower note
+--   (TODO tritones?)
 fixIntervals :: Note -> Note -> Note
-
--- | Avoid cross relations (TODO other intervals?) between upper voices. If
---   there is a cross relation on notes with <a>Suggested</a> accidentals,
---   match the lower voice.
-fixUpperVoiceIntervals :: Note -> Note -> Note
 
 -- | Are these pitches the same pitch class but different accidentals?
 --   (E.g., F vs F#?)
@@ -1636,51 +1711,6 @@ isCrossRelation :: Pitch -> Pitch -> Bool
 
 -- | Are these pitches an augmented fifth apart?
 isAugFifth :: Pitch -> Pitch -> Bool
-
--- | Are these two notes a tritone apart chromatically?
-isTritone :: Pitch -> Pitch -> Bool
-
--- | Adjust <i>musica ficta</i> accidentals in the bass.
-adjustBassFicta :: ModeSystem -> ModeList -> Mode -> MusicSection -> MusicSection
-
--- | Fix melodic tritone before or after B (fold function)
-fixMelodicTritone :: ModeSystem -> Mode -> [Note] -> Note -> [Note]
-
--- | Test the <a>Pnum</a> and <a>Accid</a> of a <a>Note</a> against given
---   values
-testPitchAccid :: Pnum -> Accid -> Note -> Bool
-
--- | Fix descending scale-degree sevens and ascending sixes (fold function)
-fixSixSeven :: ModeList -> Mode -> [Note] -> Note -> [Note]
-
--- | Cancel the <a>Pitch</a> in a <a>Note</a>
-cancelNote :: Note -> Note
-
--- | If this note is suggested flat, and the next note is suggested sharp,
---   make this note natural.
-fixFlatSharp :: [Note] -> Note -> [Note]
-
--- | If there are two subsequent accidental inflections of a note (e.g., F
---   natural--F sharp or vice versa), make the first note match the second.
---   This deals with a byproduct of <a>sharpLeadingTone</a> with repeated
---   notes, where that function would turn F--F--G into F--F#--G. This
---   function would make it F--G.
-fixAccidRepeat :: [Note] -> Note -> [Note]
-
--- | Fix the leading tones of a <a>MusicPhrase</a>.
-fixLeadingTonesInPhrase :: ModeList -> Mode -> MusicPhrase -> MusicPhrase -> MusicPhrase
-
--- | Fold function for adjusting the leading tones in the upper voice of a
---   list of (upper, lower) <a>Note</a> pairs
-fixLeadingTonePairs :: ModeList -> Mode -> [(Note, Note)] -> (Note, Note) -> [(Note, Note)]
-
--- | Sharp highest scale degree in an upper voice (1) when it leads up to
---   scale-degree eight, and (2) when the bass note is on scale degree
---   five. (TODO or two?)
---   
---   Remember, these are all 0-indexed numbers instead of the 1-indexed
---   numbers used in speech (degree 6 here is "scale degree 7" in speech).
-sharpLeadingTone :: ModeList -> Mode -> Note -> Note -> Note -> Note
 
 
 -- | This module reads (<i>lectio</i>, Latin, "I read") and process input
@@ -1719,7 +1749,7 @@ sharpLeadingTone :: ModeList -> Mode -> Note -> Note -> Note -> Note
 --   or <tt>TripleMajor</tt></li>
 --   <li><i><tt>style</tt></i> <tt>Simple</tt> (= Syntagma I) or
 --   <tt>Florid</tt> (= Syntagma II)</li>
---   <li><i><tt>mode</tt></i> e.g., <tt>Mode1</tt></li>
+--   <li><i><tt>tone</tt></i> e.g., <tt>Tone1</tt></li>
 --   </ul>
 --   
 --   Within each section the text is divided into one or more line groups
@@ -1797,7 +1827,7 @@ ArkMetadata :: String -> String -> ArkMetadata
 [arkTitle] :: ArkMetadata -> String
 [arkWordsAuthor] :: ArkMetadata -> String
 
--- | The input to the ark is an <a>ArkConfig</a> element with mode, style,
+-- | The input to the ark is an <a>ArkConfig</a> element with tone, style,
 --   and meter; and a list of strings, each of which will become a
 --   <a>LyricSentence</a>
 data ArkInput
@@ -1891,7 +1921,7 @@ LyricSentence :: [LyricPhrase] -> PhrasesInLyricSentence -> LyricSentence
 --   <a>ArkConfig</a>.
 --   
 --   Including an <a>ArkConfig</a> structure makes it possible to structure
---   the input text and program the ark to change meters or modes for
+--   the input text and program the ark to change meters or tones for
 --   different sections.
 data LyricSection
 LyricSection :: ArkConfig -> [LyricSentence] -> LyricSection
@@ -2026,7 +2056,7 @@ instance GHC.Show.Show Fortuna.Perm
 --   text, using the random permutations when a free choice would otherwise
 --   be needed. It takes the numerals and rhythmic symbols from Kircher's
 --   <i>pinakes</i> (rods); converts the numerals to pitches according to
---   the mode, and combines the pitches and rhythms (accounting for rests
+--   the tone, and combines the pitches and rhythms (accounting for rests
 --   as well).
 --   
 --   The module creates the <a>MusicScore</a> data structure which contains
@@ -2064,15 +2094,15 @@ zipFill :: [a] -> [b] -> (a -> Bool) -> b -> [(a, b)]
 
 -- | Make a pitch from duration and pitch number. Start with zero octave;
 --   we'll set it later using <a>stepwiseVoiceInRange</a>. Adjust the pitch
---   for mode (<a>pnumAccidInMode</a>).
+--   for tone (<a>pnumAccidInTone</a>).
 --   
 --   <b>TODO</b>: This could also be generalized; we are not checking
 --   inputs because we control data input.
-pair2Pitch :: ModeList -> ModeSystem -> Mode -> (Dur, Int) -> Pitch
+pair2Pitch :: ToneList -> ToneSystem -> Tone -> (Dur, Int) -> Pitch
 
 -- | Is this note a B flat, and if so, is the flat already in the key
 --   signature?
-isBflatInSignature :: Pnum -> Accid -> Mode -> ModeSystem -> Bool
+isBflatInSignature :: Pnum -> Accid -> Tone -> ToneSystem -> Bool
 
 -- | Get the right starting octave range for each voice type voice2octave
 --   :: VoiceName -&gt; Int
@@ -2237,7 +2267,7 @@ meiDur :: Pitch -> String
 --   
 --   <b>TODO</b> Verovio will display the accidental if the <tt>accid</tt>
 --   attribute or element is present, regardless of the key signature. We
---   would need to check the mode/key and then use accid.ges for
+--   would need to check the tone/key and then use accid.ges for
 --   accidentals that are in the key signature.
 meiAccid :: Pitch -> String
 
@@ -2302,17 +2332,17 @@ section2mei :: Arca -> (ListPosition, MusicSection) -> String
 --   <tt>section</tt> including all the voices. Add a final bar at the end.
 chorus2mei :: Arca -> (ListPosition, MusicChorus) -> String
 
--- | Create an MEI key signature (all naturals or one flat) based on mode
+-- | Create an MEI key signature (all naturals or one flat) based on tone
 --   (<tt>key.sig</tt> attribute for use in
 --   <tt>scoreDef</tt>/<tt>staffDef</tt>)
-meiKey :: Mode -> ModeSystem -> String
+meiKey :: Tone -> ToneSystem -> String
 
 -- | MEI key signature as an attribute (for use in <tt>staffDef</tt>)
-meiKeyAttr :: Mode -> ModeSystem -> String
+meiKeyAttr :: Tone -> ToneSystem -> String
 
--- | Value for MEI <tt>key.sig</tt>: one flat if mode is <i>mollis</i>, no
+-- | Value for MEI <tt>key.sig</tt>: one flat if tone is <i>mollis</i>, no
 --   signature otherwise
-meiKeySigString :: Mode -> ModeSystem -> String
+meiKeySigString :: Tone -> ToneSystem -> String
 
 -- | Switch to select which kind of meter to use as an element
 meiMeter :: MusicMeter -> String
