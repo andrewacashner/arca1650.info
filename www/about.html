@@ -56,11 +56,16 @@
               </li>
               <li>The <strong>mood</strong> or character of the text and its
                 setting, which determines the choice of one of twelve musical
-                modes (<em>tonoi</em>).  
-                <p>
-                Kircher’s <em>modes</em> are more like <q>church keys</q> and
-                don’t line up exactly with the older modes most musicians
-                learned.
+                <q>tones</q> or <q>church keys</q> (<em>toni
+                  ecclesiastici</em>). 
+                The tones are not the same as modern keys, nor do they match
+                up exactly with the medieval modes used to classify
+                plainchant.
+                They seem to be a hybrid of the polyphonic <q>tones</q> used
+                by keyboardists to introduce and accompany the eight
+                traditional chant psalm tones, with the twelve-mode system
+                introduced by the earlier theorists Glarean and Zarlino.
+                (see <a href="#Barnett:TonalOrganization17C">Barnett 2002</a>).
                 </p>
               </li>
               <li>The <strong>musical meter</strong> (technically, mensuration)
@@ -134,12 +139,12 @@
                 You draw out four staves and put an appropriate combination of clefs
                 for the four voices. These determine the octave and range of the
                 musical output for each voice. You also add a flat in the key
-                signature if your mode is in <em>cantus mollis</em> according to the
+                signature if your tone is in <em>cantus mollis</em> according to the
                 table, and add the appropriate mensuration sign.
               </li>
               <li><strong>Matching pitches, rhythms, and syllables:</strong> For
                 each phrase of text, you take the pitch numbers and look them up in
-                the table for the given mode in order to get note names. You pair
+                the table for the given tone in order to get note names. You pair
                 these note names with the rhythmic values, or just put rests when
                 those are given. You write these values on the staff,
                 making certain adjustments as needed.
@@ -152,7 +157,7 @@
                   <li>If the notes go out of range for that voice (too far above or
                     below the staff), you may shift them up or down by octave as
                     needed.</li>
-                  <li>The mode tables specify that you may add sharps or flats on
+                  <li>The tone tables specify that you may add sharps or flats on
                     certain notes according to <em>musica ficta</em> rules.</li>
                   <li>You may also do more complicated things like swapping the
                     notes for adjacent voices, which require your own judgment.</li>
@@ -178,7 +183,7 @@
         avoiding unwieldy leaps; I have written my own algorithm (using binary
         decision trees and weighted <q>badness</q> scores) to do this.</p>
         <p>Kircher also does not provide a full specification for applying
-        <em>musica ficta</em> accidentals based on his mode tables and other
+        <em>musica ficta</em> accidentals based on his tone tables and other
         rules. Human performers who know the conventions of Kircher’s day
         could probably adjust the music in performance, but to make the music
         sound good automatically, as in the MIDI renditions on this website,
@@ -191,7 +196,7 @@
         text into sections, sentences/stanzas, and phrases/lines.
         We generate a list of random numbers to use for each phrase, then we
         use these to select the correct vperms and rperms, and adjust these for
-        mode and range according to the rules. We then convert our internal data
+        tone and range according to the rules. We then convert our internal data
         types into MEI-XML output.</p>
         <p>In the web app, we use the third-party Verovio app to render the
         musical data to notation and MIDI format for automatic playback.</p>
@@ -250,6 +255,12 @@
           <h3>References</h3>
 
           <ul class="bibliography">
+            <li id="Barnett:TonalOrganization17C">Barnett, Gregory. 2002.
+              <q>Tonal Organization in Seventeenth-Century Music Theory.</q>
+              In <cite>The Cambridge History of Western Music Theory</cite>,
+              ed. Thomas Christensen (Cambridge: Cambridge University Press),
+              407--455. 
+            </li>
             <li id="Bohnert:Kircher">Bohnert, Agnes Cäcilie. 2010.
               <cite>Die arca musarithmica Athanasius Kirchers</cite>.
               Dissertation, Technische Universität Berlin.

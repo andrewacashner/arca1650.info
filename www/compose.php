@@ -22,7 +22,7 @@
 $inputText  = $_POST['inputText'];
 $inputType  = $_POST['inputType'];
 $inputStyle = $_POST['style'];
-$inputMode  = $_POST['mode'];
+$inputTone  = $_POST['tone'];
 $inputMeter = $_POST['musicMeter'];
 
 # File basenames for input and output
@@ -72,7 +72,7 @@ putenv('LANG=en_US.UTF-8');
 if ($inputType == "diy") {
 
     # For DIY files, users set their own parameters for style, meter, and
-    # mode.  The input files have placeholder strings for these XML
+    # tone.  The input files have placeholder strings for these XML
     # attributes, so we read in the input file, and replace the placeholders
     # with the values taken from the HTML form input.  We pass this modified
     # file text (as string) to arca in the shell.
@@ -81,8 +81,8 @@ if ($inputType == "diy") {
 
     $fileString  = file_get_contents($infileName);
     $fileString  = str_replace(
-        array("{style}", "{musicMeter}", "{mode}"),
-        array($style[$inputStyle], $inputMeter, $inputMode), 
+        array("{style}", "{musicMeter}", "{tone}"),
+        array($style[$inputStyle], $inputMeter, $inputTone), 
         $fileString);
 
     $fileString = escapeshellarg($fileString);
@@ -126,7 +126,7 @@ $mei = addslashes($rawMei);
         }
         window.meiXML = mei;
 
-        console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], mode [<?=$inputMode?>], meter [<?=$inputMeter?>]...");
+        console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], tone [<?=$inputTone?>], meter [<?=$inputMeter?>]...");
         console.log("Loading input file [<?=$infileName?>]...");
         console.log("Rendering MEI output file beginning [%s]...", window.meiXML.substring(0,300));
     </script>
@@ -198,7 +198,7 @@ $mei = addslashes($rawMei);
       <nav>
         <ul>
           <li><a href="index.html">Home</a></li>
-          <li><a href="description.html">About</a></li>
+          <li><a href="about.html">About</a></li>
           <li><a href="doc/index.html">Code</a></li>
         </ul>
       </nav>

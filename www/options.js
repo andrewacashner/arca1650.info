@@ -41,7 +41,7 @@ function removeChildren(node) {
 
 /* PREPARED MODE
  *
- * Conditional dropdown menus for prepared mode, where user selects style and
+ * Conditional dropdown menus for prepared tone, where user selects style and
  * input text only
  */
 
@@ -84,18 +84,18 @@ function preparedTextOptions(style) {
 
 /* DIY MODE
  *
-/* Conditional dropdown menus in do-it-yourself mode, where user selects
- * style, text, mode, and meter
+/* Conditional dropdown menus in do-it-yourself tone, where user selects
+ * style, text, tone, and meter
  */
 
 /* Update the select options:
- * For mode, just reset to the default option; we will fully set the mode
+ * For tone, just reset to the default option; we will fully set the tone
  * options after style and text are both selected.
  */
 function diySetOptions(style) {
     diyTextOptions(style);
     diyMeterOptions(style);
-    diyModeOptions(style); 
+    diyToneOptions(style); 
 }
 
 /* Update 'inputText' select options with only the texts that can be set in
@@ -153,16 +153,16 @@ function diyMeterOptions(style) {
     return true;
 }
 
-/* Update 'mode' select element with the correct options for permissible modes
+/* Update 'tone' select element with the correct options for permissible tones
  * for given style ("simple" or "florid") and text ("inputText" value).
  *
  * 'Text' argument is optional; if it is omitted we just reset the default
  * option.
  */
-function diyModeOptions(style, text) { 
-    console.log("Displaying mode options for style '%s', text '%s'", style, text);
+function diyToneOptions(style, text) { 
+    console.log("Displaying tone options for style '%s', text '%s'", style, text);
 
-    let legalModes = {
+    let legalTones = {
         "simple": {
             "Abide":                // Decasyllabicum           // Pinax 8
             [5, 6, 7, 8, 11, 12],
@@ -197,40 +197,40 @@ function diyModeOptions(style, text) {
         }
     };
 
-    let modeLabels = {
-        "Mode0":  "Select a mode or mood",
-        "Mode1":  "Mode I: Pious, religious",
-        "Mode2":  "Mode II: Cheerful, easygoing",
-        "Mode3":  "Mode III: Tearful",
-        "Mode4":  "Mode IV: Sad, mournful",
-        "Mode5":  "Mode V: Heroic, lively",
-        "Mode6":  "Mode VI: Warlike",
-        "Mode7":  "Mode VII: Delightful",
-        "Mode8":  "Mode VIII: Joyful",
-        "Mode9":  "Mode IX: Confident",
-        "Mode10": "Mode X: Calm, mild",
-        "Mode11": "Mode XI: Majestic",
-        "Mode12": "Mode XII: Grave, austere"
+    let toneLabels = {
+        "Tone0":  "Select a tone or mood",
+        "Tone1":  "Tone I: Pious, religious",
+        "Tone2":  "Tone II: Cheerful, easygoing",
+        "Tone3":  "Tone III: Tearful",
+        "Tone4":  "Tone IV: Sad, mournful",
+        "Tone5":  "Tone V: Heroic, lively",
+        "Tone6":  "Tone VI: Warlike",
+        "Tone7":  "Tone VII: Delightful",
+        "Tone8":  "Tone VIII: Joyful",
+        "Tone9":  "Tone IX: Confident",
+        "Tone10": "Tone X: Calm, mild",
+        "Tone11": "Tone XI: Majestic",
+        "Tone12": "Tone XII: Grave, austere"
     };
 
 
     // Clear all options in case any have already been set
-    let modeSelect = document.getElementById("mode");
-    modeSelect = removeChildren(modeSelect);
+    let toneSelect = document.getElementById("tone");
+    toneSelect = removeChildren(toneSelect);
 
     // Reset the first option
-    var firstOpt = new Option(modeLabels["Mode0"], "");
-    modeSelect.add(firstOpt);
+    var firstOpt = new Option(toneLabels["Tone0"], "");
+    toneSelect.add(firstOpt);
 
     // If the text was omitted, just stop here
     if (text != undefined) {
-        // Only add as many modes as allowed
-        // Pull out the labels for modes included in the table
-        let modes = legalModes[style][text];
-        for (let m of modes) {
-            let modeName = "Mode" + m;
-            var opt = new Option(modeLabels[modeName], modeName);
-            modeSelect.add(opt);
+        // Only add as many tones as allowed
+        // Pull out the labels for tones included in the table
+        let tones = legalTones[style][text];
+        for (let m of tones) {
+            let toneName = "Tone" + m;
+            var opt = new Option(toneLabels[toneName], toneName);
+            toneSelect.add(opt);
         }
     }
 
