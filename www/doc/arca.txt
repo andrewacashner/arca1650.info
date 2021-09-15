@@ -139,7 +139,7 @@ OctNil :: Octave
 --   
 --   The ark always produces four-voice polyphony.
 data VoiceName
-Soprano :: VoiceName
+Cantus :: VoiceName
 Alto :: VoiceName
 Tenor :: VoiceName
 Bass :: VoiceName
@@ -153,7 +153,7 @@ VoiceRange :: Pitch -> Pitch -> VoiceRange
 -- | Set of <a>VoiceRange</a> data for each <a>VoiceName</a>
 data VoiceRanges
 VoiceRanges :: VoiceRange -> VoiceRange -> VoiceRange -> VoiceRange -> VoiceRanges
-[sopranoRange] :: VoiceRanges -> VoiceRange
+[cantusRange] :: VoiceRanges -> VoiceRange
 [altoRange] :: VoiceRanges -> VoiceRange
 [tenorRange] :: VoiceRanges -> VoiceRange
 [bassRange] :: VoiceRanges -> VoiceRange
@@ -391,10 +391,12 @@ type PnumAccid = (Pnum, Accid)
 -- | A list of scales, including some notes with accidentals, from Kircher
 type ToneList = Vector (Vector PnumAccid)
 
+-- | List of tones appropriate for a single pinax
+type PinaxLegalTones = AssocList PinaxLabel [[Tone]]
+
 -- | List of tones appropriate for each pinax within each syntagma (style):
 --   association list mapping style to sets of <i>pinakes</i>, and then
 --   <i>pinakes</i> to tones
-type PinaxLegalTones = AssocList PinaxLabel [[Tone]]
 type PinaxToneList = AssocList Style PinaxLegalTones
 
 -- | Lookup a value by equality in an association list, or raise an error
@@ -429,6 +431,8 @@ Pinax9 :: PinaxLabel
 Pinax10 :: PinaxLabel
 Pinax11 :: PinaxLabel
 PinaxNil :: PinaxLabel
+
+-- | Extract a <a>Pinax</a> from the ark by style and pinax label
 arca2pinax :: Arca -> Style -> PinaxLabel -> Pinax
 
 -- | Get pinax from textual meter; this depends on the <a>Style</a> because
@@ -555,7 +559,7 @@ getVectorItem :: String -> Vector a -> Int -> a
 -- | Getting a <a>Column</a> requires indexing through nested vectors. But
 --   because there are two parts of pinax 3 in syntagma 1, we can't just
 --   use the pinax label as an enum; we have to look up the number with
---   <tt>syntagma2pinax</tt>.
+--   <a>arca2pinax</a>.
 column :: Arca -> Style -> PinaxLabel -> Int -> Column
 
 -- | Getting a <a>VpermChoir</a> means taking the first of the
@@ -766,9 +770,10 @@ s1p2 :: Pinax
 
 -- | Sub-structures used by <tt>Arca_musarithmica</tt> to build Kircher's
 --   ark. This <i>pinax</i> (<a>s1p3a</a>) is for poetry in Adonic meter
---   (<tt>`--`-</tt>). It contains four columns, one for each successive
---   verse line ("Kircher's stropha") of a quatrain. There is only one
---   rperm for each side, repeated for each column.
+--   (<tt>`--`-</tt>) with five syllables per line. It contains four
+--   columns, one for each successive verse line ("Kircher's stropha") of a
+--   quatrain. There is only one rperm for each side, repeated for each
+--   column.
 --   
 --   It may be used with any tone, especially 2 and 6.
 module Arca_musarithmica.Syntagma1.Pinax03a
@@ -779,9 +784,10 @@ s1p3a :: Pinax
 
 -- | Sub-structures used by <tt>Arca_musarithmica</tt> to build Kircher's
 --   ark. This <i>pinax</i> (<a>s1p3b</a>) is for poetry in Dactylic meter
---   (<tt>`--`--</tt>). It contains four columns, one for each successive
---   verse line ("Kircher's stropha") of a quatrain. There is only one
---   rperm for each side, repeated for each column.
+--   (<tt>`--`--</tt>) with six syllables per line (dactylic hexameter). It
+--   contains four columns, one for each successive verse line (Kircher's
+--   "stropha") of a quatrain. There is only one rperm for each side,
+--   repeated for each column.
 --   
 --   It may be used with any tone, especially 2 and 6.
 module Arca_musarithmica.Syntagma1.Pinax03b
@@ -996,8 +1002,10 @@ s2p3 :: Pinax
 --   with the paradigm being <i>Veni creator Spiritus</i>.
 --   
 --   <pre>
---   "PINAX IV. Melothesiae [-as?] floridae &amp; artificiosae Musarithmos continens PreIambicis Archilochijs."
+--   "PINAX IV. Melothesiae [-as?] floridae &amp; artificiosae Musarithmos continens
 --   </pre>
+--   
+--   PreIambicis Archilochijs."
 --   
 --   This pinax is for these <i>toni</i> (tones):
 --   
@@ -1177,7 +1185,7 @@ module Arca_musarithmica
 arca :: Arca
 
 -- | Range for each voice, based on SATB C-clef ranges, generally up to one
---   note above and below the staff (Soprano C1, alto C3, tenor C4, bass f4
+--   note above and below the staff (Cantus C1, alto C3, tenor C4, bass f4
 --   clefs), as shown on the front of the ark in Iconismus XIV. We are
 --   using the untransposed ranges. These are notably different from those
 --   of a modern mixed choir, as Kircher as all-male choirs in mind and the
@@ -1260,7 +1268,7 @@ module Cogito.Musarithmetic
 data Voice
 Voice :: VoiceName -> [Pitch] -> Voice
 
--- | Enum for Soprano, Alto, Tenor or Bass
+-- | Enum for Cantus, Alto, Tenor or Bass
 [voiceID] :: Voice -> VoiceName
 [music] :: Voice -> [Pitch]
 
@@ -1319,7 +1327,7 @@ MusicSection :: VoiceName -> ArkConfig -> [MusicSentence] -> MusicSection
 --   structured this way?
 data MusicChorus
 MusicChorus :: MusicSection -> MusicSection -> MusicSection -> MusicSection -> MusicChorus
-[soprano] :: MusicChorus -> MusicSection
+[cantus] :: MusicChorus -> MusicSection
 [alto] :: MusicChorus -> MusicSection
 [tenor] :: MusicChorus -> MusicSection
 [bass] :: MusicChorus -> MusicSection
@@ -1379,12 +1387,15 @@ pitchMath :: (Int -> Int -> Int) -> Pitch -> Pitch -> Int
 --   <a>absPitch7</a> values)
 pitchMath7 :: (Int -> Int -> Int) -> Pitch -> Pitch -> Int
 
--- | Do boolean tests on pitches (using their 'absPitch values)
+-- | Do boolean tests on pitches (using their <a>absPitch</a> values)
 pitchTest :: (Int -> Int -> Bool) -> Pitch -> Pitch -> Bool
 
 -- | Are two <a>Pitch</a>es the same chromatic pitch, enharmonically
 --   equivalent?
 pEq :: Pitch -> Pitch -> Bool
+
+-- | Test the pitch label and accidental of a <a>Pitch</a>
+pnumAccidEq :: Pnum -> Accid -> Pitch -> Bool
 
 -- | Pitch greater than?
 pGt :: Pitch -> Pitch -> Bool
@@ -1632,6 +1643,10 @@ fixFictaInPhrase :: ([Note] -> Note -> [Note]) -> MusicPhrase -> MusicPhrase
 -- | Generate a stack folding function to process a list
 foldStack :: ([a] -> a -> [a]) -> [a] -> [a]
 
+-- | Map a function to the phrases in one section (upper voice) relative to
+--   the phrases in another section (lower voice).
+adjustPhrasesRelative :: (MusicPhrase -> MusicPhrase -> MusicPhrase) -> MusicSection -> MusicSection -> MusicSection
+
 -- | Compare two <a>MusicPhrase</a>s and find the note in the one (lower)
 --   voice that coincides rhythmically with a given note in the other
 --   (upper) voice. Used to find harmonies and test them for bad intervals.
@@ -1649,6 +1664,9 @@ durQuantity :: Dur -> Int
 -- | Apply <i>ficta</i> adjustments to whole <tt>MusicPhrase</tt>s. Adjust
 --   bass voice first; then adjust the upper voices individually, then
 --   adjust them again relative to the bass.
+--   
+--   TODO nowhere do we deal with toneB (needed in s2/p4 for every 3rd and
+--   4th line)
 adjustFictaChorus :: ToneSystem -> ToneList -> MusicChorus -> MusicChorus
 
 -- | Adjust <i>musica ficta</i> for all the notes for one voice in a
@@ -1660,9 +1678,11 @@ adjustFictaChorus :: ToneSystem -> ToneList -> MusicChorus -> MusicChorus
 --   TODO they still don't deal with every problem. Some would be
 --   automatically corrected by competent performers.
 --   
---   #^7: - If the tone table has 8, keep the sharp - If it has #^7 and it
---   is the last note in the phrase, and it is not the bass voice, keep the
---   sharp - Otherwise make it natural
+--   fix "illicit intervals" in the bass (p. 71)
+--   
+--   #^7: (p. 69-70) - If the tone table has 8, keep the sharp - If it has
+--   #^7 and it is the last note in the phrase, and it is not the bass
+--   voice, keep the sharp - Otherwise make it natural
 --   
 --   b^6: - If the tone table has b^6, cancel the flat if the next note is
 --   #^7
@@ -1672,18 +1692,24 @@ adjustFictaChorus :: ToneSystem -> ToneList -> MusicChorus -> MusicChorus
 --   G).
 adjustFictaVoice :: ToneList -> Tone -> MusicSection -> MusicSection
 
+-- | Pitch class of <a>Note</a>
+pitchClass :: Note -> Pnum
+
+-- | Accid of <a>Note</a>
+noteAccid :: Note -> Accid
+
+-- | Test pitch class and accidental of <a>Note</a>
+checkPnumAccid :: Pnum -> Accid -> Note -> Bool
+
 -- | Adjust <i>musica ficta</i> in an upper voice relative to the bass.
---   Avoid cross relations and augmented fifths. (I guess tritones are
---   okay?)
+--   Avoid cross relations, augmented fifths, and certain tritones. (TODO
+--   which tritones?)
 adjustRelBass :: ToneList -> Tone -> MusicSection -> MusicSection -> MusicSection
 
--- | Map a function to the phrases in one section (upper voice) relative to
---   the phrases in another section (lower voice).
-adjustPhrasesInSection :: (MusicPhrase -> MusicPhrase -> MusicPhrase) -> MusicSection -> MusicSection -> MusicSection
-
--- | Apply <i>musica ficta</i> adjustments to a whole <a>MusicPhrase</a>
---   relative to the bass phrase.
-adjustFictaPhrase :: ToneList -> Tone -> MusicPhrase -> MusicPhrase -> MusicPhrase
+-- | Adjust the <a>Note</a>s in a <a>MusicSection</a> relative to the voice
+--   above: avoid cross-relations between upper voices; where voices
+--   disagree, favor the upper voice.
+adjustRelUpper :: MusicSection -> MusicSection -> MusicSection
 
 -- | Return the 0-indexed scale degree of a given pitch in a given tone
 --   (scale degree 0 is the modal final)
@@ -1698,19 +1724,18 @@ isFictaAccid :: Accid -> Pitch -> Bool
 -- | Apply <a>isFictaAccid</a> to a <a>Note</a>
 isFictaAccidNote :: Accid -> Note -> Bool
 
--- | Fix bad intervals against a lower voice in a <a>MusicPhrase</a>
-fixIntervalsInPhrase :: MusicPhrase -> MusicPhrase -> MusicPhrase
-
--- | No cross relations or augmented fifths between upper and lower note
---   (TODO tritones?)
-fixIntervals :: Note -> Note -> Note
-
 -- | Are these pitches the same pitch class but different accidentals?
 --   (E.g., F vs F#?)
 isCrossRelation :: Pitch -> Pitch -> Bool
 
 -- | Are these pitches an augmented fifth apart?
 isAugFifth :: Pitch -> Pitch -> Bool
+
+-- | Is this a tritone (diminished fifth or augmented fourth?)
+isTritone :: Pitch -> Pitch -> Bool
+
+-- | Is the interval between these <a>Note</a>s a tritone?
+isTritoneNote :: Note -> Note -> Bool
 
 
 -- | This module reads (<i>lectio</i>, Latin, "I read") and process input
