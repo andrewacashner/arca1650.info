@@ -27,7 +27,7 @@ $inputMeter = $_POST['musicMeter'];
 
 # File basenames for input and output
 $baseName = array(
-    , "Ave_maris_stella" => "Ave_maris_stella"
+    "Ave_maris_stella" => "Ave_maris_stella"
     , "Ave_Regina"       => "Ave_Regina_Angelorum"
     , "Bernardus"        => "Bernardus-Hora_novissima"
     , "Boethius"         => "Boethius-Nubibus_atris"
@@ -42,7 +42,7 @@ $baseName = array(
 
 # File titles to be used in the generated HTML output
 $fileTitle = array(
-    , "Ave_maris_stella" => "Ave maris stella (Iambic Euripidaeic meter)"
+    "Ave_maris_stella" => "Ave maris stella (Iambic Euripidaeic meter)"
     , "Ave_Regina"       => "Ave Regina Angelorum (Iambic Enneasyllabic meter)"
     , "Bernardus"        => "Bernardus Melanensis, Hora novissima (Dactylic/Adonic meter)"
     , "Boethius"         => "Boethius, Nubibus atriis (Adonic meter)"
