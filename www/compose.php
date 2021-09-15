@@ -27,26 +27,30 @@ $inputMeter = $_POST['musicMeter'];
 
 # File basenames for input and output
 $baseName = array(
-    "Abide"              => "Abide_with_Me"
     , "Ave_maris_stella" => "Ave_maris_stella"
     , "Ave_Regina"       => "Ave_Regina_Angelorum"
+    , "Bernardus"        => "Bernardus-Hora_novissima"
     , "Boethius"         => "Boethius-Nubibus_atris"
-    , "Ps150"            => "Ps-150"
+    , "Catullus"         => "Catullus-Viuamus_mea_Lesbia"
     , "Horace"           => "Horace-Maecenas_atavis_edite_regibus"
     , "Iste_confessor"   => "Iste_confessor_Domini"
+    , "Ps150"            => "Ps-150"
+    , "Shakespeare"      => "Shakespeare-If_Music_Be"
     , "Stephanus"        => "Stephanus-O_ter_quaterque_felix_Cicada"
     , "Veni_creator"     => "Veni_creator_Spiritus"
 );
 
 # File titles to be used in the generated HTML output
 $fileTitle = array(
-    "Abide"              => "Abide with Me (Decasyllabic meter)"
     , "Ave_maris_stella" => "Ave maris stella (Iambic Euripidaeic meter)"
     , "Ave_Regina"       => "Ave Regina Angelorum (Iambic Enneasyllabic meter)"
+    , "Bernardus"        => "Bernardus Melanensis, Hora novissima (Dactylic/Adonic meter)"
     , "Boethius"         => "Boethius, Nubibus atriis (Adonic meter)"
-    , "Ps150"            => "Psalmi CL (Irregular meter/Prose)"
+    , "Catullus"         => "Catullus, Viuamus mea Lesbia atque amemus (Hendecasyllabic meter)"
     , "Horace"           => "Horace, Maecenas atavis edite regibus (Dodecasyllabic meter)"
     , "Iste_confessor"   => "Iste confessor Domini (Sapphic meter)"
+    , "Ps150"            => "Psalmi CL (Irregular meter/Prose)"
+    , "Shakespeare"      => "Shakespeare, If Music Be the Food of Love (Decasyllabic meter = Iambic pentameter)"
     , "Stephanus"        => "Stephanus, O ter quaterque felix Cicada (Anacreontic meter)"
     , "Veni_creator"     => "Veni creator Spiritus (Iambic Archilochic meter)"
 );

@@ -54,23 +54,27 @@ function preparedTextOptions(style) {
     let texts = {
         "simple": {
             unselected:         "Select a text to set in simple style:",
-            "Abide":            "Abide with Me",
             "Ave_maris_stella": "Ave maris stella",
             "Ave_Regina":       "Ave Regina angelorum",
+            "Bernardus":        "Bernard of Cluny, Hora novissima",
             "Boethius":         "Boethius, Nubibus atris",
+            "Catullus":         "Catullus, Viuamus mea Lesbia",
             "Horace":           "Horace, Maecenas atavis edite regibus",
             "Iste_confessor":   "Iste confessor Domini",
             "Ps150":            "Psalm 150",
+            "Shakespeare":      "Shakespeare, If Music Be the Food of Love",
             "Stephanus":        "Stephanus, O ter quaterque felix Cicada",
             "Veni_creator":     "Veni creator Spiritus"
         },
         "florid": {
             unselected:         "Select a text to set in florid style:",
-            "Abide":            "Abide with Me",
             "Ave_maris_stella": "Ave maris stella",
             "Ave_Regina":       "Ave Regina angelorum",
+            "Bernardus":        "Bernard of Cluny, Hora novissima",
             "Boethius":         "Boethius, Nubibus atris",
+            "Catullus":         "Catullus, Viuamus mea Lesbia",
             "Iste_confessor":   "Iste confessor Domini",
+            "Shakespeare":      "Shakespeare, If Music Be the Food of Love",
             "Stephanus":        "Stephanus, O ter quaterque felix Cicada",
             "Veni_creator":     "Veni creator Spiritus"
         }
@@ -107,20 +111,23 @@ function diyTextOptions(style) {
     let texts = {
         "simple": {
             unselected:         "Select a text to set in simple style:",
-            "Abide":            "Abide with Me",
             "Ave_maris_stella": "Ave maris stella",
+            "Ave_Regina":       "Ave Regina angelorum",
             "Boethius":         "Boethius, Nubibus atris",
+            "Catullus":         "Catullus, Viuamus mea Lesbia",
             "Horace":           "Horace, Maecenas atavis edite regibus",
             "Iste_confessor":   "Iste confessor Domini",
+            "Shakespeare":      "Shakespeare, If Music Be the Food of Love",
             "Stephanus":        "Stephanus, O ter quaterque felix Cicada",
             "Veni_creator":     "Veni creator Spiritus"
         },
         "florid": { 
             unselected:         "Select a text to set in florid style:", 
-            "Abide":            "Abide with Me", 
             "Ave_maris_stella": "Ave maris stella",
             "Ave_Regina":       "Ave Regina angelorum",
             "Boethius":         "Boethius, Nubibus atris",
+            "Catullus":         "Catullus, Viuamus mea Lesbia",
+            "Shakespeare":      "Shakespeare, If Music Be the Food of Love",
             "Stephanus":        "Stephanus, O ter quaterque felix Cicada"
         }
     };
@@ -164,34 +171,38 @@ function diyToneOptions(style, text) {
 
     let legalTones = {
         "simple": {
-            "Abide":                // Decasyllabicum           // Pinax 8
-            [5, 6, 7, 8, 11, 12],
             "Ave_maris_stella":     // IambicumEuripidaeum      // Pinax 4
             [1, 2, 3, 4, 9, 10],
             "Ave_Regina":           // IambicumEnneasyllabicum  // Pinax 7
             [5, 6, 8, 10, 12],
             "Boethius":             // Adonium                  // Pinax 3
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            "Catullus":             // Hendecasyllabicum        // Pinax 9
+            [1, 2, 3, 4, 7],
             "Horace":               // Dodecasyllabicum         // Pinax 11
             [5, 6, 7, 8, 11, 12],
             "Iste_confessor":       // Sapphicum                // Pinax 10
             [1, 2, 3, 4, 9, 10],
             "Ps150":                // Prose                    // Pinax 1 and 2
             [1, 2, 3, 6, 7, 8, 9, 10, 11, 12],
+            "Shakespeare":          // Decasyllabicum           // Pinax 8
+            [5, 6, 7, 8, 11, 12],
             "Stephanus":            // Anacreonticum            // Pinax 5
             [1, 2, 3, 4, 9, 10],
             "Veni_creator":         // IambicumArchilochicum    // Pinax 6 
             [5, 6, 8, 12]
         },
         "florid": {
-            "Abide":                // Decasyllabicum           // Pinax 5
-            [1, 2, 3, 4, 9, 10],
             "Ave_maris_stella":     // IambicumEuripidaeum      // Pinax 2
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
             "Ave_Regina":           // IambicumEnneasyllabicum  // Pinax 5
             [1, 2, 3, 4, 9, 10],
             "Boethius":             // Adonium                  // Pinax 1 
             [5, 6, 7, 8, 11, 12],
+            "Catullus":             // Hendecasyllabicum        // Pinax 6
+            [1, 2, 3, 4, 9, 10],
+            "Shakespeare":          // Decasyllabicum           // Pinax 5
+            [1, 2, 3, 4, 9, 10],
             "Stephanus":            // Anacreonticum            // Pinax 3
             [1, 2, 3, 4, 9, 10]
         }
