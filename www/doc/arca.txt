@@ -2,9 +2,11 @@
 -- See Hoogle, http://www.haskell.org/hoogle/
 
 
--- | Please see the README on Bitbucket at
---   <a>https://bitbucket.org/andrewacashner/kircher/src/master/arca/README.md</a>.
---   The arca web app is at <a>http://www.arca1650.info</a>.
+-- | A digital implementation of Athanasius Kircher's device for automatic music composition, the Arca musarithmica of 1650
+--   
+--   This project has been anonymized while the author pursues
+--   peer-reviewed publication. The arca web app is at
+--   <a>http://www.arca1650.info</a>.
 @package arca
 @version 0.1.0.0
 
@@ -2432,9 +2434,6 @@ _whoami :: [Char]
 
 -- | The "inventor"
 _Kircher :: [Char]
-
--- | The "programmer" and "text preparer"
-_AAC :: [Char]
 
 -- | MEI project description text
 _projectDesc :: [Char]

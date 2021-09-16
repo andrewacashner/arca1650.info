@@ -1,6 +1,6 @@
 /* Conditional dropdown menus for input data to the Arca musarithmica
  *
- * Andrew Cashner, 2021/07/27
+ * 2021/07/27
  */
 
 /* Make a 'select' element with options appropriate for the given style.
