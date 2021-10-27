@@ -520,11 +520,6 @@ RpermMeter :: Int -> Vector RpermChoir -> RpermMeter
 
 -- | The <a>RpermTable</a> is a vector containing all the rhythmic
 --   permutations for one of Kircher's "rods".
---   
---   <b>TODO</b>: This implementation may not be sufficient for the more
---   complex styles where there are different rhythms for the four voices.
---   Also, as noted above, we may need to distinguish duple major and duple
---   minor.
 type RpermTable = Vector (RpermMeter)
 
 -- | The ark is a box containing rods (<i>pinakes</i>), each of which
@@ -545,7 +540,9 @@ type Pinax = Vector (Column)
 -- | A vector of <a>Pinax</a> instances is a <a>Syntagma</a>.
 type Syntagma = Vector (Pinax)
 
--- | A vector of <a>Syntagma</a> instances makes up the full <a>Arca</a>.
+-- | A vector of <a>Syntagma</a> instances plus the other elements of the
+--   physical device (tone table, vocal ranges, information matching tones
+--   to pinakes) makes up the full <a>Arca</a>.
 data Arca
 Arca :: Vector Syntagma -> ToneList -> ToneSystem -> PinaxToneList -> VoiceRanges -> Arca
 [perms] :: Arca -> Vector Syntagma
@@ -1187,11 +1184,11 @@ module Arca_musarithmica
 arca :: Arca
 
 -- | Range for each voice, based on SATB C-clef ranges, generally up to one
---   note above and below the staff (Cantus C1, alto C3, tenor C4, bass f4
---   clefs), as shown on the front of the ark in Iconismus XIV. We are
---   using the untransposed ranges. These are notably different from those
---   of a modern mixed choir, as Kircher as all-male choirs in mind and the
---   alto clef gives a much lower range.
+--   ledger line above and below the staff (Cantus C1, alto C3, tenor C4,
+--   bass f4 clefs), as shown on the front of the ark in Iconismus XIV. We
+--   are using the untransposed ranges. These are notably different from
+--   those of a modern mixed choir, as Kircher as all-male choirs in mind
+--   and the alto clef gives a much lower range.
 --   
 --   NB (unimplemented part of specification):
 --   
@@ -2119,12 +2116,9 @@ module Cogito
 --   of the corresponding element from the second list.
 zipFill :: [a] -> [b] -> (a -> Bool) -> b -> [(a, b)]
 
--- | Make a pitch from duration and pitch number. Start with zero octave;
---   we'll set it later using <a>stepwiseVoiceInRange</a>. Adjust the pitch
---   for tone (<a>pnumAccidInTone</a>).
---   
---   <b>TODO</b>: This could also be generalized; we are not checking
---   inputs because we control data input.
+-- | Make a pitch from duration and pitch number. Start with dummy octave
+--   number; we'll set it later using <a>stepwiseVoiceInRange</a>. Adjust
+--   the pitch for tone (<a>pnumAccidInTone</a>).
 pair2Pitch :: ToneList -> ToneSystem -> Tone -> (Dur, Int) -> Pitch
 
 -- | Is this note a B flat, and if so, is the flat already in the key
