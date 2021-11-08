@@ -8,7 +8,9 @@
   <text>
     <section textMeter="Prose" style="Simple"
       musicMeter="{musicMeter}" tone="{tone}">
-      {inputText}
+    <lg>
+      <l>{inputText}</l>
+    </lg>
   </section>
 </text>
 </arkText>
