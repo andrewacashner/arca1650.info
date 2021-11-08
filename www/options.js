@@ -190,7 +190,9 @@ function diyToneOptions(style, text) {
             "Stephanus":            // Anacreonticum            // Pinax 5
             [1, 2, 3, 4, 9, 10],
             "Veni_creator":         // IambicumArchilochicum    // Pinax 6 
-            [5, 6, 8, 12]
+            [5, 6, 8, 12],
+            "DIY":                  // DIY
+            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
         },
         "florid": {
             "Ave_maris_stella":     // IambicumEuripidaeum      // Pinax 2

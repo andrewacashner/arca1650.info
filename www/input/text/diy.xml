@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE arkText SYSTEM "arkText.dtd">
+<arkText>
+  <head>
+    <title>{title}</title>
+    <wordsAuthor>{wordsAuthor}</wordsAuthor>
+  </head>
+  <text>
+    <section textMeter="Prose" style="Simple"
+      musicMeter="{musicMeter}" tone="{tone}">
+      {inputText}
+  </section>
+</text>
+</arkText>
