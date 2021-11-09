@@ -71,6 +71,9 @@ $mei = addslashes($rawMei);
         var mei = '<?=$mei?>';
         if (mei.length === 0) {
             console.error("Empty MEI output from arca");
+            var warning = document.getElementById("app-panel");
+            warning.innerHTML = 
+                "<p>Something went wrong: the Arca did not generate any output</p>";
         }
         window.meiXML = mei;
 
@@ -178,7 +181,7 @@ $mei = addslashes($rawMei);
                     });
                 </script>
 
-                <div class="panel-body">
+                <div id="app-panel" class="panel-body">
                     <div id="app" class="panel"></div>
                 </div>
             </section>
