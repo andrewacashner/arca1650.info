@@ -55,9 +55,6 @@ function diyMeterOptions(style) {
             "Duple":       "Duple meter (alla breve, cut C)",
             "TripleMinor": "Triple meter, three minims per unit (C3)",
             "TripleMajor": "Triple meter, three semibreves per unit (cut C3)"
-        },
-        "florid": {
-            "Duple":  "Duple meter (C), only option in florid style",
         }
     };
 
@@ -78,12 +75,8 @@ function diyToneOptions(style, text) {
 
     let legalTones = {
         "simple": {
-            "DIY":                  // DIY
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-        },
-        "florid": {
-            "DIY":                  // DIY
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            "DIY":                  // DIY, Pinax 1-2
+            [1, 2, 3, 6, 7, 8, 9, 10, 11, 12]
         }
     };
 
