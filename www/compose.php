@@ -136,17 +136,17 @@ $mei = addslashes($rawMei);
     </script>
 
     <!-- Verovio toolkit for MIDI rendering -->
-    <script src="http://www.verovio.org/javascript/develop/verovio-toolkit.js"></script>
+    <script src="verovio/verovio-toolkit.js"></script>
 
     <!-- MIDI player and needed resources -->
-    <script src="https://www.verovio.org/javascript/jquery.min.js"></script>
+    <script src="verovio/jquery.min.js"></script>
 
     <script src="midi/019_church_organ.js"></script>
-    <script src="https://www.verovio.org/javascript/midi-player/midiplayer.js"></script>
+    <script src="midi/midiplayer.js"></script>
 
     <!-- Render music in Verovio Javascript app -->
     <script type="module">
-        import 'https://www.verovio.org/javascript/app/verovio-app.js';
+        import './verovio/verovio-app.js';
         const options = {
             defaultZoom : 3
         }
