@@ -197,6 +197,8 @@ $mei = addslashes($rawMei);
         </section>
     </main>
     <footer>
-      Copyright © 2021. All rights reserved. (Except where other licenses are specified for third-party software.)
+      <p>Copyright © 2022 
+      <a href="https://orcid.org/0000-0002-7468-8579">Andrew A. Cashner</a>. 
+        All rights reserved. (Except where other licenses are specified for third-party software.)</p>
     </footer>
 </html>

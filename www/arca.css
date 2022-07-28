@@ -137,6 +137,9 @@ nav ul a, nav ul a:visited {
 a, a:visited {
   color: DarkBlue;
 }
+footer a, footer a:visited {
+  color: LightGray;
+}
 div.panel-body {
   border: 1px solid LightGrey;
   background: white;
