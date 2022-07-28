@@ -1,6 +1,3 @@
-@import
-url('https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
-
 /* Layout */
 body {
   display: flex;
@@ -82,29 +79,24 @@ ul.bibliography li {
   padding-bottom: 0.5em;
   
 }
-div#sankey_basic {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 100%;
-}
 figcaption {
   padding-top: 0.5em;
   font-size: 80%;
   text-align: center;
 }
-div.google-visualization-tooltip { 
-  display: none; 
-}
 
 /* Font */
 body {
-  font-family: 'Cardo', serif;
+  font-family: sans-serif; 
 } 
 
 header h2 {
   font-style: italic;
   text-align: right;
+}
+footer {
+  font-family: monospace;
+  font-size: 115%;
 }
 q {
   quotes: "\201C" "\201D" "\2018" "\2019";
@@ -113,33 +105,22 @@ cite {
   font-style: italic;
 }
 nav ul a, nav ul a:visited {
-  font-variant: small-caps;
+  font-family: monospace;
+  font-size: 115%;
   text-decoration: none;
 }
 
 /* Color */
-body {
-  background: LightGrey; 
-}
-header {
-  background: #ebadc2;
-}
-main {
-  background: AntiqueWhite;
-}
-nav, footer {
-    background: DarkSlateGrey;
-  color: white; 
-}
-nav ul a, nav ul a:visited {
-  color: white;
-}
-a, a:visited {
+a, ul a:visited {
   color: DarkBlue;
 }
-footer a, footer a:visited {
-  color: LightGray;
+nav {
+  border-bottom: 1px solid LightGray;
 }
+footer {
+  border-top: 1px solid LightGray;
+}
+
 div.panel-body {
   border: 1px solid LightGrey;
   background: white;
