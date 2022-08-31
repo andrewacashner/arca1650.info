@@ -112,8 +112,6 @@ $mei = addslashes($rawMei);
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="arca.css">
-    <link rel="icon" type="image/png" href="img/panpipe.png">
 
     <title>Arca musarithmica</title>
     <meta name="description" 
@@ -122,79 +120,29 @@ $mei = addslashes($rawMei);
                    Musurgia universalis (Rome, 1650), Book VIII, in Haskell 
                    implementation (2021)">
 
-    <!-- Bring in MEI data from PHP and check input parameters -->
+    <link rel="stylesheet" type="text/css" href="arca.css">
+    <link rel="icon" type="image/png" href="img/panpipe.png">
+
     <script>
-        var mei = '<?=$mei?>';
-        if (mei.length === 0) {
-            console.error("Empty MEI output from arca");
-        }
-        window.meiXML = mei;
+      // Bring in MEI data from PHP and check input parameters -->
+      var mei = '<?=$mei?>';
+      if (mei.length === 0) {
+          console.error("Empty MEI output from arca");
+      }
+      window.meiXML = mei;
 
-        console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], tone [<?=$inputTone?>], meter [<?=$inputMeter?>]...");
-        console.log("Loading input file [<?=$infileName?>]...");
-        console.log("Rendering MEI output file beginning [%s]...", window.meiXML.substring(0,300));
+      console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], tone [<?=$inputTone?>], meter [<?=$inputMeter?>]...");
+      console.log("Loading input file [<?=$infileName?>]...");
+      console.log("Rendering MEI output file beginning [%s]...", window.meiXML.substring(0,300));
     </script>
 
-    <!-- Verovio toolkit for MIDI rendering -->
-    <script src="verovio/verovio-toolkit.js"></script>
-
-    <!-- MIDI player and needed resources -->
-    <script src="verovio/jquery.min.js"></script>
-
-    <script src="midi/019_church_organ.js"></script>
-    <script src="midi/midiplayer.js"></script>
-
-    <!-- Render music in Verovio Javascript app -->
-    <script type="module">
-        import './verovio/verovio-app.js';
-        const options = {
-            defaultZoom : 3
-        }
-        console.time("Loading MEI into Verovio web app");
-        var app = new Verovio.App(document.getElementById("app"), options);
-        app.loadData(window.meiXML);
-        console.timeEnd("Loading MEI into Verovio web app");
-    </script>
-
-    <!-- Render and play MIDI -->
-    <script>
-        // Load
-        console.time("Loading Verovio Toolkit");
-        var tk = new verovio.toolkit();
-        console.timeEnd("Loading Verovio Toolkit");
-
-        console.time("Loading MEI into Verovio");
-        tk.loadData(window.meiXML);
-        console.timeEnd("Loading MEI into Verovio");
-
-        // Render to MIDI
-        console.time("Generating MIDI");
-        var base64midi = tk.renderToMIDI();
-        var song = 'data:audio/midi;base64,' + base64midi;
-        console.timeEnd("Generating MIDI");
-        console.log("Generated MIDI data beginning [%s]...", song.substring(0,100));
-
-        // MIDI player functions
-        var midiUpdate = function(time) {
-            console.log(time);
-            return true;
-        }
-
-        var midiStop = function() {
-            $("#player").midiPlayer.stop();
-            console.log("Stopped playback");
-            return true;
-        }
-
-        function midiPlay() {
-            console.log("Playing MIDI file beginning %s...", song.substring(0,100));
-            $("#player").midiPlayer.play(song);
-            return true;
-        }
-    </script>
-
-    </head>
-    <body>
+    <script src="verovio/verovio-toolkit-wasm.js" defer></script>
+    <script src="verovio/jquery.min.js" defer></script>
+    <script src="midi/019_church_organ.js" defer></script>
+    <script src="midi/midiplayer.js" defer></script>
+    <script src="verovio/arca-verovio-app.js" defer></script>
+  </head>
+  <body>
     <header>
       <h1>ARCA MUSARITHMICA</h1>
       <h2>a device for automatic music composition from 1650</h2>
@@ -217,23 +165,17 @@ $mei = addslashes($rawMei);
                 <noscript>
                 Javascript must be enabled in your browser to display the music.
                 </noscript>
-                <div class="playback-controls">
-                    <button onclick="midiPlay();">Play (MIDI)</button>
-                    <button onclick="midiStop();">Stop</button>
+                <div class="controls">
+                    <div class="playback-controls">
+                        <button onclick="midiPlay();">Play (MIDI)</button>
+                        <button onclick="midiStop();">Stop</button>
+                    </div>
+                    <div class="page-controls">
+                        <button onclick="prevPage();">Previous page</button>
+                        <button onclick="nextPage();">Next page</button>
+                    </div>
                 </div>
                 <div id="player"></div>
-
-                <script>
-                    $( document ).ready(function() {
-                        $("#player").midiPlayer({
-                        color: "red",
-                            onStop: null,
-                            onUpdate: midiUpdate,
-                            updateRate: 1000
-                        });
-                    });
-                </script>
-
                 <div class="panel-body">
                     <div id="app" class="panel"></div>
                 </div>
