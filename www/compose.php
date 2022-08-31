@@ -140,7 +140,7 @@ $mei = addslashes($rawMei);
     <script src="verovio/jquery.min.js" defer></script>
     <script src="midi/019_church_organ.js" defer></script>
     <script src="midi/midiplayer.js" defer></script>
-    <script src="verovio/arca-verovio-app.js" defer></script>
+    <script src="script/arca-verovio-app.js" defer></script>
   </head>
   <body>
     <header>
