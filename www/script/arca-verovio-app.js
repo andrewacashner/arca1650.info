@@ -6,9 +6,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
         console.log("Verovio has loaded");
 
         tk.setOptions({
-            scale: 30,
-            landscape: false,
-            adjustPageWidth: true
+            scale: 28,
+            pageHeight: 2000,
+            pageWidth: 1000,
+            font: "Bravura",
+            header: "none",
+            footer: "none"
         });
 
         console.log("Loading data into Verovio toolkit");

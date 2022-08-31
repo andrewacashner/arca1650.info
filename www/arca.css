@@ -39,8 +39,9 @@ fieldset legend label {
 fieldset select {
   max-width: 100%;
 }
+
 div.panel-body div.panel {
-  min-height: 700px;
+  text-align: center;
 }
 div.controls {
   display: flex;
@@ -124,11 +125,6 @@ nav {
 }
 footer {
   border-top: 1px solid LightGray;
-}
-
-div.panel-body {
-  border: 1px solid LightGrey;
-  background: white;
 }
 
 
