@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         console.log("Verovio has loaded");
 
         tk.setOptions({
-            scale: 28,
+            scale: 26,
             pageHeight: 2000,
             pageWidth: 1000,
             font: "Bravura",

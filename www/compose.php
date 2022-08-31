@@ -177,7 +177,7 @@ $mei = addslashes($rawMei);
                 </div>
                 <div id="player"></div>
                 <div class="panel-body">
-                    <div id="app" class="panel"></div>
+                    <div id="app" class="panel">Rendering MEI with Verovio...</div>
                 </div>
             </section>
 
