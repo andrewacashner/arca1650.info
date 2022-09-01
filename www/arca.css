@@ -44,16 +44,28 @@ div.panel-body div.panel {
   text-align: center;
 }
 div.controls {
-  display: flex;
-  flex-direction: horizontal;
-  justify-content: space-between;
+  display: table;
+  width: 100%;
 }
-div.playback-controls, div.page-controls {
-  padding: 0.5em;
+div.buttons, div.button-key {
+  display: table-row;
 }
+div.playback-controls, div.page-controls, div.zoom-controls, div.button-key p {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+div.button-key p {
+  font-style: italic;
+  font-size: 75%;
+  text-align: center;
+  vertical-align: middle;
+}
+
 div#player {
   display: none;
 }
+
 footer {
   min-height: 2em;
   max-height: 4em;
