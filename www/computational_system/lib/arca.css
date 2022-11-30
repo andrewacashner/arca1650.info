@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel&family=Maven+Pro&family=Share+Tech+Mono&family=Noto+Music&&family=Frank+Ruhl+Libre:wght@900&display=swap');
+
+html { 
+  width: 100%;
+  height: 100%;
+/*  background: #fdf2e9; */
+}
+
+body {
+  max-width: 45em;
+  font-family: 'Martel', serif;
+  font-size: 0.9em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+header div.banner nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2em;
+  border-bottom: 1px solid LightGray;
+}
+header div.banner nav ul {
+  display: flex;
+  flex-direction: row;
+  list-style: none;
+}
+header div.banner nav ul li {
+  padding-right: 2em;
+}
+header div.banner nav ul a, nav ul a:visited {
+  font-family: monospace;
+  font-size: 115%;
+  text-decoration: none;
+  color: blue;
+}
+header div.banner h1, h2 {
+  font-family: sans-serif;
+}
+header div.banner h2 {
+  font-style: italic;
+  text-align: right;
+}
+
+h1 {
+  font-family: 'Maven Pro', sans-serif;
+}
+
+header p.author {
+  font-family: 'Martel';
+  font-size: 1.5em;
+}
+
+code {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.1em;
+}
+pre code {
+  text-indent: 0;
+  font-size: 0.95em;
+}
+
+
+cite cite {
+  font-style: normal;
+}
+
+a {
+  color: #1b4f72;
+  text-decoration: underline dotted gray;
+}
+
+a:hover {
+  color: blue;
+  text-decoration: underline;
+}
+
+a.bibref {
+  color: #154360;
+}
+
+a.figref {
+  color: #641e16;
+}
+
+header a {
+  color: black;
+}
+span.music {
+  font-family: 'Noto Music';
+  font-size: 1.4em;
+  line-height: 0;
+}
+
+span.music-timesig {
+  font-family: 'Noto Music';
+  font-size: 1.6em;
+  position: relative;
+  bottom: -0.5ex;
+  line-height: 0;
+}
+span.music-timesig-num {
+  font-family: 'Frank Ruhl Libre', serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+span.timesig {
+  font-size: 0.8em;
+  display: inline-block;
+  text-indent: 0;
+  line-height: 0.5em;
+  vertical-align: middle;
+}
+span.timesig span.top, span.timesig span.bottom {
+  display: table-row;
+  height: 0.6em;
+  vertical-align: middle;
+}
+span.timesig span.top {
+  padding-bottom: 1em;
+}
+
+
+p {
+  text-align: justify;
+  hyphens: auto;
+  line-height: 1.7em;
+  margin: 0;
+  text-indent: 2em;
+}
+
+h1 + p {
+  text-indent: 0;
+}
+
+ol.references {
+  list-style: none;
+  text-indent: -2em;
+  padding-left: 2em;
+}
+
+ol.references li {
+  padding-bottom: 1ex;
+}
+table thead {
+  font-weight: bold;
+}
+
+span.metrics {
+  font-family: monospace;
+  font-size: 150%;
+}
+
+span.scaleDegree {
+  height: 1em;
+  line-height: 0;
+}
+
+span.hat {
+  position: relative;
+  left: 0.9ch;
+  bottom: 0.2ex;
+  margin-left: -0.7ch;
+}
+
+span.under-hat {
+  font-size: 0.9em;
+}
+
+/* toc in left margin
+section.toc {
+  font-size: 75%;
+  text-align: left;
+  position: absolute; // or sticky
+  width: 24em;
+  margin-left: -27em;
+}
+
+section.toc ol {
+  padding-left: 2em;
+}
+*/
+
+ol {
+  text-indent: 0;
+}
+section.toc ol {
+  list-style: none;
+}
+
+figure img {
+  width: 100%;
+}
+
+footer p {
+  font-size: 85%;
+  text-indent: 0;
+  margin-bottom: 1ex;
+}
+

@@ -1,0 +1,1799 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:aac="http://www.arca1650.info" xml:lang="en-US">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <meta charset="utf-8">
+   <link rel="stylesheet" href="lib/arca.css">
+   <link rel="stylesheet" href="lib/code.min.css"><script src="lib/highlight.min.js"></script><script src="lib/haskell.min.js"></script><script>hljs.highlightAll();</script><title>Cashner: Kircher’s Arca musarithmica as a Computational System</title>
+   <body>
+      <header>
+         <div class="banner">
+            <h1>ARCA MUSARITHMICA</h1>
+            <h2>a device for automatic music composition from 1650</h2>
+            <nav>
+               <ul>
+                  <li><a href="../index.html">Home</a></li>
+                  <li><a href="../about.html">About</a></li>
+                  <li><a href="../compose.html">Compose</a></li>
+                  <li><a href="../doc/index.html">Code</a></li>
+               </ul>
+            </nav>
+         </div>
+         <h1>Athanasius Kircher’s Arca musarithmica (1650) as a Computational System</h1>
+         <p class="author"><a href="#fn-thanks">Andrew A. Cashner, PhD</a></p>
+      </header>
+      <main>
+         <section id="sec-abstract" class="unnumbered" xml:lang="en-US" xml:base="include/abstract.xhtml">
+            <h1>Abstract</h1>
+            <p>
+               In book eight of Athanasius Kircher’s <cite>Musurgia universalis</cite> (Rome, 1650), this Jesuit polymath describes a computing device for automated music
+               composition, called the <em>Arca musarithmica</em>.
+               A new software implementation of Kircher’s device in Haskell, a pure-functional programming
+               language, demonstrates that the Arca can be made into a completely automatic computational
+               system.
+               Moreover, the project also demonstrates that in its original form, the Arca already
+               constituted a computational system optimized for a human user, and almost completely
+               automatic: as Kircher advertised, a completely <q>amusical</q> user could generate music simply by using the device according to his rules.
+               The device itself served as a microcosm of Kircher’s goal in the <cite>Musurgia</cite> to encapsulate and codify all musical knowledge, and demonstrate that music manifested
+               the underlying mathematical order of the Creation and its Creator.
+               This article analyzes the concepts and methods of computation in Kircher’s original
+               system, in dialogue with the interpretation of his system in software.
+               The Arca musarithmica, now available on the web, makes it possible actually to hear
+               how well Kircher was able to reduce seventeenth-century music to algorithmic rules.
+               The successes of the system are inseparable from many paradoxical elements that raises
+               broader questions about how Kircher and his contemporaries understood the links between
+               composition and computation, mathematics and rhetoric, traditional harmonic theory
+               and emerging tonal practice, and concepts of <q>invention</q> and authorship.
+               </p>
+         </section>
+         <section class="toc">
+            <h1>Contents</h1>
+            <ol>
+               <li><a href="#sec-intro">1. An <q>Ark</q> of Musical Invention in Infinite Permutations</a></li>
+               <li><a href="#sec-computing">2. The Arca as a Human-Optimized Computational System</a><ol>
+                     <li><a href="#sec-structure">2.1. Kircher’s Data Structures: Syntagmata, Pinakes, Musarithms</a></li>
+                     <li><a href="#section-vperms-rperms">2.2. Encoding Pitches and Rhythms</a></li>
+                     <li><a href="#sec-optimized">2.3. Optimized for Automatic Human Operation</a></li>
+                  </ol>
+               </li>
+               <li><a href="#sec-implementation">3. Implementing the Ark for a Digital Automaton</a><ol>
+                     <li><a href="#sec-data-types">3.1. The Ark in Haskell Data Types: Syntagmata, Pinakes, Perms</a></li>
+                     <li><a href="#sec-input">3.2. Reading the Input Text</a></li>
+                     <li><a href="#sec-setting-a-phrase">3.3. Setting a Phrase to Music</a></li>
+                     <li><a href="#sec-voice-leading">3.4. Setting the Octaves for Optimal Voice Leading</a></li>
+                     <li><a href="#sec-accidentals">3.5. Accidentals and Church Keys</a></li>
+                     <li><a href="#sec-output">3.6. Encoding the Music Output</a></li>
+                  </ol>
+               </li>
+               <li><a href="#sec-composition">4. Musical Computing and Mechanical Composition</a><ol>
+                     <li><a href="#sec-encapsulation">4.1. The Ark as Encapsulation of Compositional Knowledge</a></li>
+                  </ol>
+               </li>
+               <li><a href="#sec-references">5. References</a></li>
+            </ol>
+         </section>
+         <section id="sec-intro" xml:lang="en-US" xml:base="include/intro.xhtml">
+            <h1>1. An <q>Ark</q> of Musical Invention in Infinite Permutations</h1>
+            <p>
+               In 1650 Athanasius Kircher published a detailed specification for a device called
+               the <q>Arca musarithmica</q>, which appears to be an analog computing device for automatic music composition
+               (<a class="bibref" href="#Kircher:Musurgia">Kircher 1650</a>, II: 1–199).
+               Within the ten books of the <cite>Musurgia universalis</cite>, this German-born Jesuit scholar of ancient languages and mathematics (1602–1680)
+               attempted to compile everything that was known about music in a single Latin treatise
+               (<a class="bibref" href="#Findlen:Kircher">Findlen 2004a</a>; 
+               <a class="bibref" href="#Fletcher:Kircher">Fletcher 2011</a>;
+               <a class="bibref" href="#Godwin:KircherTheater">Godwin 2009</a>).
+               The device he describes in book eight is more than a demonstration of musical combinatorics:
+               Kircher epitomizes his whole concept of music in one small box
+               (<a class="bibref" href="#Bohnert:Kircher">Bohnert 2010</a>;
+               <a class="bibref" href="#Chierotti:KircherComporre">Chierotti 1994</a>;
+               <a class="bibref" href="#Chierotti:KircherMirifica">Chierotti 1992</a>;
+               <a class="bibref" href="#Klotz:ArsCombinatoria">Klotz 1999</a>;
+               <a class="bibref" href="#Murata:KircherMusicHistory">Murata 1999</a>;
+               <a class="bibref" href="#Pangrazi:KircherMusurgia">Pangrazi 2009</a>, 157–167;
+               <a class="bibref" href="#Wald:KircherMusurgia">Wald 2006</a>, 134–143).
+               </p>
+            <p>
+               In the eighth book Kircher announces an <q>ars nova musarithmica recenter inventa</q>, <q>a new musical-numerical method, recently discovered, by means of which even an untrained
+                  musician can achieve perfect composition in a short time</q> 
+               (<a class="bibref" href="#Kircher:Musurgia">Kircher 1650</a>, II: 1).
+               Kircher’s <q>new method</q> is a system for automatic music composition, embodied in the physical device whose
+               name means something like <q>box of musical calculation</q> 
+               (<a class="figref" href="#fig-ark-image">figure 1</a>).
+               By means of this device, he says, a <q>Tyro</q> (novice) or even an <q>amusical person</q> can compose nearly every type of modern music from simple four-part homophony to
+               florid, imitative counterpoint, and even polychoral and recitative styles.
+               Moreover, an <em>amusicus</em> (someone without musical knowledge) can compose music expressive of any mood, and
+               can even set words to music from any world language—all simply by operating the device
+               according to Kircher’s detailed rules.
+               Kircher advertises that, if used properly, the ark can produce music that a professional
+               musician would recognize as correct, appropriate to the text, and
+               rich in variety. 
+               He includes a full sample composition which he says was generated by an untrained
+               musician using the ark and heard with acclaim in elite Roman circles
+               (<a class="bibref" href="#Kircher:Musurgia">Kircher 1650</a>, II: 166).
+               </p>
+            <figure id="fig-ark-image"><img src="lib/Kircher-Arca_musarithmica.png" alt="An engraved image showing a large box containing slats with tables of numbers and music symbols, like a recipe box; the underside of the lid and the outside front of the box have additional tables of clefs and tonoi"><figCaption>Figure 1. Kircher’s Arca musarithmica, <cite>Musurgia universalis</cite> (1650) II, facing p. 185</figCaption>
+            </figure>
+            <p>
+               While skepticism might be warranted for some of Kircher’s claims, there is evidence
+               that people around the globe did build and operate the Arca musarithmica.
+               By means of the lavishly printed 1650 treatise, Kircher’s ark voyaged through Jesuit
+               networks as far as Mexico City and Manila
+               (<a class="bibref" href="#Findlen:KircherAmerica">Findlen 2004b</a>;
+               <a class="bibref" href="#Irving:Colonial">Irving 2010</a>, 48–50).
+               Three surviving physical implementations of the Arca musarithmica from Kircher’s time
+               have been found, in Cambridge, Wolfenbüttel, and Florence; and some evidence suggests
+               that a version of the device was known in the German lands
+               (<a class="bibref" href="#Annibaldi:FrobergerRome">Annibaldi 1995</a>;
+               <a class="bibref" href="#Bohnert:Kircher">Bohnert 2010</a>, 127–156;
+               <a class="bibref" href="#Boni:ArcaFlorence">Boni 2020</a>).
+               I discovered an additional copy of the Arca in Puebla (Mexico), which was made around
+               1690, probably by a university mathematics professor who was part of a circle of Kircher
+               aficionados in New Spain that included the poet Sor Juana Inés de la Cruz
+               (<a class="bibref" href="#Cashner:KircherSpanish">Cashner 2022b</a>;
+               <a class="bibref" href="#Osorio:LuzImaginaria">Osorio Romero 1993</a>;
+               <a class="bibref" href="#Trabulse:Circulo">Trabulse 1984</a>;
+               <a class="bibref" href="#Beuchot:SorJuanaKircher">Beuchot Puente 1995</a>;
+               <a class="bibref" href="#Maxey:SorJuanaKircherIconography">Maxey 2020</a>).
+               (Sor Juana coined the term <em>kircherizar</em>, <q>to Kircherize</q>, to describe the intellectual and theological process that Kircher inspired her to
+               follow.)
+               I also found a pamphlet describing the Arca from late eighteenth-century Madrid.
+               While a physical implementation of the Arca might have value purely as a curiosity,
+               it is hard to believe that no one ever tried to use them as intended.
+               In fact, the version in Puebla includes only a partial selection of Kircher’s data
+               tables, which seem to have been selected for their practical value.
+               </p>
+            <p>
+               None of the surviving implementations are automatic machines, though: the Wolfenbüttel
+               and Cambridge versions are wooden boxes with paper slats inside holding Kircher’s
+               tables of numbers and notes, and the Puebla version is just paper copies of the tables.
+               Indeed, Carlo Mario Chierotti argues that despite Kircher’s use of terms like <em>mechanicus</em> and <em>artificiosus</em> to describe the Arca, his invention is neither mechanical nor automatic; and in fact
+               requires significant discretion from a human operator to produce workable results
+               (<a class="bibref" href="#Chierotti:KircherComporre">Chierotti 1994</a>, 390).
+               Jim Bumgardner calls a related device by Kircher <q>nothing more than a glorified recipe box</q>
+               (<a class="bibref" href="#Bumgardner:Kircher">Bumgardner 2009</a>, 3). 
+               </p>
+            <p>
+               Did the Arca musarithmica really work as advertised?
+               And should we consider it to be a form of computer?
+               What kind of computation did Kircher think was necessary to compose music, and how
+               did he connect concepts of calculation and composition?
+               How did Kircher encode musical knowledge in the Arca, did his invention actually output
+               music that would be judged coherent and intelligible?
+               </p>
+            <p>
+               To answer these questions, I created a working, completely automatic, <a href="https://bitbucket.org/andrewacashner/kircher/">software implementation</a> of Kircher’s Arca musarithmica in the pure-functional programming language Haskell.
+               Anyone may generate music using the <a href="https://www.arca1650.info">web application version</a>, which also includes the complete source code and documentation written in a literate
+               programming style.
+               Users can choose among prepared input texts and select the style, meter, and mood
+               of the music; or they can even type in their own text.
+               Building the ark in software is more than just a programming project; it is an act
+               of interpretation balancing textual analysis with creative synthesis.
+               The implementation serves two main purposes: first, it tests the hypothesis that Kircher
+               actually did describe an effective system for musical composition in the form of an
+               algorithm that only lacked the technological means to make it fully automated.
+               Second, it makes it possible to test the output of the ark to a degree Kircher could
+               not have imagined, and thereby to evaluate the kind of musical knowledge encoded in
+               the ark and how much musical knowledge is actually required to generate acceptable
+               music with the system.
+               </p>
+            <p>
+               I argue that Kircher did establish a computational system for composition, including
+               data structures and algorithms, in which he formulated specifically musical conceptions
+               of computation.
+               The program demonstrates that it is possible to conceive of the entire ark as a single
+               mathematical function: it takes one series of symbols, representing an input text
+               and the choice of musical parameters, and transforms those into another set of symbols
+               that represents musical notation. 
+               Kircher explicitly aims to provide a mathematically sound method of composition, and
+               though his specifications fall short of the standards of modern computer science,
+               his algorithm works.
+               The musical results generated by this implementation do sound like mid-seventeenth-century
+               Italianate music in a conservative, church-oriented style.
+               There are some mistakes in the data and portions of the instructions are underspecified
+               or omitted, but in the end only a few parts of the system actually required the addition
+               of missing data or processes.
+               In most of those cases Kircher was probably right to assume that a human user would
+               supply these gaps intuitively.
+               These places where Kircher skips a step or assumes knowledge that is not encoded in
+               the ark actually reveal important aspects of his understanding of music, because the
+               whole device should be understood as an attempt to systematize a compositional theory
+               of music.
+               </p>
+            <p>
+               This is not the first attempt to implement the ark: in addition to the physical implementations
+               already mentioned, Agnes Cäcilie Bohnert modeled the ark in a Java program, and Bumgardner
+               built a related, simpler system in Perl.  
+               Bumgardner’s program implemented the musical portion of the <em>Organum mathematicum</em> described by Kircher’s student Gaspar Schott, which was much simpler musically but
+               could also compute the date of Easter and solve other problems.
+               Bohnert’s dissertation provides a comprehensive treatment of book eight of the <cite>Musurgia</cite>, tracing its mathematical and philosophical foundations (such as the <cite>Ars combinatoria</cite> of Raimond Llull) and comparing the description of the Arca to the two physical implementations.
+               According to Bohnert’s description of the software (which I was unable to access),
+               the program implemented the two complete syntagmata (I and II) in way that followed
+               closely the manual method described by Kircher
+               (<a class="bibref" href="#Bohnert:Kircher">Bohnert 2010</a>, 123–126).
+               Users would select musical permutations one at a time, adjust them, and add them to
+               the musical composition, and then hear the result. 
+               The program is not described as fully automatic, however, and Bohnert says it can
+               only create very short settings of a small number of texts.
+               The implementation presented here is to my knowledge the first realization of the
+               Arca musarithmica to be fully automatic and to be capable of setting texts of any
+               length and type.
+               Examples <a class="figref" href="#ex-Ave_maris_stella-simple"> 1</a> and <a class="figref" href="#ex-Ave_maris_stella-florid"> 2</a> show simple and florid settings of the hymn <cite>Ave maris stella</cite> automatically generated by the ark.
+               </p>
+            <figure class="example" id="ex-Ave_maris_stella-simple"><img src="lib/Ave_maris_stella-simple.svg" alt="Music notation of a four-voice setting"><figCaption>Example 1. Automatic setting of <cite>Ave maris stella</cite> by the Arca
+                  musarithmica Haskell program, in simple style</figCaption>
+            </figure>
+            <figure class="example" id="ex-Ave_maris_stella-florid"><img src="lib/Ave_maris_stella-florid.svg" alt="Music notation of a four-voice setting"><figCaption>Example 2. Automatic setting of <cite>Ave maris stella</cite> in florid style</figCaption>
+            </figure>
+            <p>
+               I focus my examination of the ark on the ways that it embodies musical concepts of
+               computation.
+               I consider the components of Kircher’s original device as a human-operated system,
+               and discuss what was necessary to translate it for use by a digital automaton.
+               I close with reflections on how Kircher’s system reflects widespread views of the
+               nature of music and of compositional craft, and how at the same time it demonstrates
+               a gap between theory and practice.
+               </p>
+         </section>
+         <section id="sec-computing" xml:lang="en-US" xml:base="include/computing.xhtml">
+            <h1>2. The Arca as a Human-Optimized Computational System</h1>
+            <section id="sec-computing-concepts" class="unnumbered">
+               <p>
+                  The original Arca should not be dismissed as a computing device because it requires
+                  a human operator, or because its design may seem simple. 
+                  A computational system does not require an electronic implementation; in fact, the
+                  fundamental modern concepts of computing, Turing machines and Church’s lambda calculus,
+                  were defined before there existed any means of automating them.
+                  If the human operator’s role is purely mechanical and does not require intelligent
+                  decisions, then the system should still be considered automatic.
+                  With some exceptions to be discussed below, the user of the original Arca, like the
+                  human operator of a Turing machine, simply follows prescribed rules to transform symbols
+                  on paper.
+                  Kircher’s system is optimized for a human user, not because it depends on human discretion,
+                  but because it enables a human to access the data easily and manipulate it by rule.
+                  What may seem a simple structure of lookup tables is, first, more complex than
+                  it appears, and second, still a valid computational system. 
+                  This section will focus on the original specification for the ark as a human-operated
+                  system, and will show how each component embodies musical
+                  concept of computation.
+                  </p>
+               <p>
+                  As Kircher’s illustration (<a class="figref" href="#fig-ark-image">figure 1</a>) shows, the ark contains different kinds of musical information on the outside, on
+                  the lid, and stored within. 
+                  The user is supposed to choose a text to set to music, in Latin by default, and prepare
+                  the text by dividing it into sections, phrases, words, and syllables.
+                  For each segment, the user must select an appropriate style and mood for the setting.
+                  Next the operator goes through the text phrase by phrase, and for each selects a <em>pinax</em> (rod or slat) from the appropriate <em>syntagma</em> (division), based on the intended musical style and the poetic meter of the text.
+                  The ark includes three <em>syntagmata</em>: the first is for simple, syllabic, homorhythmic counterpoint; while the second is
+                  for florid, melismatic counterpoint with imitation and even fugato.
+                  The third syntagma theoretically includes a huge range of styles and techniques but
+                  Kircher only published a small portion of it, claiming that he reserved the rest in
+                  secret for the eyes of <q>princes and worthy friends</q> only 
+                  (<a class="bibref" href="#Kircher:Musurgia">Kircher 1650</a>, II: 184).
+                  </p>
+               <p>
+                  From the tables of numbers and rhythmic durations marked on the <em>pinakes</em> (plural of the borrowed Greek <em>pinax</em>) the user extracts pre-arranged permutations of numbers and rhythmic values.
+                  The user chooses a mood to suit the text from the table of tones (<em>toni ecclesiastici</em> or <q>church keys</q>) on the lid, and then matches numbers to the pitch names and potential accidentals
+                  shown there.
+                  Finally, the table on the front specifies how to inscribe these notes on paper within
+                  acceptable ranges for the four voices.
+                  The ark’s output is a notated musical composition for four voices (<em>cantus</em> or soprano, alto, tenor, and bass).
+                  </p>
+               <p>
+                  Kircher’s Arca includes most of the elements that make up any modern computational
+                  system.
+                  The marked-up lyrical text forms the input; the slats with musical permutations and
+                  the lookup tables of pitches and accidentals are function as part of a stored program;
+                  and the music paper serves as both a temporary processing area (like working memory)
+                  and output medium.
+                  The data on the ark’s pinax tables is encoded in a form that allows for compact storage
+                  and quick retrieval.
+                  The ark’s tables should be understood as data structures whose design implies the
+                  algorithms needed to access and manipulate them
+                  (<a class="bibref" href="#Wirth:Algorithms">Wirth 1976</a>, xii–xiii). 
+                  Likewise the tables map inputs to outputs according to a rule and are therefore closely
+                  related to functions.
+                  The human operator must do the actual processing of course, but the user must do this
+                  according to Kircher’s prescriptions, equivalent to the program.
+                  And except in a few areas, Kircher does provide a complete list of procedures, specifying
+                  an algorithm that may not be quite precise enough to meet a rigorous mathematical
+                  definition but is nevertheless functional
+                  (<a class="bibref" href="#Knuth:TAOCP1">Knuth 1997</a>, 1–7).
+                  Since the software implementation of Kircher’s algorithm does satisfy modern theoretical
+                  requirements, I will note where I found it necessary to complete the specification.
+                  </p>
+            </section>
+            <section id="sec-structure">
+               <h1>2.1. Kircher’s Data Structures: Syntagmata, Pinakes, Musarithms</h1>
+               <section id="sec-structure-overview">
+                  <p>
+                     Examining Kircher’s data structures more closely will show the ways in which he has
+                     encoded musical data in order to make it possible for a human operator to manipulate
+                     musical materials in a mechanical way.
+                     Inside the actual arca or box there are three groups (the syntagmata) of long, solid
+                     slats (the pinakes).
+                     The choice of syntagma is determined by the style of text-setting: respectively, simple
+                     homophony, florid counterpoint, or mixed.
+                     (This software fully implements only the completely specified syntagma I and II, and
+                     it is not clear if syntagma III could be fully automated based only on Kircher’s specification.)
+                     Within each syntagma the choice of pinax is a function of the poetic meter of the
+                     input text.
+                     </p>
+                  <p>
+                     The design of the pinakes recall Napier’s bones and similar calculating devices.
+                     The user removes the needed pinakes from the box and arranges them on a work surface
+                     to extract data from them.
+                     <a class="figref" href="#fig-s1p4">Figure 2</a> shows the slat used to set the hymn <cite>Ave maris stella</cite> in simple style, syntagma I, pinax 4; while <a class="figref" href="#fig-s2p2a">figure 3</a> shows the one used to set the same hymn in florid style: syntagama II, pinax II.
+                     
+                     Each pinax has two components: lists of integers one through eight and lists of note
+                     symbols.
+                     Kircher uses the term <em>musarithmos</em> (musical numbers) primarily to refer to the tables of numbers; for greater precision
+                     I call the pitch numbers <em>vperms</em> (voice permutations) and the durations <em>rperms</em> (rhythm permutations).
+                     </p>
+                  <figure id="fig-s1p4"><img src="lib/Kircher-s1p4.png" alt="A printed table with two sections: the top includes numerals representing pitches and the bottom includes symbols of music notes representing rhythms, with different sets of permutations in parallel columns"><figCaption>Figure 2. Arca musarithmica, syntagma I, pinax IV, in <cite>Musurgia
+                           universalis</cite> (1650), book 2, fol. 83</figCaption>
+                  </figure>
+                  <figure id="fig-s2p2a"><img src="lib/Kircher-s2p2a.png" alt="A printed table with paired sets of numerals and music symbols"><figCaption>Figure 3. Arca musarithmica, syntagma II, pinax II, in <cite>Musurgia
+                           universalis</cite> (1650), book 2, fol. 106</figCaption>
+                  </figure>
+               </section>
+            </section>
+            <section id="section-vperms-rperms">
+               <h1>2.2. Encoding Pitches and Rhythms</h1>
+               <p>
+                  The vperms and rperms are arranged differently in each syntagma.
+                  In Syntagma I, all the voices use the same rhythm, so Kircher writes separate tables
+                  of vperms and rperms: the user pairs a four-voice vperm from the top of the pinax
+                  with an rperm on the bottom that is a single list of durations.
+                  Since the music in this syntagma is syllabic, the columns correspond to successive
+                  syllables in the input text.
+                  In Syntagma II, by contrast, Kircher enables complex counterpoint by pairing four-voice
+                  vperms with four-voice rperms, so that each voice has its own rhythm.
+                  Here the music is melismatic, and there can be a different number of notes in each
+                  voice.
+                  Since Kircher never provides precise rules for how to underlay the lyrical text in
+                  syntagma II, it would be more accurate to think of these vperm rows as lists of notes
+                  rather than as table columns, which is how they are implemented in the software.
+                  In most pinakes of both syntagmata, the user is supposed to choose from a different
+                  column based on the order of poetic lines in the input text.  Kircher calls these
+                  <em>strophae</em>, which despite the cognate means lines not stanzas.
+                  </p>
+               <p>
+                  Kircher does not encode pitch directly in the vperm tables; instead, the integers
+                  are actually lookup keys for the <em>mensa tonographica</em> or tone table, where letters A through G plus sharp or flat symbols represent the
+                  pitch classes.
+                  In modern terms the numerals represent scale degrees relative to the modal final of
+                  a particular tone, so that in tone I, with its final on D, <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">5</span></span> is A.
+                  Kircher uses both 1 and 8 to refer to the final, often to express stepwise motion
+                  between <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span> and <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">8</span></span>.
+                  Each pinax includes specifications of which tones are acceptable, sometimes in a box
+                  to the side, other times at the top of each column, and some in the introductory text.
+                  At this stage the numbers only correspond to note names and also to potential accidentals;
+                  the octave and duration are still unspecified.
+                  </p>
+               <p>
+                  To encode rhythms, Kircher uses note symbols for the different rhythmic values: 
+                  breve (<span class="music">𝅜</span>),
+                  semibreve (<span class="music">𝅝</span>),
+                  minim (<span class="music">𝅗𝅥</span>),
+                  semiminim (<span class="music">𝅘𝅥</span>), and 
+                  fusa (<span class="music">𝅘𝅥𝅮</span>),
+                  along with the corresponding rest symbols.
+                  The rperms in syntagma I are divided into three sections by meter: for duple meter,
+                  <q>triple major</q>, and <q>triple minor</q>.
+                  In his notated realizations Kircher uses the mensuration sign <span class="music-timesig">𝄵</span> for duple meter, which would normally indicate a metrical pattern in groups of two
+                  breves, each divided into two semibreves—i.e., imperfect <em>tempus</em>, <em>alla breve</em>. 
+                  In practice, though, about half of his rhythm permutations suggest <span class="music-timesig">𝄴</span>, with groups of two semibreves.
+                  The system does not distinguigh between these forms of duple meter, probably out of
+                  Kircher’s stated desire to maximize the variety of the ark’s output.
+                  This would not be a problem for someone choosing the permutations intelligently, but
+                  since Kircher does not provide a way to distinguish automatically, this implementation
+                  of the ark can produce absurd results in duple meter when the implied subdivision
+                  shifts abruptly.
+                  </p>
+               <p>
+                  In Syntagma I, based on the prior choice of musical meter, the user is supposed to
+                  choose one of the three meter categories, and then select one of the rperms from the
+                  same column as the chosen vperm.
+                  In many pinakes of syntagma I, though, there is actually only set of rperms, which
+                  is repeated at the bottom of each column.
+                  The triple-meter rperms are divided into two sections, one for a ternary proportion
+                  of <span class="music-timesig">𝄵</span> and the other for a proportion of <span class="music-timesig">𝄴</span>.
+                  Kircher writes these interchangeably as <span class="music-timesig">𝄵</span><span class="music-timesig-num"><span class="timesig"><span class="top">3</span><span class="bottom">2</span></span></span> and <span class="music-timesig">𝄵</span><span class="music-timesig-num">3</span> for <q>Tripla maior</q>, and as <span class="music-timesig">𝄴</span><span class="music-timesig-num"><span class="timesig"><span class="top">3</span><span class="bottom">2</span></span></span> and <span class="music-timesig">𝄴</span><span class="music-timesig-num">3</span> for <q>Tripla minor</q>.
+                  The <em>tactus</em> or metrical unit in <span class="music-timesig">𝄵</span><span class="music-timesig-num">3</span> falls on groups of three imperfect semibreves, in a 3:2 proportion to the groups
+                  of two semibreves in <span class="music-timesig">𝄵</span>.
+                  In <span class="music-timesig">𝄴</span><span class="music-timesig-num">3</span> there are groups of three minims, in the same proportion to the binary groups of
+                  minims in <span class="music-timesig">𝄴</span>.
+                  In syntagma II all the permutations are in duple meter and the vperms and rperms are
+                  paired.
+                  </p>
+               <p>
+                  With this separate encoding of pitch and rhythm, Kircher has discovered a compact
+                  way of representing fairly complex polyphonic music.
+                  As Chierotti notes, musicians already used numbers to represent pitches in figured-bass
+                  notation, where the numbers stood for intervals above the bass note
+                  (<a class="bibref" href="#Chierotti:KircherComporre">Chierotti 1994</a>).
+                  Kircher’s rhythm notation also drew on existing practices like the German keyboard
+                  tablature of contemporary organists like Matthias Weckmann, who wrote down letter
+                  names in one row with matching duration symbols above 
+                  (<a class="bibref" href="#Weckmann:ChoraleWorks">Weckmann 1980</a>).
+                  The Arca user does not need to decode either numbers or duration symbols mentally,
+                  because the numbers are lookup keys for the tone table, and the durations need only
+                  to be copied directly onto the music paper.
+                  For the rhythm, Kircher might also have used integers keyed to a lookup table (as
+                  in the software implementation), but his use of duration symbols is more logical and
+                  efficient for a human operator.
+                  </p>
+            </section>
+            <section id="sec-optimized">
+               <h1>2.3. Optimized for Automatic Human Operation</h1>
+               <p>
+                  For a programmer, Kircher’s use of graphical symbols for rhythm seems a hindrance
+                  because a digital computer cannnot understand them until they are converted into numbers.
+                  
+                  For this reason the software implementation uses enumeration labels for durations:
+                  it is more convenient for the human programmer to write <code>Sb</code> for a semibreve while the compiler converts this to an integer internally.
+                  But Kircher designed his system for an amusical human operator, for whom no thought
+                  at all would be required to simply copy the symbols from the rperm table onto the
+                  music paper.
+                  In that way Kircher’s original graphical encoding is actually more automatic and requires
+                  less computation than the software implementation.
+                  </p>
+               <p>
+                  Kircher’s use of mensural notation further illustrates his human-oriented design.
+                  For a computer, symbols must be unambiguous, so the contextual system of mensural
+                  notation in ternary meter poses an obstacle.
+                  In <span class="music-timesig">𝄴</span><span class="music-timesig-num">3</span> (rendered in modern notation as <span class="music-timesig-num"><span class="timesig"><span class="top">3</span><span class="bottom">2</span></span></span>), 
+                  for example, the mensural figure <span class="music">𝅝</span><span class="music">𝅝</span> is equivalent to the modern <span class="music">𝅝𝅭 </span><span class="music">𝅝𝅭 </span>, 
+                  while the mensural figure <span class="music">𝅝</span><span class="music">𝅝</span><span class="music">𝅗𝅥</span> is equivalent to the modern <span class="music">𝅝𝅭 </span><span class="music">𝅝</span><span class="music">𝅗𝅥</span>.
+                  In the software implementation it was simpler just to convert the ternary rperms to
+                  their modern equivalent, which in most cases simply required adding a dot to the final
+                  duration.
+                  But in the original system, no conversion or calculation was required at all: an <q>amusical</q> user could simply copy the durations and let the performers figure out the contextual
+                  notation.
+                  </p>
+               <p>
+                  For a human user of the physical Arca, once the input parameters are known, all of
+                  these data for composing the music can be accessed quite readily by a simple scan
+                  of the box and its contents.
+                  The human user must know the poetic meter of the text and parse the text into phrases
+                  and syllables, and then must choose the intended style, mood, and musical meter.
+                  The style tells the user which area of the box to search (which syntagma), and the
+                  user then matches the text meter to the label at the top of the appropriate pinax.
+                  The user removes the needed pinakes, lays them out in order, and moves them up and
+                  down to choose the needed vperm and rperm columns; there is left only to read across
+                  the tables and copy down the symbols.
+                  In most cases the in-order position of the poetic line determines the choice of column
+                  within a pinax.
+                  Then for vperms, the selection of a row is a free choice.
+                  For rperms in syntagma I, the choice of musical meter determines which subtable of
+                  rperms to select and the particular rperm selection is a free choice.
+                  In syntagma II, all the rperms are in duple meter and they are already matched to
+                  the vperms, so only one choice is needed.
+                  Kircher’s design of the pinax limits its useability, because the user must select
+                  different rows from a single pinax; they would be easier to use if they were built
+                  like slide rules with moveable columns.
+                  </p>
+               <p>
+                  Once the numbers are copied or noted mentally, the user can turn to the tone table,
+                  where the choice of mood determines the tone, and the tone combined with the vperm
+                  integer are the keys for looking up pitch names in the table.
+                  The tone table is least optimized part of the system for any operator (aside from
+                  the musical problems with Kircher’s whole concept of <em>toni</em>, to be discussed below).
+                  Although the user must look information up in the table based on the two inputs of
+                  tone number and pitch number, the table is keyed by tone number and pitch name. 
+                  Instead of a simple array lookup, then, one has to scan each column to find the pitch
+                  number and then look over to the axis to obtain the pitch letter.
+                  Because the table also includes potential <em>ficta</em> accidentals, it would make more sense, even with a human user in mind, to put the
+                  pitch numbers on the axis and store the pitch letters with their accidentals in the
+                  table cells.
+                  In terms of computational complexity, Kircher’s table requires O(n) time, versus O(1)
+                  for a table indexed by tone and pitch numbers
+                  (<a class="bibref" href="#Knuth:TAOCP1">Knuth 1997</a>, 107–111).
+                  </p>
+               <p>
+                  To make matters worse, Kircher actually provides two conflicting tone tables, and
+                  in contrast to the one shown in the engraving (<a class="figref" href="#fig-ark-image">figure 1</a>), the one given in the text is actually unusable for computation
+                  (<a class="bibref" href="#Kircher:Musurgia">Kircher 1650</a>, II: facing 185, II: 51).
+                  The other table groups the tones out of numerical order to demonstrate patterns; it
+                  includes two conflicting entries for tone 8; and among other differences, this table
+                  lists a tone 4 with an E final and <span class="music">♯</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">3</span></span> and <span class="music">♭</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">5</span></span>, while in the engraved table,  tone 4 has an A final with <span class="music">♯</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">3</span></span>
+                  (<a class="bibref" href="#Bohnert:Kircher">Bohnert 2010</a>, 65–77).
+                  The software implementation is based on the engraved table.
+                  </p>
+               <p>
+                  Kircher never actually specifies a rule for choosing a particular vperm or rperm within
+                  a column. 
+                  In some places he implies that a random choice would increase variety, while elsewhere
+                  he suggests that the user discriminate based on musical considerations.
+                  Kircher seems ambivalent about creating a fully automated system, perhaps motivated
+                  by theological anxieties about superseding human free will and intelligence, or about
+                  chance operations.
+                  At the same time, there are numerous ways a human user can simply <q>pick any row</q> and achieve semi-random results.
+                  The digital automaton can only simulate a free choice by using a pseudo-random number
+                  generator, though in this implementation it would still be possible for a superstitious
+                  user to supply their own list of permutation choices.
+                  </p>
+               <p>
+                  Regardless of the inconsistencies, Kircher’s encoding system should be recognized
+                  as a symbolic representation of music intended to allow a mathematical approach.
+                  Kircher compares his system to the working-out of an algebra problem, in which simply
+                  by applying a series of rule-based transformations to a set of symbols, one can achieve
+                  previously unexpected results
+                  (<a class="bibref" href="#Kircher:Musurgia">Kircher 1650</a>, II: 2).
+                  Kircher’s effort moved in the same direction as contemporary mathematicians Fermat,
+                  who shared Kircher’s interest in combinatorics, and Leibniz, with whom Kircher corresponded:
+                  his encoding system lifted music into a more abstract realm in which the sonic materials
+                  could be manipulated symbolically
+                  (<a class="bibref" href="#Chierotti:KircherComporre">Chierotti 1994</a>, 389;
+                  <a class="bibref" href="#Ifrah:Computing">Ifrah 2001</a>, 70, 77–80, 88–92).
+                  Like Kircher, those mathematicians did not fully succeed in finding unambiguous symbolic
+                  represenations or state their proofs according to the same laws of rigor practiced
+                  today.
+                  Even today the closest we come to a symbolic language for manipulating music abstractly
+                  may be MEI-XML; but that system still lacks full support for notating music of Kircher’s
+                  era, and is designed for machines to use rather than humans
+                  (<a class="bibref" href="#MEI">Music Encoding Initiative 2022</a>).
+                  </p>
+            </section>
+         </section>
+         <section id="sec-implementation" xml:lang="en-US" xml:base="include/implementation.xhtml">
+            <h1>3. Implementing the Ark for a Digital Automaton</h1>
+            <section id="sec-outline" class="unnumbered">
+               <p>
+                  In contrast with Kircher’s human-oriented design, the software implementation for
+                  a digital automaton requires a complete, fully precise algorithm reducible to binary
+                  numbers.
+                  By number alone, the machine must build the ark, read the input, access the ark data,
+                  transform it, and then write it in the output format.
+                  The Haskell language with its pure-functional orientation guaranteed that the implementation
+                  would be a single function (calling other nested functions), while its strict typing
+                  made it possible to treat the required data structures as distinct data types.
+                  The program uses the following modules:
+                  </p>
+               <dl>
+                  <dt><code>Aedifico</code> (<q>I build</q>)</dt>
+                  <dd>This module defines the software versions of Kircher’s structures and the basic methods
+                     for accessing them.</dd>
+                  <dt><code>Arca musarithmica</code></dt>
+                  <dd>
+                     This module stores the original data of Kircher’s ark in nested vectors and lists
+                     of integer values and enumeration values corresponding to the rhythmic durations,
+                     plus the lists of mode scales and other information.
+                     </dd>
+                  <dt><code>Lectio</code> (<q>I read</q>)</dt>
+                  <dd>
+                     This module creates the system for reading the input texts, which must be written
+                     in a custom XML vocabulary.
+                     The functions in this module extract the parameters like text meter, music meter,
+                     and mode; and parse the text into sections, sentences, phrases, words, and syllables.
+                     </dd>
+                  <dt><code>Fortuna</code> (<q>Chance</q>)</dt>
+                  <dd>
+                     This module generates the pseudo-random numbers used to select vperms and rperms.
+                     </dd>
+                  <dt><code>Cogito</code> (<q>I think</q>)</dt>
+                  <dd>
+                     This module is where the actual <q>musarithmetic</q> occurs, where vperm numbers are converted into pitches with accidentals, rperms are
+                     converted into durations, and octaves are set and adjusted according to Kircher’s
+                     rules. 
+                     The module stores all this data in internal data structures that encode music sections,
+                     phrases, and pitches (with pitch class, octave, accidental, duration, and syllables).
+                     
+                     <dl>
+                        <dt><code>Cogito.Musarithmetic</code></dt>
+                        <dd>
+                           This submodule includes the functions that calculate musical pitches (such as adding
+                           pitches to shift octaves or subtracting to find and test intervals), and the functions
+                           for setting the octaves of pitches in order to create an optimal sequence within a
+                           given voice range.
+                           </dd>
+                        <dt><code>Cogito.Ficta</code></dt>
+                        <dd>
+                           This module makes the calculations required to apply Kircher’s suggested accidentals,
+                           and others required by <em>musica ficta</em> conventions. 
+                           Kircher’s rules in this area are underspecified, and as a result this is the most
+                           experimental and interpretive component of the software.
+                           </dd>
+                     </dl>
+                  </dd>
+                  <dt><code>Scribo</code> (<q>I write</q>)</dt>
+                  <dd>
+                     This module writes the data generated by the <code>Cogito</code> module to a music-notation language that other software can use to put the actual
+                     notes on the screen or paper. 
+                     The submodules output to MEI-XML, and there is also limited capacity for Lilypond
+                     output (used for testing).
+                     </dd>
+               </dl>
+            </section>
+            <section id="sec-data-types">
+               <h1>3.1. The Ark in Haskell Data Types: Syntagmata, Pinakes, Perms</h1>
+               <p>
+                  The <code>Arca</code> data type contains the same information as the physical ark though slightly rearranged:
+                  
+                  <pre><code class="language-haskell">-- | A vector of 'Syntagma' instances plus the other elements of the physical
+-- device (tone table, vocal ranges, information matching tones to pinakes)
+-- makes up the full 'Arca'.
+data Arca = Arca {
+    perms      :: Vector (Syntagma),
+    tones      :: ToneList,
+    systems    :: ToneSystem,
+    pinaxTones :: PinaxToneList,
+    ranges     :: VoiceRanges
+}
+    </code></pre>
+                  The <code>ranges</code> member holds the key information of the <em>Palimpsest phonotacticum</em> on the front of the box, while the <code>tones</code> and <code>systems</code> members correspond to the <em>Mensa tonographica</em> or tone table.
+                  The member <code>pinaxTones</code> supplies the list of legal tones per pinax, which Kircher lists in various places.
+                  The Haskell version of the tone table is optimized for quick lookup as a vector of
+                  vectors, indexed by tone number and pitch number.
+                  </p>
+               <p>
+                  The <code>perms</code> member of the <code>Arca</code> structure holds the pitch numbers and rhythmic durations from the pinakes.
+                  This member stores the contents of the ark box—the syntagmata and pinakes—as a set
+                  of nested vectors.
+                  Each column is a data type with two members: one vector of vperms and one of rperms.
+                  The rperms are further subdivided by meter.
+                  At the bottom level, the pitch numbers are stored in lists of <code>Int</code> types, while the durations are members of a custom <code>Dur</code> enumerator type.
+                  The following excerpts show how the Haskell data structures for rhythm permutations
+                  fit within the hierarchy of data types:
+                  
+                  <pre><code class="language-haskell">type Syntagma   = Vector (Pinax)
+type Pinax      = Vector (Column)
+data Column     = Column {
+    colVpermTable :: VpermTable, 
+    colRpermTable :: RpermTable
+}
+type RpermTable = Vector (RpermMeter)
+
+-- | An 'RpermMeter' includes a vector of 'RpermChoir's all in one meter (see
+-- the 'MusicMeter' data type above) and the length of that vector, since
+-- Kircher has a variable number of 'Rperm's in the different meters in each
+-- column.
+data RpermMeter = RpermMeter {
+    rpermMax :: Int,            -- ^ length of 'rperms'
+    rperms :: Vector (RpermChoir)
+}
+
+-- | In Syntagma I, there is only one set of rhythmic permutation that we
+-- apply to all four voices of the 'VpermChoir'. But in Syntagma II, there are
+-- groups of four 'Rperm's that match up with the four voices. 
+-- So we make a "choir" as a vector of 'Rperm's, though in Syntagma I this
+-- will always just have a single member.
+type RpermChoir = Vector (Rperm)
+
+-- | The bottom part of the "rods" contain tables of rhythmic values written
+-- with musical notes. We implement this using our 'Dur' data type for the
+-- rhythmic values. An 'Rperm' is a list of 'Dur' values.
+type Rperm      = [Dur]
+
+-- | Duration values: We use the mensural names; first the base values, then
+-- dotted variants, then a series marked as rest values.
+data Dur = 
+      DurNil -- ^ unset
+    | Lg     -- ^ longa
+    | Br     -- ^ breve
+    | Sb     -- ^ semibreve 
+    | Mn     -- ^ minim
+    | Sm     -- ^ semiminim
+    | Fs     -- ^ fusa
+    -- ...
+    deriving (Enum, Eq, Ord, Show)
+    </code></pre>
+               </p>
+               <p>
+                  Using these data types, then, it is possible to build to ark using the data directly
+                  from Kircher’s tables. 
+                  The similarity between Kircher’s original encoding and that used in the program is
+                  clear in this excerpt of the code for the first column of syntagma 1, pinax 4 (shown
+                  in <a class="figref" href="#fig-s1p4">figure 2</a>), from the submodule <code>Arca_musarithmica.Syntagma1.Pinax04</code>:
+                  
+                  <pre><code class="language-haskell">c0 = (c0v, c0r)
+c0v = [
+        [ -- 0
+            [5, 5, 3, 2, 3, 3],
+            [8, 7, 5, 7, 7, 7],
+            [3, 2, 3, 4, 5, 5],
+            [8, 5, 8, 7, 3, 3]
+        ],
+        [ -- 1
+            [5, 5, 5, 5, 5, 5],
+            [8, 8, 8, 7, 8, 8],
+            [3, 3, 3, 2, 3, 3],
+            [1, 1, 1, 5, 1, 1]
+        ],
+        -- ...
+        [ -- 9
+            [3, 4, 5, 4, 2, 3],
+            [8, 7, 7, 6, 5, 5],
+            [5, 4, 3, 8, 7, 8],
+            [1, 2, 3, 4, 5, 1]
+        ]
+    ]
+c0r = [
+        [ -- Duple
+            [[SbD, Mn, Mn, Mn, Sb, Sb]],
+            [[MnD, Sm, Mn, Mn, Sb, Sb]],
+            [[Mn, Mn, Mn, Mn, Sb, Sb]],
+            -- ...
+        ],
+        [ -- TripleMajor
+            [[Br, Sb, Br, Sb, BrD, BrD]], 
+            [[SbR, Sb, Sb, Br, Sb, BrD, BrD]],
+            [[Sb, Sb, Sb, Sb, Br, BrD]]
+        ],
+        [ -- TripleMinor
+            [[Sb, Mn, Sb, Mn, SbD, SbD]], 
+            [[Mn, Mn, Mn, Mn, Sb, SbD]],
+            [[MnR, Mn, Mn, Sb, Mn, SbD, SbD]]
+        ]
+    ]
+    </code></pre>
+               </p>
+               <p>
+                  The ark is built by converting these nested lists to the appropriate data types and
+                  storing them in a single variable, <code>arca</code>, which is imported into the main program environment. 
+                  To go in the other direction and access the vperm and rperm data, the program establishes
+                  various forms of lookup functions to map the input parameters (style, text meter,
+                  music meter, tone) to the relevant data.
+                  For example, to select the proper pinax the computer looks up the text meter to find
+                  a pinax label and then looks up the pinax label to find the vector index of that pinax
+                  in its syntagma.
+                  A number of inconsistencies in Kircher’s own structuring of the data and rules for
+                  its access—for one, Syntagma I, Pinax 3 actually includes data for two different textual
+                  meters—require explicit lookups rather than a simple mapping of enumeration tags to
+                  vector indices.
+                  </p>
+            </section>
+            <section id="sec-input">
+               <h1>3.2. Reading the Input Text</h1>
+               <p>
+                  Before the digital Arca can use these data and algorithms to compose music, it must
+                  read the input text prepared with all the information Kircher says is required.
+                  The Haskell program accepts input files in a custom XML format, using certain elements
+                  of the Text Encoding Initiative vocabulary
+                  (<a class="bibref" href="#TEI">Text Encoding Initiative 2022</a>).
+                  The file must have a <code>head</code> element with the title and author of the words, followed by a <code>text</code> element that includes the words to be set to music, in which the words are divided
+                  by syllable with long (or accented) syllables marked.
+                  Here is an abridged input text for <cite>Ave maris stella</cite>, showing the possibility of changing style, meter, and tone in different sections:
+                  
+                  <pre xml:lang="en-US" xml:base="include/implementation/input-Ave_maris_stella.xhtml"><code class="language-xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!DOCTYPE arkText SYSTEM "arkText.dtd"&gt;
+&lt;arkText&gt;
+  &lt;head&gt;
+    &lt;title&gt;Ave maris stella&lt;/title&gt;
+    &lt;wordsAuthor&gt;Liber Hymnarius&lt;/wordsAuthor&gt;
+  &lt;/head&gt;
+  &lt;text&gt;
+    &lt;section textMeter="IambicumEuripidaeum" style="Simple" 
+             musicMeter="TripleMajor" tone="Tone3"&gt;
+      &lt;lg&gt;
+        &lt;l&gt;`A-ve, `ma-ris `stel-la,&lt;/l&gt;
+        &lt;l&gt;`De-i `ma-ter `al-ma,&lt;/l&gt;
+        &lt;l&gt;`at-que `sem-per `vi-rgo,&lt;/l&gt;
+        &lt;l&gt;`fe-lix `coe-li `por-ta.&lt;/l&gt;
+      &lt;/lg&gt;
+      &lt;lg&gt;
+        &lt;l&gt;`Su-mens `il-lud A-ve&lt;/l&gt;
+        &lt;l&gt;Gab-ri-`el-is `o-re,&lt;/l&gt;
+        &lt;l&gt;`fun-da nos in `pa-ce,&lt;/l&gt;
+        &lt;l&gt;`mu-tans `E-vae `no-men.&lt;/l&gt;
+      &lt;/lg&gt;
+      &lt;!-- ... --&gt;
+    &lt;/section&gt;
+    &lt;!-- ... --&gt;
+    &lt;section textMeter="IambicumEuripidaeum" style="Florid" 
+             musicMeter="Duple" tone="Tone9"&gt;
+      &lt;lg&gt;
+        &lt;l&gt;Sit laus `De-o `Pat-ri,&lt;/l&gt;
+        &lt;l&gt;`sum-mo `Chris-to `de-cus,&lt;/l&gt;
+        &lt;l&gt;Spi-`ri-tu-i `Sanc-to&lt;/l&gt;
+        &lt;l&gt;`tri-bus `ho-nor `u-nus.&lt;/l&gt;
+      &lt;/lg&gt;
+    &lt;/section&gt;
+    &lt;section textMeter="Prose" style="Simple" 
+             musicMeter="TripleMajor" tone="Tone9"&gt;
+      &lt;lg&gt;&lt;l&gt;A-`men.&lt;/l&gt;&lt;/lg&gt;
+    &lt;/section&gt;
+    &lt;/text&gt;
+  &lt;/arkText&gt;
+</code></pre>
+               </p>
+               <p>
+                  The text should be divided into one or more sections, and subsequently into one or
+                  more line groups (<code>lg</code> elements for stanzas or paragraphs) and lines (<code>l</code> elements).
+                  The following attributes are required at the start of each section, and set the main
+                  parameters needed to run the ark:
+                  
+                  <dl>
+                     <dt><code>style</code>:</dt>
+                     <dd>
+                        Either <code>Simple</code> or <code>Florid</code></dd>
+                     <dt><code>tone</code>:</dt>
+                     <dd>
+                        One of the twelve tones (<em>toni</em>) as <code>Tone1</code>, <code>Tone2</code>, ... <code>Tone12</code></dd>
+                     <dt><code>musicMeter</code>:</dt>
+                     <dd><code>Duple</code>, <code>TripleMajor</code>, or <code>TripleMinor</code></dd>
+                     <dt><code>textMeter</code>:</dt>
+                     <dd>
+                        One of the following values:
+                        
+                        <table xml:lang="en-US" xml:base="include/implementation/table-textMeter.xhtml">
+                           <thead>
+                              <td>Value</td>
+                              <td>Syllables</td>
+                              <td>Pattern</td>
+                           </thead>
+                           <tr>
+                              <td><code>Prose</code></td>
+                              <td>2–6</td>
+                              <td>Free or irregular</td>
+                           </tr>
+                           <tr>
+                              <td><code>Adonium</code></td>
+                              <td>5</td>
+                              <td><span class="metrics">´´ ´˘˘´˘ ´´</span></td>
+                           </tr>
+                           <tr>
+                              <td><code>Dactylicum</code></td>
+                              <td>6</td>
+                              <td><span class="metrics">´´ ´˘˘ ´˘˘´˘˘ ´´</span></td>
+                           </tr>
+                           <tr>
+                              <td><code>IambicumEuripidaeum</code></td>
+                              <td>6</td>
+                              <td><span class="metrics">´´ ´˘´˘´˘ ´´</span></td>
+                           </tr>
+                           <tr>
+                              <td><code>Anacreonticum</code></td>
+                              <td>7</td>
+                              <td>Penultimate long</td>
+                           </tr>
+                           <tr>
+                              <td><code>IambicumArchilochicum</code></td>
+                              <td>8</td>
+                              <td>Penultimate short</td>
+                           </tr>
+                           <tr>
+                              <td><code>IambicumEnneasyllabicum</code></td>
+                              <td>9</td>
+                              <td>Penultimate long</td>
+                           </tr>
+                           <tr>
+                              <td><code>Enneasyllabicum</code></td>
+                              <td>9</td>
+                              <td>Generic</td>
+                           </tr>
+                           <tr>
+                              <td><code>Decasyllabicum</code></td>
+                              <td>10</td>
+                              <td>Penultimate short</td>
+                           </tr>
+                           <tr>
+                              <td><code>PhaleuciumHendecasyllabicum</code></td>
+                              <td>11</td>
+                              <td>Generic</td>
+                           </tr>
+                           <tr>
+                              <td><code>Hendecasyllabicum</code></td>
+                              <td>11</td>
+                              <td>Generic</td>
+                           </tr>
+                           <tr>
+                              <td><code>Sapphicum</code></td>
+                              <td>11 and 5</td>
+                              <td>Quatrains, 11.11.11.5</td>
+                           </tr>
+                           <tr>
+                              <td><code>Dodecasyllabicum</code></td>
+                              <td>12</td>
+                              <td>Penultimate short</td>
+                           </tr>
+                        </table>
+                     </dd>
+                  </dl>
+               </p>
+               <p>
+                  The <code>Lectio</code> module provides the functions needed to parse this text and store it in internal
+                  data structures for further processing.
+                  These structures (including <code>Verbum</code> for a single word and <code>LyricPhrase</code> for a group of <code>Verbum</code>) store the text grouped in syllables and words, along with information about the
+                  poetic length of each syllable and the penultimate length in each phrase.
+                  The list of parsed phrase information is then passed on to the <code>Cogito</code> module for setting to music.
+                  </p>
+               <p>
+                  The <code>arca</code> program, like Kircher’s original specification, assumes that its user is capable
+                  of preparing the text as required and making the simple decisions about style, mood,
+                  and musical meter.
+                  The program does go one step further than Kircher does to automate the composition
+                  of prose texts, though: where Kircher expects the human user to segment the text by
+                  hand into chunks of two to six syllables, the program does this automatically for
+                  input marked with <code>textMeter="Prose"</code>.
+                  A smarter algorithm could certainly be designed, but this one groups the text into
+                  the largest chunks possible and puts the longest groups toward the end; this avoids
+                  too many choppy phrases and increases coherence.
+                  </p>
+            </section>
+            <section id="sec-setting-a-phrase">
+               <h1>3.3. Setting a Phrase to Music</h1>
+               <p>
+                  The <code>Cogito</code> module provides the functions to extract and transform data from the <code>arca</code> and match it up with the processed input text.
+                  This is the function to compose the music for single phrase of text:
+                  
+                  <pre><code class="language-haskell">-- | Compose the music for a whole 'LyricPhrase' with one permutation from the
+-- ark, and package it into a 'MusicPhrase'. Note that this is for a single
+-- voice only, not the four SATB voices. 
+-- Line up pitches and syllables, skipping rests. In Syntagma I, line up text
+-- and notes syllabically (one syllable per note); in syntagma II (florid),
+-- lump the text into a single syllable and put it as an incipit text at the
+-- beginning of the phrase.
+makeMusicPhrase :: Arca 
+                    -&gt; ArkConfig 
+                    -&gt; VoiceName
+                    -&gt; LyricPhrase 
+                    -&gt; Perm 
+                    -&gt; MusicPhrase
+makeMusicPhrase arca config voiceID phrase perm = MusicPhrase {
+        phraseVoiceID = voiceID,
+        notes = theseNotes
+    } where
+
+        -- Match up pitches and syllables, skipping rests
+        theseNotes = map (\(pitch, syllable) -&gt; Note pitch syllable)
+            $ zipFill (music voice) syllables isPitchRest blankSyllable
+
+        voice       = stepwiseVoiceInRange (ranges arca) voiceRaw :: Voice
+        voiceRaw    = ark2voice arca config penult sylCount 
+                          lineCount voiceID perm
+
+        range       = ranges arca
+        penult      = phrasePenultLength phrase
+        sylCount    = phraseSylCount phrase
+        lineCount   = phrasePosition phrase
+        words       = phraseText phrase
+
+        -- In Syntagma II, put the whole phrase of lyrics as a single
+        -- syllable under the first note
+        syllables = case arkStyle config of
+            Simple -&gt; concat $ map makeSyllables words
+            Florid -&gt; [Syllable {
+                        sylText = unwords $ map verbumText $ phraseText phrase,
+                        sylPosition = Only }]
+    </code></pre>
+               </p>
+               <p>
+                  Within <code>makeMusicPhrase</code>, the function <code>ark2voice</code> does the work of accessing the <q>musarithm</q> data for a specific voice (e.g., tenor) and transforming it into pitch classes and
+                  durations in the appropriate tone.
+                  The function <code>stepwiseVoiceInRange</code> sets the octaves for the pitch classes in order to produce an optimal voice leading
+                  without illicit leaps.
+                  These transformation steps involve the most challenging programming in the project
+                  and reveal some of the difficulties inherent in Kircher’s specification.
+                  </p>
+            </section>
+            <section id="sec-voice-leading">
+               <h1>3.4. Setting the Octaves for Optimal Voice Leading</h1>
+               <p>
+                  In the original system, before notating a pitch a user needed to know its letter name,
+                  duration, and accidental; then the user had to choose the appropriate octave for the
+                  pitch based on the range of a particular voice.
+                  In the software these data make up the elements of the <code>Pitch</code> data type:
+                  
+                  <pre><code class="language-haskell">-- | A 'Pitch' stores the essential information for notating a single note.
+data Pitch = Pitch {
+    pnum  :: Pnum,          -- ^ Enum for diatonic pitch number
+    oct   :: Int,           -- ^ Helmholtz system, middle C = 4
+    dur   :: Dur,           -- ^ Duration, one of @Dur@ enum
+    accid :: Accid,         -- ^ Accidental
+    accidType :: AccidType  -- ^ Type of accidental for display
+                            --   ('Written', 'Implicit', or 'Suggested')
+} deriving (Show, Eq, Ord)
+    </code></pre>
+               </p>
+               <p>
+                  Everything but the octave is pulled directly from the pinax and the tone table.
+                  Setting the octave, however, requires more computing than it might seem, and in fact
+                  more than Kircher specifies.
+                  </p>
+               <p>
+                  Once again, we see a marked difference between computation devices designed for human
+                  operators as opposed to what a digital machine requires. 
+                  Kircher’s original <em>palimpsest phonotacticum</em> is effectively a graphical computing device for setting the octave of pitches.
+                  Before matching a pitch name and rhythm, Kircher tells the user to write a temporary
+                  dot on the appropriate staff line as shown on the illustration affixed to the front
+                  of the ark.
+                  Having located the right series of rhythmic durations, the user is to copy the symbol
+                  onto the staff in place of the dot.
+                  Kircher does not provide rules for choosing between multiple valid pitch-classes within
+                  range; he only says that the user should find the next closest pitch that is on the
+                  staff.
+                  The ark’s chart of staves with clefs, signatures for <em>cantus durus</em> or <em>mollis</em>, and pitch names written on the lines establishes the possible range and gamut of
+                  pitches for a particular voice.
+                  A cantus part with a C1 clef, might range from C<sub>3</sub> to F<sub>5</sub> if limited to notes actually on the staff.
+                  With a <em>cantus mollis</em> (one flat) signature all the Bs in that range are flat.
+                  To set the octave for a pitch, then—to know which line to place the dot on—one simply
+                  selects from any of that pitch class within range.
+                  To find the next pitch, one calculates geometrically the shortest distance on the
+                  staff-line graph from the previous pitch to the new pitch, provided that the new pitch
+                  is still in range.
+                  </p>
+               <p>
+                  Kircher does not give a precise definition of the ranges, but in practice he will
+                  extend up to a single ledger line above or below the staves.
+                  That would give the voices the following ranges, which are used in the software (in
+                  the <code>_vocalRanges</code> member of the <code>arca</code> structure):
+                  
+                  <table>
+                     <tr>
+                        <td>Cantus</td>
+                        <td>A<sub>3</sub></td>
+                        <td>F<sub>5</sub></td>
+                     </tr>
+                     <tr>
+                        <td>Alto</td>
+                        <td>D<sub>3</sub></td>
+                        <td>B<sub>4</sub></td>
+                     </tr>
+                     <tr>
+                        <td>Tenor</td>
+                        <td>B<sub>2</sub></td>
+                        <td>G<sub>4</sub></td>
+                     </tr>
+                     <tr>
+                        <td>Bass</td>
+                        <td>E<sub>2</sub></td>
+                        <td>C<sub>4</sub></td>
+                     </tr>
+                  </table>
+               </p>
+               <p>
+                  Even for a human operator, though, this simple algorithm is not sufficient to establish
+                  optimal voice leading within the range.
+                  In Kircher’s written-out realizations of the musarithms, he does not in fact always
+                  choose the smaller interval.
+                  Especially in the bass, he sometimes opts for an ascending fifth (especially moving
+                  to the final) rather than a descending fourth.
+                  Posing more of a problem are those permutations in which there is a long sequence
+                  of stepwise movements in one direction (as in <a class="figref" href="#ex-Ave_maris_stella-florid">example 2</a>), because if the tone transposes this sequence to a position that overlaps the range
+                  boundary, it is impossible to realize it without either going out of range or turning
+                  a second into a seventh.
+                  Kircher warns against intervals that are too large but does not define them precisely.
+                  Human users would have need at least a little musical knowledge to resolve these situations
+                  on paper.
+                  </p>
+               <p>
+                  Kircher’s specifications were not sufficient to translate them into a computer program.
+                  Instead the <code>Cogito.Musarithmetic</code> module provides the function <code>stepwiseVoiceInRange</code>, which attempts to capture in programming logic the intuitive steps a human user
+                  would follow to evaluate the different possible realizations of a vperm in a given
+                  range.
+                  </p>
+               <pre><code class="language-haskell">-- | Find a melody for a voice with an optimal blend of avoiding bad leaps and
+-- staying within range. This is the main function used in @Cogito@.
+stepwiseVoiceInRange :: VoiceRanges -&gt; Voice -&gt; Voice
+stepwiseVoiceInRange ranges v = Voice {
+    voiceID = voiceID v,
+    music   = adjust
+}
+    where
+        pitches     = music v
+        range       = getRange (voiceID v) ranges
+        candidates  = pitchCandidates range pitches
+        options     = stepwiseTree candidates
+        adjust      = bestPath range pitches $ paths [] options
+    </code></pre>
+               <p>
+                  We begin with a set of <code>Pitch</code> objects with the octave still unset (taken from the pinax tables), and make a nested
+                  list containing all the possible octave values for each pitch.
+                  Because we know that we might need to go out of range in the end, we first expand
+                  the permissible range by a third in each direction.
+                  From these permutations we construct a tree (implemented as a left-child/right-sibling
+                  binary tree) of every possible permutation of pitches, ending a branch if the interval
+                  between parent and child is illegal.
+                  We define a legal leap as any interval less than a seventh, or an octave.
+                  Traversing the resulting tree produces a list of the possible paths.
+                  </p>
+               <p>
+                  To simulate the human user’s cultural-stylistic discretion in evaluating the possibilities,
+                  we assign each path a <q>badness</q> score based on three factors: 
+                  
+                  <ol>
+                     <li>its ambitus, the total spread from lowest to highest pitch;</li>
+                     <li>the sum of all intervals larger than a fourth;</li>
+                     <li>for all the pitches that exceed the range, the sum of the interval by which they exceed
+                        the range boundary:</li>
+                  </ol>
+               </p>
+               <pre><code class="language-haskell">-- | Calculate weighted "badness" score for a list of pitches. 
+badness :: VoiceRange -&gt; [Pitch] -&gt; Int
+badness range ps = sum [ ambitus ps,
+                         sumBigIntervals ps * 2,
+                         sumBeyondRange range ps * 10 ]
+    </code></pre>
+               <p>
+                  These scores are weighted and combined, and then the path with the lowest score is
+                  chosen (or the first path in order with the lowest score, in case of a tie).
+                  </p>
+               <p>
+                  This algorithm yields melodies that fit reasonably within range and avoid awkward
+                  leaps.
+                  The function does what Kircher says it should do, just in a different way.
+                  Kircher’s graphical system would need to be adapted to a numeric one in any case;
+                  but the program required more specific rules than he provided to evaluate the possibilities.
+                  It obviates the need for some of the makeshift remedies that Kircher provides in place
+                  of a rigorous algorithm, which include swapping voices.
+                  </p>
+            </section>
+            <section id="sec-accidentals">
+               <h1>3.5. Accidentals and Church Keys</h1>
+               <p>
+                  The other area in which the software must fill in an incomplete specification is the
+                  problem of setting the accidental for each pitch.
+                  Kircher’s tone table only provides potential accidentals, to be applied according
+                  to <em>musica ficta</em> conventions in each <em>tonus</em>.
+                  In practice, the problem of accidentals is a major detriment to making the ark fully
+                  automatic, regardless of whether the operator is electronic or human.
+                  From Kircher’s table of twelve <em>toni ecclesiastici</em>, accidentals are derived from the designation of each tone as being in <em>cantus durus</em> or <em>mollis</em>, and from the accidentals included with the pitch numbers.
+                  <em>Cantus durus</em> meant there were no accidentals in the signature and the tones were untransposed
+                  (tones I on D); <em>cantus mollis</em> meant there was one B flat in the signature and the tones were transposed down a
+                  fifth (mode I on G).
+                  Kircher does provide some rules for when to apply his suggested accidentals, but he
+                  also gives examples where additional accidentals must be added, and his own notated
+                  examples contradict his specifications.
+                  </p>
+               <p>
+                  The accidental problem arises not just because of Kircher’s incomplete instructions,
+                  but because of the structure of the tone table itself.
+                  Kircher’s table and his rules for using it represent an underappreciated attempt to
+                  theorize the rapidly changing, chaotic state of modal and harmonic practice in the
+                  seventeenth century.
+                  Previous scholars have seen Kircher’s tones too simply in terms of modes or keys
+                  (<a class="bibref" href="#Chierotti:KircherComporre">Chierotti 1994</a>; 
+                  <a class="bibref" href="#Bumgardner:Kircher">Bumgardner 2009</a>; 
+                  <a class="bibref" href="#Bohnert:Kircher">Bohnert 2010</a>).
+                  Kircher actually blurs the distinction between the twelve modes defined by Glarean
+                  and Zarlino, and the new system of <em>toni ecclesiastici</em> or <q>church keys</q>
+                  (<a class="bibref" href="#Barnett:TonalOrganization17C">Barnett 2002</a>). 
+                  The latter developed in part from keyboardists’ practices of playing
+                  polyphonic intonations for the eight traditional psalm tones of Gregorian chant, but
+                  more and more musicians were coming to think of <q>tone</q> as something like a key.
+                  Meanwhile there was a separate way of understanding mode in polyphonic composition,
+                  based primarily on the final in the lowest voice and the ambitus of the tenor voice
+                  (plagal or authentic).
+                  But there also was a growing tendency in the seventeenth century to speak prescriptively
+                  of mode as dictating not just the final but also patterns of internal cadences as
+                  well as character and affect.
+                  Performers using <em>musica ficta</em> practices tended to raise <q>leading tones</q> at cadences and sharp thirds at the ends of phrases, and with these adjustments along
+                  with greater emphasis on bass-line movements by fifth and other elements of tonality,
+                  the <em>toni</em> increasingly came to resemble either major or minor keys.  
+                  </p>
+               <p>
+                  Most of the other seventeenth-century classification systems that Barnett describes
+                  feature eight church keys instead of Kircher’s twelve.
+                  Perhaps Kircher was trying to combine the concepts of mode, tone, and church key,
+                  or perhaps he did not understand the difference; either way, as Barnett notes, he
+                  was hardly alone in his confusion.
+                  Practice was changing rapidly and no one had yet provided a consistent theory.
+                  The way Kircher codifies the tone system in the Arca should be understood as his contribution
+                  to harmonic theory, imperfect as it is.
+                  </p>
+               <p>
+                  The tone table is typical of Kircher’s paradoxes: he maintains that there are twelve
+                  tones out of faithfulness to tradition, but he also recognizes that the traditional
+                  approach does not fully address modern practice.
+                  As in other parts of the book his attempt to synthesize old and new results in something
+                  that neither ancients or moderns would recognize.
+                  Although composers of the time wrote differently in each mode or tone, Kircher’s system
+                  simply transposes the same voice-leading patterns.
+                  Had he used full key signatures instead of suggested accidentals, Kircher would have
+                  produced something close to the modern system of transposable major and minor keys.
+                  As it is, Kircher must limit the selection of tones that can be used with certain
+                  pinakes, because not every voice-leading pattern works in every tone, given the different
+                  pattern of intervals in each.
+                  Kircher saw a variety of <em>toni</em> as necessary for conveying distinct affective influences to listeners, and a system
+                  with only major or minor keys would have broken consistency with centuries-old traditions
+                  of modal affect associations.
+                  Kircher’s system actually highlights the affective impact of distinct <em>toni</em>, because the same musarithm pattern can produce markedly different effects depending
+                  on the interval and accidental pattern of the chosen tone.
+                  </p>
+               <p>
+                  Moreover, the user is also supposed to add other accidentals as needed in order to
+                  avoid illicit melodic intervals in the bass, and thereby to avoid bad harmonic intervals
+                  above the bass.
+                  The basic rules according to Kircher are these: make all Bs flat if the tone is in
+                  <em>cantus mollis</em>; before adjusting the other voices one must first adjust the bass voice according
+                  to a table he provides to avoid illicit intervals (changing B–F to B<span class="music">♭</span>–F, for example).
+                  Then in the upper voice apply the accidentals by rule: 
+                  <span class="music">♭</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">6</span></span>; in the table is always flat, but Kircher says that where there is a <span class="music">♯</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span> in the tone table, the user should only apply the sharp when the voice is ascending
+                  to <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">8</span></span>.
+                  In his realizations, though, he goes beyond these rules: sometimes he raises a <span class="music">♭</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">6</span></span>, often he writes a <span class="music">♯</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">3</span></span> at cadences, and there are numerous other exceptions. 
+                  Many corner cases are unclear, such as the common idiom in the florid syntagma II
+                  of <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span>–<span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">6</span></span>–<span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">8</span></span> in tones with <span class="music">♯</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span> and <span class="music">♭</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">6</span></span>.
+                  What if one voice has <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">6</span></span>–<span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span>–<span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">8</span></span> while another voice (in a voice-exchange pattern) has <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">8</span></span>–<span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span>–<span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">6</span></span>?
+                  The top voice would have <span class="music">♯</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span> according to Kircher’s simple rule, but the lower voice would have <span class="music">♮</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span> at the same time, making an unacceptable cross relation. 
+                  It would not be hard for a competent musician of the time to resolve such cases, but
+                  Kircher does not provide enough information for a true Tyro to complete this complex
+                  task mechanically.
+                  The software implementation uses the rules Kircher does provide but expands them,
+                  using a multiple pass system to adjust the accidentals in layers.
+                  We first adjust the bass line (including fixing tritones, avoiding <span class="music">♯</span><span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span> when it is not moving to 
+                  <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">8</span></span>), then adjust the upper voices based on their own internal patterns (raising <span class="scaleDegree"><span class="hat">ˆ</span><span class="under-hat">7</span></span> when ascending).
+                  </p>
+               <p>
+                  Then we adjust the upper voices relative to the bass, and finally adjust the upper
+                  voices relative to each other.
+                  The adjustments fix cross relations and impossible intervals like an augmented fifth
+                  between bass and upper voice.
+                  </p>
+               <p>
+                  The automatic setting of <cite>O ter quaterque felix cicada</cite> (<a class="figref" href="#ex-Stephanus">example 3</a>) demonstrates a successful output in tone 1 with florid counterpoint.
+                  The small accidentals above the staff are the result of <em>ficta</em> adjustments: sharps and flats show where the program has applied Kircher’s suggested
+                  accidentals; naturals show where it has canceled them.
+                  The current algorithm does not handle every case appropriately, but does avoid the
+                  most egregious problems.
+                  It still remains unclear whether with enough rules the program could automatically
+                  produce stylistically appropriate music, or whether some features of Kircher’s tone
+                  system and musarithm patterns make that impossible.
+                  </p>
+               <figure class="example" id="ex-Stephanus"><img src="lib/Stephanus.svg" alt="Music notation for a four-voice setting"><figCaption>Example 3. Automatic setting of Stephanus, <cite>O ter quaterque felix Cicada</cite> in tone 1, florid style, with <em>musica ficta</em> adjustments</figCaption>
+               </figure>
+            </section>
+            <section id="sec-output">
+               <h1>3.6. Encoding the Music Output</h1>
+               <p>
+                  In Kircher’s final stage, the user simply copied the music symbols onto staff-ruled
+                  paper, but the computer implementation encodes the musical output so that other programs
+                  may render it visible and audible.
+                  This project uses the XML format of the Music Encoding Initiative, which may easily
+                  be converted to other formats like MusicXML and Lilypond or imported into notation
+                  software
+                  (<a class="bibref" href="#MEI">Music Encoding Initiative 2022</a>).
+                  The software system, then, translates two sources of encoded data—the input text encoded
+                  in XML, and the ark data encoded in Kircher’s vperm and rperm tables—into a third
+                  encoding system.
+                  <a href="ex-Ave_Maris_stella-simple">The example</a> shows a portion of the automatically generated setting of <cite>Ave maris stella</cite> in simple style as rendered by Verovio. 
+                  This example represents the music for the first line of text in the Soprano part:
+                  
+                  <pre xml:base="include/implementation/input-mei.xhtml" xml:lang=""><code class="language-xml">&lt;staff n="1" corresp="Cantus"&gt;
+  &lt;layer n="1"&gt;
+    &lt;note pname="c" oct="4" dur="breve"&gt;
+      &lt;accid accid.ges="n"&gt;&lt;/accid&gt;
+      &lt;verse&gt;&lt;syl con="d" wordpos="i"&gt;A&lt;/syl&gt;&lt;/verse&gt;
+    &lt;/note&gt;
+    &lt;note pname="b" oct="3" dur="1"&gt;
+      &lt;accid accid.ges="n"&gt;&lt;/accid&gt;
+      &lt;verse&gt;&lt;syl con="d" wordpos="t"&gt;ve,&lt;/syl&gt;&lt;/verse&gt;
+    &lt;/note&gt; 
+    &lt;note pname="c" oct="4" dur="breve"&gt;
+      &lt;accid accid.ges="n"&gt;&lt;/accid&gt;
+      &lt;verse&gt;&lt;syl con="d" wordpos="i"&gt;ma&lt;/syl&gt;&lt;/verse&gt;
+    &lt;/note&gt; 
+    &lt;note pname="d" oct="4" dur="1"&gt;
+      &lt;accid accid.ges="n"&gt;&lt;/accid&gt;
+      &lt;verse&gt;&lt;syl con="d" wordpos="t"&gt;ris&lt;/syl&gt;&lt;/verse&gt;
+    &lt;/note&gt; 
+    &lt;note pname="e" oct="4" dur="breve" dots="1"&gt;
+      &lt;accid accid.ges="n"&gt;&lt;/accid&gt;
+      &lt;verse&gt;&lt;syl con="d" wordpos="i"&gt;stel&lt;/syl&gt;&lt;/verse&gt;
+    &lt;/note&gt; 
+    &lt;note pname="e" oct="4" dur="breve" dots="1"&gt;
+      &lt;accid accid.ges="n"&gt;&lt;/accid&gt;
+      &lt;verse&gt;&lt;syl con="d" wordpos="t"&gt;la,&lt;/syl&gt;&lt;/verse&gt;
+    &lt;/note&gt;
+    &lt;barLine&gt;&lt;/barLine&gt; 
+    &lt;!-- ... --&gt;
+  &lt;/layer&gt;
+&lt;/staff&gt;
+</code></pre>
+               </p>
+               <p>
+                  The program’s <code>Note</code> data type was designed to map easily onto the MEI <code>note</code> element, which combines pitch information with a syllable text.
+                  The members of the <code>Pitch</code> structure translate directly to the XML attributes or subelements of the MEI <code>note</code> To render the whole <code>Phrase</code> (one line of input text, set to music by the ark) into MEI, we map <code>note2mei</code> over the phrase and add barlines at the <code>section</code> divisions marked in the input text.
+                  The program takes advantage of MEI’s alternative mensural mode, in which music may
+                  be structured one voice (MEI <code>layer</code>) at a time rather than being organized by measure.
+                  The web application uses Verovio to render the MEI to graphical notation (SVG)
+                  and sound (via MIDI).
+                  </p>
+               <p>
+                  Putting all these elements together, the application’s main function builds the ark,
+                  reads and parses the input text, and generates a list of random numbers to select
+                  permutations for each phrase.
+                  The function <code>makeMusicScore</code> generates the music and <code>score2mei</code> to converts the internal data structures to MEI output.
+                  This is the central portion of the application:
+                  
+                  <pre><code class="language-haskell">main :: IO ()
+main = do
+-- ...
+let 
+    input       = readInput rawInput
+    sections    = prepareInput input 
+    lengths     = inputPhraseLengths sections
+    metadata    = arkMetadata input
+
+perms &lt;- inputPerms lengths
+
+let 
+    score = makeMusicScore arca sections perms 
+    mei   = score2mei arca metadata score
+-- ...
+writeFile outfile mei
+    </code></pre>
+                  The simple web app wraps a convenient user interface around the Haskell program to
+                  enable users to select either fully prepared input texts, or make their own choices
+                  about style, tone (based on mood), and meter.
+                  </p>
+            </section>
+         </section>
+         <section id="sec-composition" xml:lang="en-US" xml:base="include/composition.xhtml">
+            <h1>4. Musical Computing and Mechanical Composition</h1>
+            <section id="sec-conclusion-intro" class="unnumbered">
+               <p>
+                  In sum, even before its implementation as a computer program, Kircher’s Arca musarithmica
+                  was already a computational system.
+                  The Arca includes multiple kinds of structured data and algorithms, and in the words
+                  of Niklaus Wirth’s memorable title, <cite>Algorithms + Data Structures = Programs</cite>
+                  (<a class="bibref" href="#Wirth:Algorithms">Wirth 1976</a>).
+                  The system does not meet every modern definition of a computer, since its its data
+                  structures are not always consistent and its algorithms not completely specified.
+                  Considered as a physical device with a human operator, though, Kircher’s system is
+                  reasonably optimized and specified fully enough that most people capable of reading
+                  the Latin instructions would be able to follow the steps and with enough patience,
+                  generate a composition.
+                  The ark’s structure makes the process nearly automatic for a human user, including
+                  the visual indexing of the box’s internal structure, the ability to physically move
+                  and rearrange the pinakes in their order of use, and the <em>palimpsest</em> system for finding in-range pitches graphically.
+                  For Kircher’s learned readers, parsing and metrifying a Latin poetic text would not
+                  perhaps have been an obstacle, but some of the musical decisions required to achieve
+                  optimal stepwise voice leading and appropriate accidentals would require more knowledge
+                  than an <em>amusicus</em> would have.
+                  </p>
+               <p>
+                  The digital implementation demonstrates that with some modifications Kircher’s system
+                  can be made to work as a single function transforming an input text and parameters
+                  into an output of encoded music.
+                  Most of the modifications are just implementation details needed for a user that at
+                  base level only understands arithmetic, Boolean conditionals, and memory registers,
+                  though we have seen there are also several areas where greater specification was needed.
+                  </p>
+               <p>
+                  Being written as a Haskell program clarifies the structure of flows from input to
+                  output.
+                  Every function in the program includes a signature showing a series of data types
+                  moving from input to output. 
+                  The arguments to the initial function are shown in series because Haskell functions
+                  are actually curried: functions with multiple arguments are actually composed from
+                  a series of functions, each of which receives a single input and returns a single
+                  output.
+                  The <code>arca</code> program’s primary function takes as input the ark data, the processed input text,
+                  and the random permutation numbers, and outputs a data structure for the entire music
+                  score:
+                  
+                  <pre><code class="language-haskell">-- | Compose the music for the whole document as a 'MusicScore', 
+--   pulling the data from the 'Arca'.
+makeMusicScore :: Arca -&gt; [LyricSection] -&gt; [SectionPerm] -&gt; MusicScore
+makeMusicScore arca lyricSections sectionPerms = 
+    zipWith (makeMusicChorus arca) lyricSections sectionPerms 
+</code></pre>
+               </p>
+               <p>
+                  The flow of inputs to outputs in the digital implementation is the same as in
+                  the physical system.
+                  The chart in <a class="figref" href="#fig-flows">figure 4</a> focuses on the output of a single note, ignoring the larger structural divisions.
+                  The chart does not account for the adjustments we must make only after we have put
+                  together the whole series of notes (setting the octave and accidentals based on intervals
+                  between notes).
+                  </p>
+               <figure id="fig-flows"><img src="lib/ioflow.svg" alt="A line diagram connecting the inputs of the ark through the program functions to their outputs"><figCaption>Figure 4. The entire ark system: Flows from inputs through functions to
+                     outputs</figCaption>
+               </figure>
+               <p>
+                  Many of the flows in the chart can be seen clearly in the <code>pair2pitch</code> function, which takes the pair of pitch and rhythm values from the ark tables and
+                  returns a <code>Pitch</code> data structure that includes pitch name, accidental, octave, and duration:
+                  
+                  <pre><code class="language-haskell">pair2Pitch :: ToneList -&gt; ToneSystem -&gt; Tone -&gt; (Dur, Int) -&gt; Pitch
+pair2Pitch toneList systems tone pair 
+    | isRest thisDur = newRest thisDur 
+    | otherwise      = newPitch
+    where 
+        newPitch = Pitch {
+            pnum      = thisPnumInTone,
+            accid     = thisAccid,
+            accidType = thisAccidType,
+            oct       = 4, -- dummy value, will be adjusted
+            dur       = thisDur
+        } 
+        thisPnum       = (snd pair) - 1 -- adjust to 0 index
+        thisDur        = fst pair
+        thisPnumInTone = fst tonePitch
+        thisAccid      = snd tonePitch
+        tonePitch      = pnumAccidInTone thisPnum toneList tone
+
+        thisAccidType = case thisAccid of
+            Na -&gt; Implicit
+            Sh -&gt; Suggested
+            Fl -&gt; if isBflatInSignature thisPnumInTone thisAccid tone systems 
+                    then Implicit 
+                    else Suggested
+            _  -&gt; None
+</code></pre>
+               </p>
+               <p>
+                  The <code>arca</code> program is as faithful to Kircher’s original design as possible, but it also surpasses
+                  the incomplete specification to become a true, fully automatic composition machine.
+                  Thus an erstwhile <q>recipe box</q> full of tables, taken along with Kircher’s written specifications, has become a single,
+                  complete algorithm for computing music. 
+                  </p>
+            </section>
+            <section id="sec-encapsulation">
+               <h1>4.1. The Ark as Encapsulation of Compositional Knowledge</h1>
+               <p>
+                  If music can be composed mechanically using the Arca, then, what does this tell us
+                  about how Kircher and his contemporaries understood composition?
+                  When Kircher says his goal is to create a system for <q>artificial</q> (<em>artificiosus</em>) composition, he is using the word in an early modern sense where <em>art</em> more readily connotes a practice or technique. 
+                  The seventeenth-century European or colonial composer was, in modern terms, more an
+                  artisan than an artist. 
+                  An artificial system would be one built on artifice, one created by tools and ingenuity
+                  rather than a natural part of the created world.
+                  The point of artifice was to imitate the natural world, to draw out its latent patterns
+                  and order.
+                  </p>
+               <p>
+                  The basic principle of the ark is to arrange pre-formulated patterns into a new combination,
+                  and as Chierotti argues, this practice is none other than the rhetorician’s art of
+                  <em>dispositio</em> 
+                  (<a class="bibref" href="#Chierotti:KircherComporre">Chierotti 1994</a>, 407–409).
+                  In the Classical practice of preparing a speech (derived from authorities like Quintillian
+                  and Cicero) that stage of arranging an argument was preceded by <em>inventio</em>, coming up with an idea.
+                  It may seem that the ark eliminates this first step by providing a set of musical
+                  ideas which only need to be combined, obviating any expressive or communicative role
+                  of the human creator, but such a view would stem from a modern concept of <q>invention</q> as original creation.
+                  In Kircher’s day, invention meant as much <q>discovery</q> as creativity.  
+                  One had to <em>find</em> the ideas, and the artisan’s craft was displayed in how the craftsman manipulated
+                  existing materials. 
+                  A carpenter needed a pattern, tools, and lumber to begin, but his reputation depended
+                  on his ability to turn the raw materials into a finished product according to the
+                  plans.
+                  </p>
+               <p>
+                  Recent research has shown that European musicians of the seventeenth and eighteenth
+                  centuries, as late as J. S. Bach and Mozart, constructed their music from pre-existing
+                  patterns, according to well-known, standard techniques
+                  (<a class="bibref" href="#Dreyfus:BachInvention">Dreyfus 1996</a>;
+                  <a class="bibref" href="#Gjerdingen:Galant">Gjerdingen 2007</a>).
+                  Gjerdingen has shown that composers trained in eighteenth-century Neapolitan conservatories
+                  were taught to build up a repertoire of conventional voice-leading patterns and to
+                  assemble these, with elaboration, into full compositions. 
+                  Using such practical methods did not inhibit composers from conveying sophisticated
+                  poetic concepts and creating dramatic effects; instead, they actually enabled that
+                  communication by appealing to common tropes familiar to a community of listeners
+                  (<a class="bibref" href="#Cashner:Segovia">Cashner 2022a</a>).
+                  Completely apart from its status as a computational system, Kircher’s Arca merits
+                  study as a repository of conventional mid-seventeenth century voice-leading patterns.
+                  
+                  </p>
+               <p>
+                  In this light, then, Kircher’s device fits well within an early modern concept of
+                  musical craft. 
+                  As a human-operated system, preserving the user’s ability to choose permutations intelligently
+                  and adjust them with discretion, the ark merely codifies and reduces the set of combinations
+                  available to the user and makes it easier for the human composer to <q>find</q> them. 
+                  By ensuring that each individual combination is already a coherent and rule-compliant
+                  musical idea (<em>inventio</em>), and by providing an algorithm for arranging the ideas (<em>dispositio</em>), the ark eases the burden of a human operator, who no longer has to check each bar
+                  for such errors as parallel fifths or octaves. 
+                  (This would be even more effective if Kircher himself had successfully avoided such
+                  errors in the ark.)
+                  In that way the ark fulfills the same purpose as other computing devices, from multiplication
+                  tables through Napier’s bones and slide rules, which is to reduce the number of calculations
+                  required by storing pre-calculated results.
+                  </p>
+               <p>
+                  Kircher’s procedure of finding appropriate music for one phrase of text at a time
+                  does correspond to the text-setting practice of many composers of his age.
+                  On the other hand, the lack of any motivic connection between the permutations contradicts
+                  a core principle of rhetoric, that an oration should focus on one central theme.
+                  For master musicians of Kircher’s time, applying that principle to music meant carrying
+                  a single idea (<q>invention</q>) or motive throughout a work 
+                  (<a class="bibref" href="#Jacobson:BuxtehudeRhetoric">Jacobson 1982</a>).
+                  This discrepancy between Kircher’s stated rhetorical ideal and actual contemporary
+                  musical-rhetorical practice reflects a tension throughout the <cite>Musurgia</cite> between the idea of music as an orderly, rule-based system, and the idea of music
+                  as a form of rhetoric and an expression of human
+                  passions.
+                  </p>
+               <p>
+                  If Kircher’s system reflects widespread attitudes about composition, therefore, it
+                  also reflects widespread misunderstandings.
+                  The fact that composers communicated with existing conventions does not mean that
+                  their work was purely mechanical. 
+                  The task of creating music could not be reduced to numerical calculation, and Kircher’s
+                  system does not in fact succeed in doing so. 
+                  The machine does something with music that is analogous to mathematical calculation,
+                  but it also demonstrates the limits of trying to reduce music to pure number.
+                  </p>
+               <p>
+                  The gap between theory and practice also shows when trying to take up Kircher
+                  on his promise that the Arca may be used to set texts in any language.
+                  Kircher hoped that his fellow Jesuit priests in overseas missions could use the Arca
+                  to generate music in local languages
+                  (<a class="bibref" href="#Kircher:Musurgia">Kircher 1650</a>, II: 126–141).
+                  The <code>arca</code> program does show that this is technically possible.
+                  The Shakespeare text <q>If Music Be the Food of Love, Play On</q> (from <cite>The Tempest</cite>) included on the website demonstrates the ark’s ability to set non-Latin texts with
+                  reasonably good results.
+                  Though finding or creating non-Latin texts that fit one of Kircher’s Classical meters
+                  is a major impediment, if the <code>textMeter</code> is set to <code>Prose</code>, the program will automatically set any kind of text.
+                  As a manual system, though, Kircher’s Arca cannot have proved very useful to the pragmatic
+                  needs of missionary priests in Goa or Nagasaki.
+                  </p>
+               <p>
+                  Kircher was never strong on practicalities, in any case, and I would argue that his
+                  real goal for the Arca was to encapsulate universal musical knowledge in one device.
+                  This idea of epitomizing all knowledge of a domain through describing an imaginary
+                  computing device is echoed in many respects by Donald Knuth’s invention of <a href="https://www-cs-faculty.stanford.edu/~knuth/mmix.html">the MIX computer</a> in <cite>The Art of Computer Programming</cite>, especially given that Knuth’s first major application of the device is to permutations
+                  (<a class="bibref" href="#Knuth:TAOCP1">Knuth 1997</a>, 124–144, 164–175).
+                  The Arca epitomizes the overall theological argument of the <cite>Musurgia</cite> that music embodies the order of God’s creation and reflects the perfection of God’s
+                  nature, while it also has a powerful effect on the human body and soul, and serves
+                  as a form of communication and expresssion.
+                  </p>
+               <p>
+                  Like many of his seventeenth-century contemporaries, Kircher understood music as <q>sounding number</q>, an embodiment of the mathematical order inherent in God’s created universe, and
+                  a reflection of the perfection of God himself. 
+                  The Puebla copy of the Arca musarithmica is preserved in a manuscript miscellany of
+                  notes on mathematical subjects, including geometry (with attempts to solve the impossible
+                  problems of squaring the circle and trisecting the angle), astrology, chronology,
+                  and tax accounting
+                  (<a class="bibref" href="#Cashner:KircherSpanish">Cashner 2022b</a>).
+                  All of those forms of speculation and inquiry involved number in the attempt to trace
+                  hidden patterns of connection, and this is what Sor Juana termed <q>Kircherizing</q>.
+                  Out of the infinite variety of possible combinations of notes and rhythms, the user
+                  of the ark selects a specific set of permutations and thus imitates God in his original
+                  act of creation.
+                  </p>
+               <p>
+                  In this digital implementation, the Arca musarithmica not only enables someone with
+                  no knowledge of music to compose, as Kircher intended; it also brings to life a forgotten
+                  body of musical knowledge.
+                  The ark encodes pre-calculated knowledge of seventeenth-century music, a library of
+                  musical invention, that generates output that one of Kircher’s Roman contemporaries
+                  like Carissimi would probably have recognized as music, even if somewhat monotonous
+                  and with occasional quirks and errors.
+                  There are manifold possibilities for extending Kircher’s design, including using machine-learning
+                  techniques to improve the permutation data or the composition process, and even replacing
+                  the pinax tables with music in other styles or metrical patterns better suited to
+                  other languages.
+                  The machine-readable MEI output of the Arca program could be analyzed by computer
+                  and compared to other digitized corpora, which might even reveal the sources for Kircher’s
+                  permutations.
+                  With a digital implementation accessible to anyone on the Internet, musical Tyros
+                  and experts alike can do what Kircher hoped, and with no more work or knowledge than
+                  the click of a few buttons, they can generate and hear limitless permutations of never-before-heard,
+                  newly composed seventeenth-century music.
+                  </p>
+            </section>
+         </section>
+         <section id="sec-references" xml:lang="en-US" xml:base="include/references.xhtml">
+            <h1>5. References</h1>
+            <ol class="references">
+               <li id="Annibaldi:FrobergerRome" data-citation="Annibaldi 1995">
+                  Annibaldi, Claudio.
+                  1995.
+                  <q>Froberger in Rome: From Frescobaldi’s Craftsmanship to Kircher’s
+                     Compositional Secrets</q>.
+                  <cite>Current Musicology</cite>
+                  58: 5–27, 131.
+                  </li>
+               <li id="Barnett:TonalOrganization17C" data-citation="Barnett 2002">
+                  Barnett, Gregory. 2002.
+                  <q>Tonal Organization in Seventeenth-Century Music Theory</q>.
+                  In <cite>The Cambridge History of Music Theory</cite>, 
+                  ed. Thomas Christensen
+                  (Cambridge: Cambridge University Press),
+                  407–455.
+                  </li>
+               <li id="Beuchot:SorJuanaKircher" data-citation="Beuchot Puente 1995">
+                  Beuchot Puente, Mauricio.
+                  1995.
+                  <q>Sor Juana y el hermetismo de Kircher</q>.
+                  In <cite>Los empeños: Ensayos en homenaje a Sor Juana Inés de la Cruz</cite> 
+                  (Mexico City: Universidad Nacional Autónoma de México): 1–9.
+                  </li>
+               <li id="Bohnert:Kircher" data-citation="Bohnert 2010">
+                  Bohnert, Agnes Cäcilie. 2010.
+                  <q>Die arca musarithmica Athanasius Kirchers</q>.
+                  Dissertation, Technische Universität Berlin.
+                  Berlin: Mensch und Buch Verlag.
+                  </li>
+               <li id="Boni:ArcaFlorence" data-citation="Boni 2020">
+                  Boni, Erik.
+                  2020.
+                  <q>L’arca musurgica di Athansius Kircher alla Biblioteca nazionale
+                     centrale di Firenze</q>.
+                  <cite>Accademie &amp; Biblioteche d'Italia</cite> 15 (1): 7–13.
+                  </li>
+               <li id="Cashner:Segovia" data-citation="Cashner 2022a">
+                  Cashner, Andrew A.
+                  2022a.
+                  <a href="https://doi.org/10.1093/ml/gcab106"><q>Bringing Heavenly Music Down to Earth: Global Exchange and Local Devotion at Segovia
+                        Cathedral, 1678</q>.</a><cite>Music and Letters</cite> 103 (1): 27–59.
+                  </li>
+               <li id="Cashner:KircherSpanish" data-citation="Cashner 2022b">
+                  Cashner, Andrew A.
+                  2022b.
+                  <q>Kircherizers and Trisectors: Athanasius Kircher’s Automatic Composition System in
+                     the Spanish Empire</q>.
+                  <cite>Anuario musical</cite> (forthcoming).
+                  </li>
+               <li id="Bumgardner:Kircher" data-citation="Bumgardner 2009">
+                  Bumgardner, Jim. 2009.
+                  <a href="https://jbum.com/papers/kircher_paper.pdf"><q>Kircher’s Mechanical Composer: A Software Implementation</q>.
+                     </a>
+                  Paper presented at the Bridges Conference, Banff.
+                  </li>
+               <li id="Chierotti:KircherComporre" data-citation="Chierotti 1994">
+                  Chierotti, Carlo Mario. 1994.
+                  <q>Comporre senza conoscere la musica: Athanasius Kircher e le <q>Musica mirifica</q>: un singolare esempio di scienza musicale nell’età barroca</q>.
+                  <cite>Nuova rivista musicale italiana</cite> 28 (3):
+                  382–410.
+                  </li>
+               <li id="Chierotti:KircherMirifica" data-citation="Chierotti 1992">
+                  Chierotti, Carlo Mario.
+                  1992.
+                  <q>La musurgia mirifica di Athanasius Kircher: la composizione
+                     musicale alla portata di tutti nell’età barocca</q>.
+                  <cite>Musica/realtà</cite> 13 (37): 107–127.
+                  </li>
+               <li id="Dreyfus:BachInvention" data-citation="Dreyfus 1996">
+                  Dreyfus, Laurence. 1996.
+                  <cite>Bach and the Patterns of Invention.</cite>
+                  Cambridge, MA: Harvard University Press.
+                  </li>
+               <li id="Findlen:Kircher" data-citation="Findlen 2004a">
+                  Findlen, Paula. 2004a.
+                  <cite>Athanasius Kircher: The Last Man Who Knew Everything.</cite>
+                  New York: Routledge.
+                  </li>
+               <li id="Findlen:KircherAmerica" data-citation="Findlen 2004b">
+                  Findlen, Paula.
+                  2004b.
+                  <q>A Jesuit’s Books in the New World: Athanasius Kircher and His
+                     American Readers</q>.
+                  In <a class="bibref" href="#Findlen:Kircher">Findlen 2004a</a>, 329–364.
+                  </li>
+               <li id="Fletcher:Kircher" data-citation="Fletcher 2011">
+                  Fletcher, John E.
+                  2011.
+                  <cite>A Study of the Life and Works of Athanasius Kircher.</cite>
+                  Leiden: Brill.
+                  </li>
+               <li id="Gjerdingen:Galant" data-citation="Gjerdingen 2007">
+                  Gjerdingen, Robert O. 2007. 
+                  <cite>Music in the Galant Style.</cite>
+                  New York: Oxford University Press.
+                  </li>
+               <li id="Godwin:KircherTheater" data-citation="Godwin 2009">
+                  Godwin, Joscelyn. 2009.
+                  <cite>Athanasius Kircher’s Theater of the World: The Life and Work of the Last Man to Search
+                     for Universal Knowledge</cite>.
+                  Rochester, VT: Inner Traditions.
+                  </li>
+               <li id="Ifrah:Computing" data-citation="Ifrah 2001">
+                  Ifrah, Georges. 2001.
+                  <cite>The Universal History of Computing: From the Abacus to the Quantum
+                     Computer.</cite>
+                  Trans. E. F. Harding.
+                  New York: John Wiley &amp; Sons, Inc.
+                  </li>
+               <li id="Irving:Colonial" data-citation="Irving 2010">
+                  Irving, David.
+                  2010.
+                  <cite>Colonial Counterpoint: Music in Early Modern Manila.</cite>
+                  Oxford: Oxford University Press.
+                  </li>
+               <li id="Jacobson:BuxtehudeRhetoric" data-citation="Jacobson 1982">
+                  Jacobson, Lena. 1982.
+                  <q>Musical Rhetoric in Buxtehude’s Free Organ Works</q>.
+                  <cite>The Organ Yearbook</cite> 13: 60–79.
+                  </li>
+               <li id="Kircher:Musurgia" data-citation="Kircher 1650">
+                  Kircher, Athanasius. 1650.
+                  <cite>Musurgia universalis, sive Ars magna consoni et dissoni in X. libros digesta.</cite>
+                  Rome.
+                  </li>
+               <li id="Klotz:ArsCombinatoria" data-citation="Klotz 1999">
+                  Klotz, Sebastian.
+                  1999.
+                  <q><q>Ars combinatoria</q> oder <q>Musik ohne Kopfzerbrechen</q>: Kalküle des Musikalischen von Kircher bis Kirnberger</q>.
+                  <cite>Musiktheorie</cite> 14 (3): 230–245.
+                  </li>
+               <li id="Knuth:TAOCP1" data-citation="Knuth 1997">
+                  Knuth, Donald E. 1997.
+                  <cite>The Art of Computer Programming, Volume 1: Fundamental Algorithms</cite>.
+                  Upper Saddle River, NJ: Addison-Wesley.
+                  </li>
+               <li id="Maxey:SorJuanaKircherIconography" data-citation="Maxey 2020">
+                  Maxey, Bruce.
+                  2020.
+                  <a href="https://dx.doi.org/10.5209/alhi.73134"><q>La iconografía de <cite>Ars magna lucis et umbrae</cite> en <cite>Primero sueño</cite> de Sor Juana</q>.</a><cite>Anales de Literatura Hispanoamericana</cite> 49: 321–334.
+                  </li>
+               <li id="MEI" data-citation="Music Encoding Initiative 2022">
+                  Music Encoding Initiative. 2022.
+                  <a href="https://music-encoding.org/guidelines/v4/content/"><cite>Guidelines (4.0.1)</cite></a>.
+                  </li>
+               <li id="Murata:KircherMusicHistory" data-citation="Murata 1999">
+                  Murata, Margaret.
+                  1999.
+                  <q>Music History in the <cite>Musurgia universalis</cite> of Athanasius Kircher</q>.
+                  In <a class="bibref" href="#OMalley:Jesuits">O’Malley et al. 1999</a>, 190–207.
+                  </li>
+               <li id="OMalley:Jesuits" data-citation="O’Malley et al. 1999">
+                  O’Malley, S. J., John W., Gauvin Alexander Bailey, Steven J. Harris, and T. Frank
+                  Kennedy, S. J, eds.
+                  1999.
+                  <cite>The Jesuits: Cultures, Sciences, and the Arts 1540–1773.</cite>
+                  Toronto: University of Toronto Press.
+                  </li>
+               <li id="Osorio:LuzImaginaria" data-citation="Osorio Romero 1993">
+                  Osorio Romero, Ignacio.
+                  1993.
+                  <cite>La luz imaginaria: Epistolario de Atanasio Kircher con los novohispanos.</cite>
+                  Mexico City: Universidad Nacional Autónoma de México.
+                  </li>
+               <li id="Pangrazi:KircherMusurgia" data-citation="Pangrazi 2009">
+                  Pangrazi, Tiziana.
+                  2009.
+                  <cite>La <cite>Musurgia universalis</cite> di Athanasius Kircher:
+                     Contenuti, fonti, terminologia.</cite>
+                  Firenze: Leo S. Olschki.
+                  </li>
+               <li id="TEI" data-citation="Text Encoding Initiative 2022">
+                  Text Encoding Initiative. 2022.
+                  <a href="https://tei-c.org/release/doc/tei-p5-doc/en/html/index.html"><cite>P5: Guidelines for Electronic Text Encoding and Interchange</cite></a>.
+                  </li>
+               <li id="Trabulse:Circulo" data-citation="Trabulse 1984">
+                  Trabulse, Elías.
+                  <cite>El círculo roto.</cite>
+                  Mexico City: Fondo de Cultura Económica.
+                  </li>
+               <li id="Weckmann:ChoraleWorks" data-citation="Weckmann 1980">
+                  Weckmann, Matthias. 1980.
+                  <cite>Choralbearbeitungen: Für Orgel.</cite>
+                  Ed. Werner Breig.
+                  Kassel: Bärenreiter.
+                  </li>
+               <li id="Wald:KircherMusurgia" data-citation="Wald 2006">
+                  Wald, Melanie.
+                  2006.
+                  <cite>Welterkenntnis aus Musik: Athanasius Kirchers <q>Musurgia
+                        universalis</q> un die Universalwissenschaft im 17. Jahrhundert.</cite>
+                  Kassel: Bärenreiter.
+                  </li>
+               <li id="Wirth:Algorithms" data-citation="Wirth 1976">
+                  Wirth, Niklaus. 1976.
+                  <cite>Algorithms + Data Structures = Programs.</cite>
+                  Englewood Cliffs, N.J: Prentice-Hall.
+                  </li>
+            </ol>
+         </section>
+      </main>
+      <footer>
+         <div id="fn-thanks" xml:lang="en-US" xml:base="include/thanks.xhtml">
+            <p>
+               Cashner, Andrew. 2022. <q>Athanasius Kircher’s Arca musarithmica (1650) as a Computational System</q>. <cite>Arca musarithmica: A Device for Automatic Music Composition from 1650</cite>. Rochester, NY: Peacemaker Press. <a href="https://www.arca1650.info/computational_system/">https://www.arca1650.info/computational_system.html</a>. (Published online Nov. 30, 2022.)
+               </p>
+            <p><a href="http://www.andrewcashner.com/">Andrew A. Cashner, PhD,</a> teaches music in the Arthur W. Satz Department of Music at the <a href="http:www.rochester.edu/">University of Rochester</a> (New York, USA) and performs regularly as a pianist and bandleader.
+               </p>
+            <p>
+               This work was completed on the ancestral land of the Onöndowa’ga:’ (Seneca) Nation,
+               one of the Six Nations of the Haudenosaunee (Iroquois) Confederacy.
+               This project was made possible by a Humanities Center Fellowship and a junior-faculty
+               research leave from the University of Rochester.
+               Thanks are due to Christopher Brown, Devin Burke, Paulo Cereda, Margaret Murata, and
+               David Temperley for reading and providing feedback on this article.
+               </p>
+            <p>
+               This article is dedicated with admiration and gratitude to Donald Knuth.
+               </p>
+            <p>
+               Copyright © 2022 Andrew A. Cashner.
+               
+               <div itemscope="itemscope" itemtype="https://schema.org/Person"><a itemprop="sameAs" content="https://orcid.org/0000-0002-7468-8579" href="https://orcid.org/0000-0002-7468-8579" target="orcid.widget" rel="noopener noreferrer"><img src="https://orcid.org/sites/default/files/images/orcid_16x16.png" alt="ORCID iD icon">https://orcid.org/0000-0002-7468-8579</a></div>
+            </p>
+            <p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png"></a><br>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+               </p>
+         </div>
+      </footer>
+   </body>
+</html>
