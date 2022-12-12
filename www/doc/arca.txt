@@ -4,8 +4,8 @@
 
 -- | A digital implementation of Athanasius Kircher's device for automatic music composition, the Arca musarithmica of 1650
 --   
---   Please see the README on Bitbucket at
---   <a>https://bitbucket.org/andrewacashner/kircher/src/master/arca/README.md</a>.
+--   Please see the README on GitHub at
+--   <a>https://github.com/andrewacashner/kircher/src/master/arca/README.md</a>.
 --   The arca web app is at <a>https://www.arca1650.info</a>.
 @package arca
 @version 0.1.0.0
