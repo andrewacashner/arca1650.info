@@ -11,9 +11,9 @@ The site is a web app interface for a digital implementation in Haskell of
 Athanasius Kircher's *Arca musarithmica* of 1650, a device for automatic music
 composition.
 
-The Haskell code is at <https://www.bitbucket.org/andrewacashner/kircher.git>.
+The Haskell code is at <https://www.github.com/andrewacashner/kircher>.
 
-All content on this site is copyright © 2021 Andrew A. Cashner, all rights
+All content on this site is copyright © 2022 Andrew A. Cashner, all rights
 reserved, except for the public-domain material from Kircher's 1650 *Musurgia
 universalis*.
 
