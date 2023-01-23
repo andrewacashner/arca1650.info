@@ -1,20 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Martel&family=Maven+Pro&family=Share+Tech+Mono&display=swap');
+
+
 /* Layout */
 body {
+  max-width: 45em;
   display: flex;
   flex-direction: column;
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
-body, header, nav, main, footer {
-  max-width: 45em;
+/*body, header, nav, main, footer {
   padding-left: 1em;
   padding-right: 1em;
 }
-nav, footer {
+*/
+nav {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-nav {
   height: 2em;
 }
 nav ul {
@@ -105,16 +108,20 @@ figcaption {
 
 /* Font */
 body {
-  font-family: sans-serif; 
+  font-family: 'Martel', serif;
+  font-size: 0.9em;
 } 
 
 header h2 {
   font-style: italic;
   text-align: right;
 }
+h1, h2 {
+  font-family: 'Maven Pro', sans-serif;
+}
+
 footer {
-  font-family: monospace;
-  font-size: 115%;
+  font-size: 80%;
 }
 q {
   quotes: "\201C" "\201D" "\2018" "\2019";
@@ -123,7 +130,7 @@ cite {
   font-style: italic;
 }
 nav ul a, nav ul a:visited {
-  font-family: monospace;
+  font-family: 'Share Tech Mono', monospace;
   font-size: 115%;
   text-decoration: none;
 }

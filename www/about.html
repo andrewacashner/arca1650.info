@@ -27,12 +27,91 @@
     <main>
       <section>
         <h1>About the Arca musarithmica</h1>
-
-        <p>For a more in-depth study of the Arca and this implementation, see the
-        article, <q><a href="computational_system/index.html">Athanasius
-            Kircher’s Arca musarithmica (1650) as a Computational System</a></q></p>
+        <ul>
+          <li><a href="#background">Kircher and his <q>ark</q></a></li>
+          <li><a href="#how-to">How to operate the Arca</a></li>
+          <li><a href="computational_system/index.html">Concepts of computing in the Arca and its digital implementation</a></li>
+          <li><a href="reception/Cashner-2022-Kircherizers-AM.pdf">The reception and use of the Arca in the Spanish Empire</a></li>
+          <li><a href="#biblio">Other implementations of the Arca</a></li>
+        </ul>
       </section>
-      <section>
+      <section id="background">
+        <h1>An <q>Ark</q> of Musical Knowledge in Infinite Permutations</h1>
+        <p>
+        The <em>Arca musarithmica</em> or <q>box of music-numbers</q> is a
+        computation device invented by Athanasius Kircher.
+        Kircher (1602–1680) was a German-born Jesuit priest and polymath in
+        Rome who also wrote books about optics, magnetism, geology, and
+        Egyptian hieroglyphics and corresponded with a global network of
+        scientists, scholars, and missionaries.
+        In book VIII of his treatise <cite>Musurgia universalis</cite> (Rome,
+        1650), Kircher promised that the device could automatically generate
+        musical settings for four-voice chorus of any given text, in any
+        language.
+        The Arca could generate music in several styles, from a simple homophonic texture like a hymn to a complex fugal texture, all by combining preset permutations of musical patterns.
+        Though the Arca did not have an automatic mechanism, a user could produce coherent output solely by following Kircher’s rules, without knowing anything about music.
+        </p>
+        <p>
+        The ark holds a set of data tables, which together with a list of rules
+        for how to use the tables, amounts to a computation device for
+        composing music. Given input in the form of a marked text in Latin and
+        a small set of simple choices about the musical setting, a user who
+        knows nothing about music can use the ark to generate unique,
+        never-before-heard musical settings of that text for four-voice (SATB)
+        chorus.
+        </p>
+        <p>
+        Kircher presented this as an embodiment of mathematical permutations.
+        Like many of his seventeenth-century contemporaries, he understood music
+        as <q>sounding number,</q> an embodiment of the mathematical order
+        inherent in God’s created universe, and a reflection of the perfection
+        of God himself. Out of the infinite variety of possible combinations of
+        notes and rhythms, the user of the ark selects a specific set of
+        permutations and thus imitates God in his original act of creation.
+        </p>
+        <p>
+        The combination of structured data and completely prescribed
+        algorithms makes Kircher’s device a computational system, with some of
+        the characteristics that would later characterize modern computers,
+        though of course Kircher had no way to automate his system and
+        certainly did not theorize it fully.
+        This implementation, written in the pure-functional programming
+        language Haskell, models the entire ark as a single mathematical
+        function: it takes one series of symbols, representing an input text
+        and the choice of musical parameters, and transforms those into
+        another set of symbols that represents musical notation.
+        Though others have implemented portions of the ark and related
+        systems (see the <a href="about.html#biblio">bibliography</a>), to my
+        knowledge this is the version to be fully automatic and to be capable
+        of setting texts of any length and type.
+        </p>
+        <p>
+        Kircher intended his device for the total musical novice, a
+        <q>Tyro</q> who knew <em>nothing</em> about music except the rules he
+        provided. 
+        Kircher did not know it, but he was describing an automatic computer.
+        Even though his system lacks an automatic <em>mechanism</em>, the
+        human-operated system does not require the operator to do anything but
+        retrieve data from the tables and transform it according to reasonably
+        precise rules. 
+        The digital version simply translates the data structures and
+        algorithms into a form that the electronic computer, the ultimate
+        know-nothing, can use to generate music.
+        For a more in-depth study of the Arca and this implementation, see the
+        article, <q><a href="computational_system/index.html">Athanasius
+            Kircher’s Arca musarithmica (1650) as a Computational System</a></q>.
+        </p>
+        <p>
+        The program and its output make it possible to reflect on what
+        Kircher’s project meant: What does his <q>artificial</q> system of
+        composition tell us about his and his contemporaries’ concepts of both
+        music and computation?
+        How much musical knowledge is embodied in this device? What is
+        missing? 
+        And what purposes would such a device have served in its time?
+        </p>
+      </section> 
+      <section id="how-to">
         <h1>How to compose music using the ark</h1>
 
         <ol>
@@ -316,7 +395,7 @@
  
     </main>
     <footer>
-      <p>Copyright © 2022 
+      <p>Copyright © 2023
       <a href="https://orcid.org/0000-0002-7468-8579">Andrew A. Cashner</a>. 
       All rights reserved.</p>
     </footer>

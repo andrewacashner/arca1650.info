@@ -26,103 +26,33 @@
     </nav>
     <main>
       <section>
-        <h1>Arca musarithmica Athanasii Kircherii MDCL</h1>
         <p>
-        This site presents a digital implementation of a device for automatic
-        music composition invented by Athanasius Kircher in 1650, 
-        created by <a href="https://www.andrewcashner.com">Andrew A. Cashner, PhD</a>.
+        This site presents <a href="http://www.andrewcashner.com/">Andrew Cashner</a>’s digital implementation of a device for automatic music composition invented by Athanasius Kircher in 1650, along with research about the device and its history.
         Based on the specifications in Kircher’s <cite>Musurgia
           universalis</cite> (Rome, 1650), Book VIII, the core program was
         written in Haskell (2021), with a simple web interface in Javascript
         and PHP.
         </p>
-         <img id="ark-image"
-              src="img/Kircher-Arca_musarithmica.jpg"
-              alt="Image: The original print illustration of Kircher’s Arca
-                      musarithmica, a large box containing many sets of ruler-like
-                      rods and adorned with images of historic musical instruments."
-              title="The Arca musarithmica, in Musurgia universalis (1650),
-                        facing book 2, fol. 185"
-              width="100%"/>
-
+        <ul>
+          <li><a href="compose.html">Generate your own new music</a> using your own text or one of several preset texts, and hear it played back</li>
+          <li><a href="about.html">Learn more about the Arca</a> and <a href="computational_system/index.html">Kircher’s concepts of computation and music</a></li>
+          <li>Learn about <a href="reception/Cashner-2022-Kircherizers-AM.pdf">the people who used the Arca in the seventeenth and eighteenth centuries</a> and what it meant to them, and see the evidence for the first known copy of the Arca in the New World.</li>
+          <li><a href="doc/index.html">Read the Haskell code and documentation</a> to see how the Arca can be implemented in pure-functional programming.</li>
+        </ul>
       </section>
-      <section> 
-        <h1>An <q>Ark</q> of Musical Knowledge in Infinite Permutations</h1>
-
-        <p>
-        The <em>Arca musarithmica</em> Athanasii Kircherii MDCL</em> is an ark
-        or box for <q>music-arithmetic</q>, or musical calculation. The ark
-        holds a set of data tables, which together with a list of rules for
-        how to use the tables, amounts to a computation device for composing
-        music. Given input in the form of a marked text in Latin and a small
-        set of simple choices about the musical setting, a user who knows
-        nothing about music can use the ark to generate unique,
-        never-before-heard musical settings of that text for four-voice (SATB)
-        chorus.
-        </p>
-        <p>
-        Kircher presented this as an embodiment of mathematical permutations.
-        Like many of his seventeenth-century contemporaries, he understood music
-        as <q>sounding number,</q> an embodiment of the mathematical order
-        inherent in God’s created universe, and a reflection of the perfection
-        of God himself. Out of the infinite variety of possible combinations of
-        notes and rhythms, the user of the ark selects a specific set of
-        permutations and thus imitates God in his original act of creation.
-        </p>
-        <p>
-        The combination of structured data and completely prescribed
-        algorithms makes Kircher’s device a computational system, with some of
-        the characteristics that would later characterize modern computers,
-        though of course Kircher had no way to automate his system and
-        certainly did not theorize it fully.
-        This implementation, written in the pure-functional programming
-        language Haskell, models the entire ark as a single mathematical
-        function: it takes one series of symbols, representing an input text
-        and the choice of musical parameters, and transforms those into
-        another set of symbols that represents musical notation.
-        Though others have implemented portions of the ark and related
-        systems (see the <a href="about.html#biblio">bibliography</a>), to my
-        knowledge this is the version to be fully automatic and to be capable
-        of setting texts of any length and type.
-        </p>
-        <p>
-        Kircher intended his device for the total musical novice, a
-        <q>Tyro</q> who knew <em>nothing</em> about music except the rules he
-        provided. 
-        Kircher did not know it, but he was describing an automatic computer.
-        Even though his system lacks an automatic <em>mechanism</em>, the
-        human-operated system does not require the operator to do anything but
-        retrieve data from the tables and transform it according to reasonably
-        precise rules. 
-        The digital version simply translates the data structures and
-        algorithms into a form that the electronic computer, the ultimate
-        know-nothing, can use to generate music.
-        </p>
-        <p>
-        The program and its output make it possible to reflect on what
-        Kircher’s project meant: What does his <q>artificial</q> system of
-        composition tell us about his and his contemporaries’ concepts of both
-        music and computation?
-        How much musical knowledge is embodied in this device? What is
-        missing? 
-        And what purposes would such a device have served in its time?
-        </p>
-        <p>
-        Run the ark as many times as you like and create ever-new, unique
-        musical combinations!
-        </p>
-
-        <h2>Next Steps</h2>
-        <p><a href="about.html">Learn how to use the ark</a> and dig into the
-        details of this digital implementation.</a></p>
-        <p><a href="computational_system/index.html">Read the academic article</a>,
-        <q>Athanasius Kircher’s Arca musarithmica (1650) as a Computational System</q></p>
-        <p><a href="doc/index.html">Read the documentation and the code</a></p>
-        <p><a href="compose.html"><strong>Compose new music using the ark!</strong></a></p>
-      </section>
+        <img id="ark-image"
+             src="img/Kircher-Arca_musarithmica.jpg"
+             alt="Image: The original print illustration of Kircher’s Arca
+                       musarithmica, a large box containing many sets of ruler-like
+                       rods and adorned with images of historic musical instruments."
+             title="The Arca musarithmica, in Musurgia universalis (1650),
+                         facing book 2, fol. 185"
+             width="100%"/>
     </main>
     <footer>
-      <p>Copyright © 2022 
+      <p>This project was created on the ancestral land of the Onöndowa’ga:’ (Seneca) Nation, one of the Six Nations of the Haudenosaunee (Iroquois) Confederacy.
+      Funding was provided by the University of Rochester.</p>
+      <p>Copyright © 2023
       <a href="https://orcid.org/0000-0002-7468-8579">Andrew A. Cashner</a>. 
       All rights reserved.</p>
     </footer>
