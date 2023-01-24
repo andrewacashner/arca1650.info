@@ -30,8 +30,8 @@
         <ul>
           <li><a href="#background">Who built the Arca and why?</a></li>
           <li><a href="#how-to">How did the Arca work?</a></li>
-          <li><a href="computational_system/index.html">Was the Arca a computer?</a></li>
-          <li><a href="reception/Cashner-2022-Kircherizers-AM.pdf">Who used the Arca?</a></li>
+          <li><a href="#computer">Was the Arca a computer?</a></li>
+          <li><a href="#reception">Who used the Arca?</a></li>
           <li><a href="#biblio">Other implementations and research</a></li>
         </ul>
       </section>
@@ -82,24 +82,8 @@
         another set of symbols that represents musical notation.
         Though others have implemented portions of the ark and related
         systems (see the <a href="about.html#biblio">bibliography</a>), to my
-        knowledge this is the version to be fully automatic and to be capable
-        of setting texts of any length and type.
-        </p>
-        <p>
-        Kircher intended his device for the total musical novice, a
-        <q>Tyro</q> who knew <em>nothing</em> about music except the rules he
-        provided. 
-        Kircher did not know it, but he was describing an automatic computer.
-        Even though his system lacks an automatic <em>mechanism</em>, the
-        human-operated system does not require the operator to do anything but
-        retrieve data from the tables and transform it according to reasonably
-        precise rules. 
-        The digital version simply translates the data structures and
-        algorithms into a form that the electronic computer, the ultimate
-        know-nothing, can use to generate music.
-        For a more in-depth study of the Arca and this implementation, see the
-        article, <q><a href="computational_system/index.html">Athanasius
-            Kircher’s Arca musarithmica (1650) as a Computational System</a></q>.
+        knowledge this is the first version to be fully automatic and to be
+        capable of setting texts of any length and type.
         </p>
         <p>
         The program and its output make it possible to reflect on what
@@ -284,6 +268,63 @@
         <p>In the web app, we use the third-party Verovio app to render the
         musical data to notation and MIDI format for automatic playback.</p>
       </section>
+      </section>
+      <section id="computer">
+        <h2>Was the Arca musarithmica a computer?</h2>
+        <p>
+        Kircher’s device does not have an automatic mechanism, and requires a human operator.
+        But the operator does not need to do anything except retrieve data from the tables in the Arca and transform it according to reasonably precise rules.
+        Kircher intended his device for the total musical novice, a
+        <q>Tyro</q> who knew <em>nothing</em> about music except the rules he
+        provided. 
+        So although the <em>device</em> is not automatic, the <em>system</em> is automatic in the sense that no additional knowledge or discretion is needed beyond what is built in to the device and the specified algorithm for operating it.
+        </p>
+        <p>
+        In order for a digital computer to step in as the operator, only a few adjustments need to be made to fill gaps and inconsistencies in Kircher’s system.
+        The rest of the work in writing the software just consisted of taking a
+        system designed for a human operator who can manipulate graphic symbols
+        on paper and translating it to the kinds of instructions needed by the digital automaton.
+        The modern computer is the ultimate know-nothing, as it can only do exactly what it is programmed to do, and in the end its processing all boils down to manipulating binary numbers.
+        The implementation in Haskell, a pure-functional programming language, demonstrates that the Arca can be modeled as a single mathematical function, transforming a set of inputs into a set of outputs.
+        </p>
+        <p>
+        For a more in-depth study of the Arca and this implementation, see the
+        article, <q><a href="computational_system/index.html">Athanasius
+            Kircher’s Arca musarithmica (1650) as a Computational System</a></q>.
+        </p>
+      </section>
+      <section id="reception">
+        <h2>Who Used the Arca?</h2>
+        <p>
+        After describing the Arca, Kircher says he not only built one but that he and other musicians had been using it to generate complex music, and gives an example of a composition produced with the Arca.
+        He also says there is a secret, customized version of the Arca with considerably greater capabilities, which he is reserving for the inspection of trusted associates.
+        No other trace survives of this <q>Arca 2.0</q>, but there is evidence that other people used the Arca as specified in the <em>Musurgia universalis</em>.
+        </p>
+        <p>
+        Three physical implementations of the ark are known to have survived in the UK and the rest of Europe—in Cambridge, Wolfenbüttel, and Florence.
+        These look like elaborate recipe boxes filled with slats, each of which is covered with a copy of Kircher’s tables of <em>musarithmi</em> or <q>music-numbers</q>.
+        No one has yet found a surviving piece of music generated with the ark.
+        </p>
+        <p>
+        I found evidence for a previously unknown copy of the Arca in Puebla, Mexico,
+        which is the first known implementation in the New World.
+        Buried within an obscure manuscript miscellany filled with mathematical
+        calculations, tax records, and experiments in universal chronology and
+        trigonometry, there is a copy of a core selection of Kircher’s Arca tables.
+        The parts copied out would be sufficient to operate the device, even if one did not actually build a box to put them in.
+        The author was probably a university mathematics professor in Puebla, writing around 1690, and the array of interests in the manuscript collection show the kind of intellectual climate in which Kircher’s work was read.
+        The poet and nun Sor Juana Inés de la Cruz described herself as <q>Kircherizing</q>, when she followed Kircher in following chains of connections between elements of creation in the pursuit of universal knowledge.
+        She and the copyist of the Puebla Arca were part of a circle of such Kircher enthusiasts in seventeenth-century New Spain.
+        I also found another source, a digest of the Arca system from late
+        eighteenth-century Madrid, that demonstrates the longevity of these
+        interests through the period of the Scientific Revolution and into the
+        Enlightenment—though numerous mistakes also suggest that the author
+        struggled to understand Kircher’s system and likely viewed it as merely
+        a curiosity, rather than a link in a chain leading to divine truth.
+        </p>
+        <p>
+        For a more in-depth study of the reception of Kircher’s device in the New World, see the article, <q><a href="http://www.andrewcashner.com/research/index.html#kircher-reception">Kircherizers and Trisectors: Athanasius Kircher’s Automatic Computing Device in the Spanish Empire</a></q>, published in the journal <cite>Anuario musical</cite> in 2022.
+        </p>
       </section>
       <section id="biblio">
         <h2>Other Implementations and Related Projects</h2>
