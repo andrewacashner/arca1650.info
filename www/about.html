@@ -9,8 +9,8 @@
     <title>Arca musarithmica</title>
     <meta name="description" 
           content="Description of how to compose using Athanasius
-                   Kircher’s 1650 device for automatic music composition
-                   implemented in Haskell (2021)" />
+                    Kircher’s 1650 device for automatic music composition
+                    implemented in Haskell (2021)" />
   </head>
   <body>
     <header>
@@ -27,416 +27,436 @@
     <main>
       <section>
         <h1>About the Arca musarithmica</h1>
-        <ul>
-          <li><a href="#background">Who built the Arca and why?</a></li>
-          <li><a href="#how-to">How did the Arca work?</a></li>
-          <li><a href="#computer">Was the Arca a computer?</a></li>
-          <li><a href="#reception">Who used the Arca?</a></li>
-          <li><a href="#biblio">Other implementations and research</a></li>
-        </ul>
-      </section>
-      <section id="background">
-        <h2>Who Built the Arca and Why?</h2>
-        <p>
-        The <em>Arca musarithmica</em> or <q>box of music-numbers</q> is a
-        computation device invented by Athanasius Kircher.
-        Kircher (1602–1680) was a German-born Jesuit priest and polymath in
-        Rome who also wrote books about optics, magnetism, geology, and
-        Egyptian hieroglyphics and corresponded with a global network of
-        scientists, scholars, and missionaries.
-        In book VIII of his treatise <cite>Musurgia universalis</cite> (Rome,
-        1650), Kircher promised that the device could automatically generate
-        musical settings for four-voice chorus of any given text, in any
-        language.
-        The Arca could generate music in several styles, from a simple homophonic texture like a hymn to a complex fugal texture, all by combining preset permutations of musical patterns.
-        Though the Arca did not have an automatic mechanism, a user could produce coherent output solely by following Kircher’s rules, without knowing anything about music.
-        </p>
-        <p>
-        The ark holds a set of data tables, which together with a list of rules
-        for how to use the tables, amounts to a computation device for
-        composing music. Given input in the form of a marked text in Latin and
-        a small set of simple choices about the musical setting, a user who
-        knows nothing about music can use the ark to generate unique,
-        never-before-heard musical settings of that text for four-voice (SATB)
-        chorus.
-        </p>
-        <p>
-        Kircher presented this as an embodiment of mathematical permutations.
-        Like many of his seventeenth-century contemporaries, he understood music
-        as <q>sounding number,</q> an embodiment of the mathematical order
-        inherent in God’s created universe, and a reflection of the perfection
-        of God himself. Out of the infinite variety of possible combinations of
-        notes and rhythms, the user of the ark selects a specific set of
-        permutations and thus imitates God in his original act of creation.
-        </p>
-        <p>
-        The combination of structured data and completely prescribed
-        algorithms makes Kircher’s device a computational system, with some of
-        the characteristics that would later characterize modern computers,
-        though of course Kircher had no way to automate his system and
-        certainly did not theorize it fully.
-        This implementation, written in the pure-functional programming
-        language Haskell, models the entire ark as a single mathematical
-        function: it takes one series of symbols, representing an input text
-        and the choice of musical parameters, and transforms those into
-        another set of symbols that represents musical notation.
-        Though others have implemented portions of the ark and related
-        systems (see the <a href="about.html#biblio">bibliography</a>), to my
-        knowledge this is the first version to be fully automatic and to be
-        capable of setting texts of any length and type.
-        </p>
-        <p>
-        The program and its output make it possible to reflect on what
-        Kircher’s project meant: What does his <q>artificial</q> system of
-        composition tell us about his and his contemporaries’ concepts of both
-        music and computation?
-        How much musical knowledge is embodied in this device? What is
-        missing? 
-        And what purposes would such a device have served in its time?
-        </p>
-      </section> 
-      <section id="how-to">
-        <h2>How Did the Arca Work?</h1>
 
-        <ol>
-          <li>Kircher expects you to <strong>prepare a text</strong> in Latin or
-            another language, with words divided into syllables, marked long or
-            short. You can set texts in several Classical meters (like
-            Anacreontic or Sapphic), but you can also set irregular verse and
-            prose texts.  <ul>
-              <li>In this web app, we provide a set of <strong>pre-marked
-                  texts</strong>.</li>
-              <li>With the command-line version, you can create your own texts
-                that might even have multiple sections in different styles and
-                moods!</li>
-            </ul>
-          </li> 
-          <li>Next, Kircher wants you to choose several aspects of the music
-            setting you want the ark to create:
-            <ul>
-              <li>The <strong>style</strong> and texture of the music:
-                <ol>
-                  <li>you can opt for simple, note-against-note counterpoint (like a
-                    hymn),</li>
-                  <li>or florid, melismatic counterpoint (like a motet, anthem, or
-                    even fugue).</li>
-                </ol>
-              </li>
-              <li>The <strong>mood</strong> or character of the text and its
-                setting, which determines the choice of one of twelve musical
-                <q>tones</q> or <q>church keys</q> (<em>toni
-                  ecclesiastici</em>). 
-                The tones are not the same as modern keys, nor do they match
-                up exactly with the medieval modes used to classify
-                plainchant.
-                They seem to be a hybrid of the polyphonic <q>tones</q> used
-                by keyboardists to introduce and accompany the eight
-                traditional chant psalm tones, with the twelve-mode system
-                introduced by the earlier theorists Glarean and Zarlino.
-                (see <a href="#Barnett:TonalOrganization17C">Barnett 2002</a>).
-                </p>
-              </li>
-              <li>The <strong>musical meter</strong> (technically, mensuration)
-                of the setting. 
-                <ol>
-                  <li>In the simple style, you can choose 
-                    <ol>
-                      <li>duple meter (cut C),</li>
-                      <li>triple minor (C3, three minims/half notes per metrical
-                        unit),</li>
-                      <li>or triple major (cut C3, three semibreves/whole notes
-                        per metrical unit).</li>
-                    </ol>
-                    <p>
-                    Some duple-meter permutations in the ark have a minim pulse
-                    (C) and others have a semibreve pulse (cut C).
-                    </p>
-                  </li>
-                  <li>In florid style, everything is in duple meter (C).</li>
-                </ol>
-              </li>
-            </ul>
-          </li>
-          <li>If you are operating the ark by hand, you use these input
-            parameters to select the proper tables. 
-            <ul> 
-              <li><strong>Syntagma:</strong> There are three <em>syntagmata</em>
-                or large divisions in the ark. For simple style, you select from
-                Syntagma I; for florid, use Syntagma II.
-                <p>
-                Kircher provides a third syntagma as well, but because it would
-                be much more difficult if not impossible to make completely
-                automatic, we have omitted it from this implementation.
-                (An exercise for the reader!)
-                </p>
-              </li>
-              <li><strong>Pinax:</strong> Each syntagma containes a set of
-                <q>rods</q> or <em>pinakes</em> (singular, <em>pinax</em>). You
-                select the <em>pinax</em> based on the meter of the text.
-              </li>
-              <li><strong>Column:</strong> Each pinax contain
-                several columns of data. The column is either a free choice, or
-                is based on the order of lines in the poem.
-              </li>
-              <li><strong>Voice and rhythm permutations:</strong> Each column
-                includes two parts: sets of numbers representing musical pitches
-                (we call these <q>voice permutations</q> or vperms), and sets of
-                musical notes representing rhythmic durations (<q>rhythm
-                  permutations</q> or rperms).
-                <ul>
-                  <li>In syntagma I (simple counterpoint), the user is supposed
-                    to freely choose one set of vperms and one set of
-                    rperms. All the musical voices use the same rhythms.
-                    <ul>
-                      <li>In syntagma I, there are (generally) three sets of
-                        rhythm permutation, one for each type of musical meter
-                        you can use.</li>
-                    </ul>
-                    <li>In syntagma II (florid counterpoint), there is a set of
-                      rperms that matches up with each vperm, so that there is a
-                      specified rhythm for each of the SATB voices. This makes
-                      independent contrapuntal voices possible.
-                    </li>
-                </ul>
-                  </li>
-            </ul>
-              </li>
-              <li><strong>Writing the  music down:</strong> Next you lay out what
-                Kircher calls the <em>palimpsest phontacticum</em>, or what the rest
-                of us call <q>music paper</q>.
-                You draw out four staves and put an appropriate combination of clefs
-                for the four voices. These determine the octave and range of the
-                musical output for each voice. You also add a flat in the key
-                signature if your tone is in <em>cantus mollis</em> according to the
-                table, and add the appropriate mensuration sign.
-              </li>
-              <li><strong>Matching pitches, rhythms, and syllables:</strong> For
-                each phrase of text, you take the pitch numbers and look them up in
-                the table for the given tone in order to get note names. You pair
-                these note names with the rhythmic values, or just put rests when
-                those are given. You write these values on the staff,
-                making certain adjustments as needed.
-              </li>
-              <li>Kircher describes a variety of <strong>adjustments</strong>, some
-                of which are easier to automate (that is, are more completely
-                prescribed) than
-                others: 
-                <ol>
-                  <li>If the notes go out of range for that voice (too far above or
-                    below the staff), you may shift them up or down by octave as
-                    needed.</li>
-                  <li>The tone tables specify that you may add sharps or flats on
-                    certain notes according to <em>musica ficta</em> rules.</li>
-                  <li>You may also do more complicated things like swapping the
-                    notes for adjacent voices, which require your own judgment.</li>
-                </ol>
-              </li>
-              </ul>
-          </li>
-        </ol>
-      <section>
-        <h3>Digital Implementation</h3>
-        <p>In this software we implement all those parts of the ark which are
-        completely specified as automatic algorithms. This includes how to
-        pull pitches and rhythms from the ark and match them with words.</p>
-        <p>Instead of the user’s choice of vperms and rperms we choose to tempt
-        fate (from a seventeenth-century Catholic perspective and roll the dice,
-        a literally aleatoric method, by using computer-generated pseudo-random
-        numbers.  Other elements that depend on the user’s taste and judgment,
-        or elements under-specified by Kircher (like text underlay in
-        the melismatic Syntagma II) we leave up to our own users’ discretion.</p>
-        <p>Kircher does not provide a complete set of instructions, though,
-        for the essential task of fitting the notes within vocal ranges while
-        avoiding unwieldy leaps; I have written my own algorithm (using binary
-        decision trees and weighted <q>badness</q> scores) to do this.</p>
-        <p>Kircher also does not provide a full specification for applying
-        <em>musica ficta</em> accidentals based on his tone tables and other
-        rules. Human performers who know the conventions of Kircher’s day
-        could probably adjust the music in performance, but to make the music
-        sound good automatically, as in the MIDI renditions on this website,
-        requires more complicated adjustments. The current implementation is
-        incomplete and does not cover all the difficult edge cases that
-        arise.</p>
-        <p>We encode the data of the ark itself (syntagmata, pinakes, etc.) in a
-        set of tables in Haskell, technically nested vectors and lists.
-        We read the input text and parameters from an XML file and parse the
-        text into sections, sentences/stanzas, and phrases/lines.
-        We generate a list of random numbers to use for each phrase, then we
-        use these to select the correct vperms and rperms, and adjust these for
-        tone and range according to the rules. We then convert our internal data
-        types into MEI-XML output.</p>
-        <p>In the web app, we use the third-party Verovio app to render the
-        musical data to notation and MIDI format for automatic playback.</p>
-      </section>
-      </section>
-      <section id="computer">
-        <h2>Was the Arca musarithmica a computer?</h2>
-        <p>
-        Kircher’s device does not have an automatic mechanism, and requires a human operator.
-        But the operator does not need to do anything except retrieve data from the tables in the Arca and transform it according to reasonably precise rules.
-        Kircher intended his device for the total musical novice, a
-        <q>Tyro</q> who knew <em>nothing</em> about music except the rules he
-        provided. 
-        So although the <em>device</em> is not automatic, the <em>system</em> is automatic in the sense that no additional knowledge or discretion is needed beyond what is built in to the device and the specified algorithm for operating it.
-        </p>
-        <p>
-        In order for a digital computer to step in as the operator, only a few adjustments need to be made to fill gaps and inconsistencies in Kircher’s system.
-        The rest of the work in writing the software just consisted of taking a
-        system designed for a human operator who can manipulate graphic symbols
-        on paper and translating it to the kinds of instructions needed by the digital automaton.
-        The modern computer is the ultimate know-nothing, as it can only do exactly what it is programmed to do, and in the end its processing all boils down to manipulating binary numbers.
-        The implementation in Haskell, a pure-functional programming language, demonstrates that the Arca can be modeled as a single mathematical function, transforming a set of inputs into a set of outputs.
-        </p>
-        <p>
-        For a more in-depth study of the Arca and this implementation, see the
-        article, <q><a href="computational_system/index.html">Athanasius
-            Kircher’s Arca musarithmica (1650) as a Computational System</a></q>.
-        </p>
-      </section>
-      <section id="reception">
-        <h2>Who Used the Arca?</h2>
-        <p>
-        After describing the Arca, Kircher says he not only built one but that he and other musicians had been using it to generate complex music, and gives an example of a composition produced with the Arca.
-        He also says there is a secret, customized version of the Arca with considerably greater capabilities, which he is reserving for the inspection of trusted associates.
-        No other trace survives of this <q>Arca 2.0</q>, but there is evidence that other people used the Arca as specified in the <em>Musurgia universalis</em>.
-        </p>
-        <p>
-        Three physical implementations of the ark are known to have survived in the UK and the rest of Europe—in Cambridge, Wolfenbüttel, and Florence.
-        These look like elaborate recipe boxes filled with slats, each of which is covered with a copy of Kircher’s tables of <em>musarithmi</em> or <q>music-numbers</q>.
-        No one has yet found a surviving piece of music generated with the ark.
-        </p>
-        <p>
-        I found evidence for a previously unknown copy of the Arca in Puebla, Mexico,
-        which is the first known implementation in the New World.
-        Buried within an obscure manuscript miscellany filled with mathematical
-        calculations, tax records, and experiments in universal chronology and
-        trigonometry, there is a copy of a core selection of Kircher’s Arca tables.
-        The parts copied out would be sufficient to operate the device, even if one did not actually build a box to put them in.
-        The author was probably a university mathematics professor in Puebla, writing around 1690, and the array of interests in the manuscript collection show the kind of intellectual climate in which Kircher’s work was read.
-        The poet and nun Sor Juana Inés de la Cruz described herself as <q>Kircherizing</q>, when she followed Kircher in following chains of connections between elements of creation in the pursuit of universal knowledge.
-        She and the copyist of the Puebla Arca were part of a circle of such Kircher enthusiasts in seventeenth-century New Spain.
-        I also found another source, a digest of the Arca system from late
-        eighteenth-century Madrid, that demonstrates the longevity of these
-        interests through the period of the Scientific Revolution and into the
-        Enlightenment—though numerous mistakes also suggest that the author
-        struggled to understand Kircher’s system and likely viewed it as merely
-        a curiosity, rather than a link in a chain leading to divine truth.
-        </p>
-        <p>
-        For a more in-depth study of the reception of Kircher’s device in the New World, see the article, <q><a href="http://www.andrewcashner.com/research/index.html#kircher-reception">Kircherizers and Trisectors: Athanasius Kircher’s Automatic Computing Device in the Spanish Empire</a></q>, published in the journal <cite>Anuario musical</cite> in 2022.
-        </p>
-      </section>
-      <section id="biblio">
-        <h2>Other Implementations and Related Projects</h2>
-        <section id="literature-review">
-          <p>
-          Carlo Maria Chierotti’s dissertation and articles 
-          (<a href="#Chierotti:KircherDiss">n.d.</a>, 
-          <a href="#Chierotti:KircherMirifica">1992</a>, and 
-          <a href="#Chierotti:KircherComporre">1994</a>) 
-          on the same subject provide a good overview of Kircher’s work and the
-          structure and operation of the ark, with some detailed analysis of the
-          types of harmonies and cadences in the voice permutations.
-          He does not view the <i>Arca musarithmica</i> as a machine or
-          consider its potential as an automatic system, emphasizing instead how
-          much interaction is actually demanded from the user in order to
-          produce good results.</p>
-          <p>
-          Jim Bumgardner (<a href="#Bumgardner:Kircher">2009</a>) 
-          implemented a different music-computing device by Kircher, the
-          <cite>Organum mathematicum</cite>.
-          That device was much simpler musically but had the virtue of also
-          being able to calculate the date of Easter and lots of other useful
-          functions.
-          That implementation in Perl allowed a user to set a very small set of
-          short texts in simple or florid style.
-          It could generate MIDI output, even using vocal synthesis to render
-          the actual syllable sounds.
-          Bumgardner highlights both Kircher’s clear intent to build an
-          automatic, algorithmic system for composition, and the inconsistencies
-          and underspecified elements that undermine that goal. He also
-          recognizes Kircher’s ambivalence about the need for random choices in
-          order to automate the system fully.
-          </p>
-          <p>
-          Agnes Cäcilie Bohnert’s dissertation 
-          (<a href="#Bohnert:Kircher">2010</a>) provides a comprehensive
-          treatment of Book VIII of the <cite>Musurgia</cite> in detail,
-          including its mathematical and philosophical foundations.
-          Every musical combination in the ark is examined and compared.
-          Bohnert implemented syntagma I and II of the ark in a Java program
-          which according to her description 
-          (<a href="#Bohnert:Kircher">Bohnert 2010, 123–126</a>), followed
-          quite closely the manual method described by Kircher.
-          Users would select <q>musarithms</q> by hand, one at a time,
-          adjust them, and add them to the musical composition, and then hear
-          the result.
-          Though I was not able to examine the program, it is not described as
-          fully automatic, and Bohnert says it can only create very short
-          settings of a small number of texts.
-          </p>
-        </section>
-        <section id="references">
-          <h3>References</h3>
-
-          <ul class="bibliography">
-            <li id="Barnett:TonalOrganization17C">Barnett, Gregory. 2002.
-              <q>Tonal Organization in Seventeenth-Century Music Theory.</q>
-              In <cite>The Cambridge History of Western Music Theory</cite>,
-              ed. Thomas Christensen (Cambridge: Cambridge University Press),
-              407--455. 
+        <section id="sec:articles">
+          <h2>In-Depth Research Articles by Andrew Cashner</h2>
+          <ul>
+            <li>
+              <q>Athanasius Kircher’s Arca musarithmica (1650) as a Computational System,</q>
+              <a href="https://doi.org/10.5920/jcms.1325"><cite>Journal of Creative Music Systems</cite>, vol. 8, no. 1 (2024)</a>
             </li>
-            <li id="Bohnert:Kircher">Bohnert, Agnes Cäcilie. 2010.
-              <cite>Die arca musarithmica Athanasius Kirchers</cite>.
-              Dissertation, Technische Universität Berlin.
-              Berlin: Mensch und Buch Verlag.
-            </li>
-            <li id="Bumgardner:Kircher">Bumgardner, Jim. 2009. 
-              <a href="https://jbum.com/papers/kircher_paper.pdf">
-                <q>Kircher’s Mechanical Composer: A Software
-                  Implementation.</q></a>
-              Paper presented at the Bridges Conference, Banff.
-            </li>
-            <li id="Chierotti:KircherDiss">Chierotti, Carlo Mario. n.d. 
-              <a href="http://www.kircher.chierotti.it/tesi">[Tesi di laurea
-                sulla <cite>Musurgia Universalis</cite> di Athanasius
-                Kircher]</a>.
-              Laureate thesis, University of Turin.
-            </li>
-            <li id="Chierotti:KircherMirifica">Chierotti, Carlo Mario. 1992.
-              <q>La musurgia mirifica di Athanasius Kircher: la composizione
-                musicale alla portata di tutti nell’età barocca.</q>
-              <cite>Musica/realtà</cite> 13, no. 37: 107–127.
-            </li>
-            <li id="Chierotti:KircherComporre">Chierotti, Carlo Mario. 1994.
-              <q>Comporre senza conoscere la musica: Athanasius Kircher e le
-                ‘Musica mirifica’: un singolare esempio di scienza musicale
-                nell’età barocca.</q>
-              <cite>Nuova rivista musicale italiana</cite> 28, no. 3: 382–410.
-            </li>
-            <li id="Findlen:Kircher">Findlen, Paula, ed. 2004.
-              <cite>Athanasius Kircher: The Last Man Who Knew
-                Everything</cite>.
-              New York: Routledge.
-            </li>
-            <li id="Godwin:KircherTheater">Godwin, Joscelyn. 2009.
-              <cite>Athanasius Kircher’s Theater of the World: The Life and
-                Work of the Last Man to Search for Universal
-                Knowledge</cite>.
-              Rochester, VT: Inner Traditions.
-            </li>
-            <li id="Kircher:Musurgia">Kircher, Athanasius. 1650.
-              <cite>Musurgia universalis, sive Ars magna consoni et dissoni
-                in X. libros digesta</cite>.
-              Rome.
+            <li>
+              <q>Kircherizers and Trisectors: Athanasius Kircher’s Automatic
+                Composition System in the Spanish Empire,</q>
+              <a href="https://doi.org/10.3989/anuariomusical.2022.77.04"><cite>Anuario musical</cite> no. 77 (2022), 51–75</a>
             </li>
           </ul>
         </section>
+
+        <section id="intro">
+          <h2>Introduction to the Arca musarithmica</h2>
+          <ul>
+            <li><a href="#background">Who built the Arca and why?</a></li>
+            <li><a href="#how-to">How did the Arca work?</a></li>
+            <li><a href="#computer">Was the Arca a computer?</a></li>
+            <li><a href="#reception">Who used the Arca?</a></li>
+            <li><a href="#biblio">Other implementations and research</a>
+            </li>
+          </ul>
+        </section>
+        <section id="background">
+          <h2>Who Built the Arca and Why?</h2>
+          <p>
+          The <em>Arca musarithmica</em> or <q>box of music-numbers</q> is a
+          computation device invented by Athanasius Kircher.
+          Kircher (1602–1680) was a German-born Jesuit priest and polymath in
+          Rome who also wrote books about optics, magnetism, geology, and
+          Egyptian hieroglyphics and corresponded with a global network of
+          scientists, scholars, and missionaries.
+          In book VIII of his treatise <cite>Musurgia universalis</cite> (Rome,
+          1650), Kircher promised that the device could automatically generate
+          musical settings for four-voice chorus of any given text, in any
+          language.
+          The Arca could generate music in several styles, from a simple homophonic texture like a hymn to a complex fugal texture, all by combining preset permutations of musical patterns.
+          Though the Arca did not have an automatic mechanism, a user could produce coherent output solely by following Kircher’s rules, without knowing anything about music.
+          </p>
+          <p>
+          The ark holds a set of data tables, which together with a list of rules
+          for how to use the tables, amounts to a computation device for
+          composing music. Given input in the form of a marked text in Latin and
+          a small set of simple choices about the musical setting, a user who
+          knows nothing about music can use the ark to generate unique,
+          never-before-heard musical settings of that text for four-voice (SATB)
+          chorus.
+          </p>
+          <p>
+          Kircher presented this as an embodiment of mathematical permutations.
+          Like many of his seventeenth-century contemporaries, he understood music
+          as <q>sounding number,</q> an embodiment of the mathematical order
+          inherent in God’s created universe, and a reflection of the perfection
+          of God himself. Out of the infinite variety of possible combinations of
+          notes and rhythms, the user of the ark selects a specific set of
+          permutations and thus imitates God in his original act of creation.
+          </p>
+          <p>
+          The combination of structured data and completely prescribed
+          algorithms makes Kircher’s device a computational system, with some of
+          the characteristics that would later characterize modern computers,
+          though of course Kircher had no way to automate his system and
+          certainly did not theorize it fully.
+          This implementation, written in the pure-functional programming
+          language Haskell, models the entire ark as a single mathematical
+          function: it takes one series of symbols, representing an input text
+          and the choice of musical parameters, and transforms those into
+          another set of symbols that represents musical notation.
+          Though others have implemented portions of the ark and related
+          systems (see the <a href="about.html#biblio">bibliography</a>), to my
+          knowledge this is the first version to be fully automatic and to be
+          capable of setting texts of any length and type.
+          </p>
+          <p>
+          The program and its output make it possible to reflect on what
+          Kircher’s project meant: What does his <q>artificial</q> system of
+          composition tell us about his and his contemporaries’ concepts of both
+          music and computation?
+          How much musical knowledge is embodied in this device? What is
+          missing? 
+          And what purposes would such a device have served in its time?
+          </p>
+        </section> 
+        <section id="how-to">
+          <h2>How Did the Arca Work?</h1>
+
+          <ol>
+            <li>Kircher expects you to <strong>prepare a text</strong> in Latin or
+              another language, with words divided into syllables, marked long or
+              short. You can set texts in several Classical meters (like
+              Anacreontic or Sapphic), but you can also set irregular verse and
+              prose texts.  <ul>
+                <li>In this web app, we provide a set of <strong>pre-marked
+                    texts</strong>.</li>
+                <li>With the command-line version, you can create your own texts
+                  that might even have multiple sections in different styles and
+                  moods!</li>
+              </ul>
+            </li> 
+            <li>Next, Kircher wants you to choose several aspects of the music
+              setting you want the ark to create:
+              <ul>
+                <li>The <strong>style</strong> and texture of the music:
+                  <ol>
+                    <li>you can opt for simple, note-against-note counterpoint (like a
+                      hymn),</li>
+                    <li>or florid, melismatic counterpoint (like a motet, anthem, or
+                      even fugue).</li>
+                  </ol>
+                </li>
+                <li>The <strong>mood</strong> or character of the text and its
+                  setting, which determines the choice of one of twelve musical
+                  <q>tones</q> or <q>church keys</q> (<em>toni
+                    ecclesiastici</em>). 
+                  The tones are not the same as modern keys, nor do they match
+                  up exactly with the medieval modes used to classify
+                  plainchant.
+                  They seem to be a hybrid of the polyphonic <q>tones</q> used
+                  by keyboardists to introduce and accompany the eight
+                  traditional chant psalm tones, with the twelve-mode system
+                  introduced by the earlier theorists Glarean and Zarlino.
+                  (see <a href="#Barnett:TonalOrganization17C">Barnett 2002</a>).
+                  </p>
+                </li>
+                <li>The <strong>musical meter</strong> (technically, mensuration)
+                  of the setting. 
+                  <ol>
+                    <li>In the simple style, you can choose 
+                      <ol>
+                        <li>duple meter (cut C),</li>
+                        <li>triple minor (C3, three minims/half notes per metrical
+                          unit),</li>
+                        <li>or triple major (cut C3, three semibreves/whole notes
+                          per metrical unit).</li>
+                      </ol>
+                      <p>
+                      Some duple-meter permutations in the ark have a minim pulse
+                      (C) and others have a semibreve pulse (cut C).
+                      </p>
+                    </li>
+                    <li>In florid style, everything is in duple meter (C).</li>
+                  </ol>
+                </li>
+              </ul>
+            </li>
+            <li>If you are operating the ark by hand, you use these input
+              parameters to select the proper tables. 
+              <ul> 
+                <li><strong>Syntagma:</strong> There are three <em>syntagmata</em>
+                  or large divisions in the ark. For simple style, you select from
+                  Syntagma I; for florid, use Syntagma II.
+                  <p>
+                  Kircher provides a third syntagma as well, but because it would
+                  be much more difficult if not impossible to make completely
+                  automatic, we have omitted it from this implementation.
+                  (An exercise for the reader!)
+                  </p>
+                </li>
+                <li><strong>Pinax:</strong> Each syntagma containes a set of
+                  <q>rods</q> or <em>pinakes</em> (singular, <em>pinax</em>). You
+                  select the <em>pinax</em> based on the meter of the text.
+                </li>
+                <li><strong>Column:</strong> Each pinax contain
+                  several columns of data. The column is either a free choice, or
+                  is based on the order of lines in the poem.
+                </li>
+                <li><strong>Voice and rhythm permutations:</strong> Each column
+                  includes two parts: sets of numbers representing musical pitches
+                  (we call these <q>voice permutations</q> or vperms), and sets of
+                  musical notes representing rhythmic durations (<q>rhythm
+                    permutations</q> or rperms).
+                  <ul>
+                    <li>In syntagma I (simple counterpoint), the user is supposed
+                      to freely choose one set of vperms and one set of
+                      rperms. All the musical voices use the same rhythms.
+                      <ul>
+                        <li>In syntagma I, there are (generally) three sets of
+                          rhythm permutation, one for each type of musical meter
+                          you can use.</li>
+                      </ul>
+                      <li>In syntagma II (florid counterpoint), there is a set of
+                        rperms that matches up with each vperm, so that there is a
+                        specified rhythm for each of the SATB voices. This makes
+                        independent contrapuntal voices possible.
+                      </li>
+                  </ul>
+                    </li>
+              </ul>
+                </li>
+                <li><strong>Writing the  music down:</strong> Next you lay out what
+                  Kircher calls the <em>palimpsest phontacticum</em>, or what the rest
+                  of us call <q>music paper</q>.
+                  You draw out four staves and put an appropriate combination of clefs
+                  for the four voices. These determine the octave and range of the
+                  musical output for each voice. You also add a flat in the key
+                  signature if your tone is in <em>cantus mollis</em> according to the
+                  table, and add the appropriate mensuration sign.
+                </li>
+                <li><strong>Matching pitches, rhythms, and syllables:</strong> For
+                  each phrase of text, you take the pitch numbers and look them up in
+                  the table for the given tone in order to get note names. You pair
+                  these note names with the rhythmic values, or just put rests when
+                  those are given. You write these values on the staff,
+                  making certain adjustments as needed.
+                </li>
+                <li>Kircher describes a variety of <strong>adjustments</strong>, some
+                  of which are easier to automate (that is, are more completely
+                  prescribed) than
+                  others: 
+                  <ol>
+                    <li>If the notes go out of range for that voice (too far above or
+                      below the staff), you may shift them up or down by octave as
+                      needed.</li>
+                    <li>The tone tables specify that you may add sharps or flats on
+                      certain notes according to <em>musica ficta</em> rules.</li>
+                    <li>You may also do more complicated things like swapping the
+                      notes for adjacent voices, which require your own judgment.</li>
+                  </ol>
+                </li>
+                </ul>
+            </li>
+          </ol>
+          <section>
+            <h3>Digital Implementation</h3>
+            <p>In this software we implement all those parts of the ark which are
+            completely specified as automatic algorithms. This includes how to
+            pull pitches and rhythms from the ark and match them with words.</p>
+            <p>Instead of the user’s choice of vperms and rperms we choose to tempt
+            fate (from a seventeenth-century Catholic perspective and roll the dice,
+            a literally aleatoric method, by using computer-generated pseudo-random
+            numbers.  Other elements that depend on the user’s taste and judgment,
+            or elements under-specified by Kircher (like text underlay in
+            the melismatic Syntagma II) we leave up to our own users’ discretion.</p>
+            <p>Kircher does not provide a complete set of instructions, though,
+            for the essential task of fitting the notes within vocal ranges while
+            avoiding unwieldy leaps; I have written my own algorithm (using binary
+            decision trees and weighted <q>badness</q> scores) to do this.</p>
+            <p>Kircher also does not provide a full specification for applying
+            <em>musica ficta</em> accidentals based on his tone tables and other
+            rules. Human performers who know the conventions of Kircher’s day
+            could probably adjust the music in performance, but to make the music
+            sound good automatically, as in the MIDI renditions on this website,
+            requires more complicated adjustments. The current implementation is
+            incomplete and does not cover all the difficult edge cases that
+            arise.</p>
+            <p>We encode the data of the ark itself (syntagmata, pinakes, etc.) in a
+            set of tables in Haskell, technically nested vectors and lists.
+            We read the input text and parameters from an XML file and parse the
+            text into sections, sentences/stanzas, and phrases/lines.
+            We generate a list of random numbers to use for each phrase, then we
+            use these to select the correct vperms and rperms, and adjust these for
+            tone and range according to the rules. We then convert our internal data
+            types into MEI-XML output.</p>
+            <p>In the web app, we use the third-party Verovio app to render the
+            musical data to notation and MIDI format for automatic playback.</p>
+          </section>
+        </section>
+        <section id="computer">
+          <h2>Was the Arca musarithmica a computer?</h2>
+          <p>
+          Kircher’s device does not have an automatic mechanism, and requires a human operator.
+          But the operator does not need to do anything except retrieve data from the tables in the Arca and transform it according to reasonably precise rules.
+          Kircher intended his device for the total musical novice, a
+          <q>Tyro</q> who knew <em>nothing</em> about music except the rules he
+          provided. 
+          So although the <em>device</em> is not automatic, the <em>system</em> is automatic in the sense that no additional knowledge or discretion is needed beyond what is built in to the device and the specified algorithm for operating it.
+          </p>
+          <p>
+          In order for a digital computer to step in as the operator, only a few adjustments need to be made to fill gaps and inconsistencies in Kircher’s system.
+          The rest of the work in writing the software just consisted of taking a
+          system designed for a human operator who can manipulate graphic symbols
+          on paper and translating it to the kinds of instructions needed by the digital automaton.
+          The modern computer is the ultimate know-nothing, as it can only do exactly what it is programmed to do, and in the end its processing all boils down to manipulating binary numbers.
+          The implementation in Haskell, a pure-functional programming language, demonstrates that the Arca can be modeled as a single mathematical function, transforming a set of inputs into a set of outputs.
+          </p>
+          <p>
+          For a more in-depth study of the Arca and this implementation, see the
+          article, <q><a href="https://doi.org/10.5920/jcms.1325">Athanasius
+              Kircher’s Arca musarithmica (1650) as a Computational System</a></q>, published in the <cite>Journal of Creative Music Systems</cite> in 2024.
+          </p>
+        </section>
+        <section id="reception">
+          <h2>Who Used the Arca?</h2>
+          <p>
+          After describing the Arca, Kircher says he not only built one but that he and other musicians had been using it to generate complex music, and gives an example of a composition produced with the Arca.
+          He also says there is a secret, customized version of the Arca with considerably greater capabilities, which he is reserving for the inspection of trusted associates.
+          No other trace survives of this <q>Arca 2.0</q>, but there is evidence that other people used the Arca as specified in the <em>Musurgia universalis</em>.
+          </p>
+          <p>
+          Three physical implementations of the ark are known to have survived in the UK and the rest of Europe—in Cambridge, Wolfenbüttel, and Florence.
+          These look like elaborate recipe boxes filled with slats, each of which is covered with a copy of Kircher’s tables of <em>musarithmi</em> or <q>music-numbers</q>.
+          No one has yet found a surviving piece of music generated with the ark.
+          </p>
+          <p>
+          I found evidence for a previously unknown copy of the Arca in Puebla, Mexico,
+          which is the first known implementation in the New World.
+          Buried within an obscure manuscript miscellany filled with mathematical
+          calculations, tax records, and experiments in universal chronology and
+          trigonometry, there is a copy of a core selection of Kircher’s Arca tables.
+          The parts copied out would be sufficient to operate the device, even if one did not actually build a box to put them in.
+          The author was probably a university mathematics professor in Puebla, writing around 1690, and the array of interests in the manuscript collection show the kind of intellectual climate in which Kircher’s work was read.
+          The poet and nun Sor Juana Inés de la Cruz described herself as <q>Kircherizing</q>, when she followed Kircher in following chains of connections between elements of creation in the pursuit of universal knowledge.
+          She and the copyist of the Puebla Arca were part of a circle of such Kircher enthusiasts in seventeenth-century New Spain.
+          I also found another source, a digest of the Arca system from late
+          eighteenth-century Madrid, that demonstrates the longevity of these
+          interests through the period of the Scientific Revolution and into the
+          Enlightenment—though numerous mistakes also suggest that the author
+          struggled to understand Kircher’s system and likely viewed it as merely
+          a curiosity, rather than a link in a chain leading to divine truth.
+          </p>
+          <p>
+          For a more in-depth study of the reception of Kircher’s device in the New World, see the article, <q><a href="http://www.andrewcashner.com/research/index.html#kircher-reception">Kircherizers and Trisectors: Athanasius Kircher’s Automatic Computing Device in the Spanish Empire</a></q>, published in the journal <cite>Anuario musical</cite> in 2022.
+          </p>
+        </section>
+        <section id="biblio">
+          <h2>Other Implementations and Related Projects</h2>
+          <section id="literature-review">
+            <p>
+            Carlo Maria Chierotti’s dissertation and articles 
+            (<a href="#Chierotti:KircherDiss">n.d.</a>, 
+            <a href="#Chierotti:KircherMirifica">1992</a>, and 
+            <a href="#Chierotti:KircherComporre">1994</a>) 
+            on the same subject provide a good overview of Kircher’s work and the
+            structure and operation of the ark, with some detailed analysis of the
+            types of harmonies and cadences in the voice permutations.
+            He does not view the <i>Arca musarithmica</i> as a machine or
+            consider its potential as an automatic system, emphasizing instead how
+            much interaction is actually demanded from the user in order to
+            produce good results.</p>
+            <p>
+            Jim Bumgardner (<a href="#Bumgardner:Kircher">2009</a>) 
+            implemented a different music-computing device by Kircher, the
+            <cite>Organum mathematicum</cite>.
+            That device was much simpler musically but had the virtue of also
+            being able to calculate the date of Easter and lots of other useful
+            functions.
+            That implementation in Perl allowed a user to set a very small set of
+            short texts in simple or florid style.
+            It could generate MIDI output, even using vocal synthesis to render
+            the actual syllable sounds.
+            Bumgardner highlights both Kircher’s clear intent to build an
+            automatic, algorithmic system for composition, and the inconsistencies
+            and underspecified elements that undermine that goal. He also
+            recognizes Kircher’s ambivalence about the need for random choices in
+            order to automate the system fully.
+            </p>
+            <p>
+            Agnes Cäcilie Bohnert’s dissertation 
+            (<a href="#Bohnert:Kircher">2010</a>) provides a comprehensive
+            treatment of Book VIII of the <cite>Musurgia</cite> in detail,
+            including its mathematical and philosophical foundations.
+            Every musical combination in the ark is examined and compared.
+            Bohnert implemented syntagma I and II of the ark in a Java program
+            which according to her description 
+            (<a href="#Bohnert:Kircher">Bohnert 2010, 123–126</a>), followed
+            quite closely the manual method described by Kircher.
+            Users would select <q>musarithms</q> by hand, one at a time,
+            adjust them, and add them to the musical composition, and then hear
+            the result.
+            Though I was not able to examine the program, it is not described as
+            fully automatic, and Bohnert says it can only create very short
+            settings of a small number of texts.
+            </p>
+          </section>
+          <section id="references">
+            <h3>References</h3>
+
+            <ul class="bibliography">
+              <li id="Barnett:TonalOrganization17C">Barnett, Gregory. 2002.
+                <q>Tonal Organization in Seventeenth-Century Music Theory.</q>
+                In <cite>The Cambridge History of Western Music Theory</cite>,
+                ed. Thomas Christensen (Cambridge: Cambridge University Press),
+                407--455. 
+              </li>
+              <li id="Bohnert:Kircher">Bohnert, Agnes Cäcilie. 2010.
+                <cite>Die arca musarithmica Athanasius Kirchers</cite>.
+                Dissertation, Technische Universität Berlin.
+                Berlin: Mensch und Buch Verlag.
+              </li>
+              <li id="Bumgardner:Kircher">Bumgardner, Jim. 2009. 
+                <a href="https://jbum.com/papers/kircher_paper.pdf">
+                  <q>Kircher’s Mechanical Composer: A Software
+                    Implementation.</q></a>
+                Paper presented at the Bridges Conference, Banff.
+              </li>
+              <li id="Chierotti:KircherDiss">Chierotti, Carlo Mario. n.d. 
+                <a href="http://www.kircher.chierotti.it/tesi">[Tesi di laurea
+                  sulla <cite>Musurgia Universalis</cite> di Athanasius
+                  Kircher]</a>.
+                Laureate thesis, University of Turin.
+              </li>
+              <li id="Chierotti:KircherMirifica">Chierotti, Carlo Mario. 1992.
+                <q>La musurgia mirifica di Athanasius Kircher: la composizione
+                  musicale alla portata di tutti nell’età barocca.</q>
+                <cite>Musica/realtà</cite> 13, no. 37: 107–127.
+              </li>
+              <li id="Chierotti:KircherComporre">Chierotti, Carlo Mario. 1994.
+                <q>Comporre senza conoscere la musica: Athanasius Kircher e le
+                  ‘Musica mirifica’: un singolare esempio di scienza musicale
+                  nell’età barocca.</q>
+                <cite>Nuova rivista musicale italiana</cite> 28, no. 3: 382–410.
+              </li>
+              <li id="Findlen:Kircher">Findlen, Paula, ed. 2004.
+                <cite>Athanasius Kircher: The Last Man Who Knew
+                  Everything</cite>.
+                New York: Routledge.
+              </li>
+              <li id="Godwin:KircherTheater">Godwin, Joscelyn. 2009.
+                <cite>Athanasius Kircher’s Theater of the World: The Life and
+                  Work of the Last Man to Search for Universal
+                  Knowledge</cite>.
+                Rochester, VT: Inner Traditions.
+              </li>
+              <li id="Kircher:Musurgia">Kircher, Athanasius. 1650.
+                <cite>Musurgia universalis, sive Ars magna consoni et dissoni
+                  in X. libros digesta</cite>.
+                Rome.
+              </li>
+            </ul>
+          </section>
+        </section>
       </section>
- 
+
     </main>
     <footer>
-      <p>Copyright © 2023
+      <p>Copyright © 2024
       <a href="https://orcid.org/0000-0002-7468-8579">Andrew A. Cashner</a>. 
       All rights reserved.</p>
     </footer>
