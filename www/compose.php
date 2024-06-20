@@ -25,47 +25,56 @@ $inputStyle = $_POST['style'];
 $inputTone  = $_POST['tone'];
 $inputMeter = $_POST['musicMeter'];
 
-# File basenames for input and output
-$baseName = array(
-    "Ave_maris_stella" => "Ave_maris_stella"
-    , "Ave_Regina"       => "Ave_Regina_Angelorum"
-    , "Bernardus"        => "Bernardus-Hora_novissima"
-    , "Boethius"         => "Boethius-Nubibus_atris"
-    , "Catullus"         => "Catullus-Viuamus_mea_Lesbia"
-    , "Horace"           => "Horace-Maecenas_atavis_edite_regibus"
-    , "Iste_confessor"   => "Iste_confessor_Domini"
-    , "Ps150"            => "Ps-150"
-    , "Shakespeare"      => "Shakespeare-If_Music_Be"
-    , "Stephanus"        => "Stephanus-O_ter_quaterque_felix_Cicada"
-    , "Veni_creator"     => "Veni_creator_Spiritus"
-);
-
-# File titles to be used in the generated HTML output
-$fileTitle = array(
-    "Ave_maris_stella" => "Ave maris stella (Iambic Euripidaeic meter)"
-    , "Ave_Regina"       => "Ave Regina Angelorum (Iambic Enneasyllabic meter)"
-    , "Bernardus"        => "Bernardus Melanensis, Hora novissima (Dactylic/Adonic meter)"
-    , "Boethius"         => "Boethius, Nubibus atriis (Adonic meter)"
-    , "Catullus"         => "Catullus, Viuamus mea Lesbia atque amemus (Hendecasyllabic meter)"
-    , "Horace"           => "Horace, Maecenas atavis edite regibus (Dodecasyllabic meter)"
-    , "Iste_confessor"   => "Iste confessor Domini (Sapphic meter)"
-    , "Ps150"            => "Psalmi CL (Irregular meter/Prose)"
-    , "Shakespeare"      => "Shakespeare, If Music Be the Food of Love (Decasyllabic meter = Iambic pentameter)"
-    , "Stephanus"        => "Stephanus, O ter quaterque felix Cicada (Anacreontic meter)"
-    , "Veni_creator"     => "Veni creator Spiritus (Iambic Archilochic meter)"
-);
-
-$title = "$fileTitle[$inputText]";
-
-# Style selection to be inserted into XML input (maps to Haskell Style data type)
-$style = array(
-    "simple" => "Simple"
-    , "florid" => "Florid"
-);
-
-
 # SET UP INPUT AND OUTPUT FILES and RUN THE ARK
-$fileBasename = "$baseName[$inputText]";
+
+try {
+    # Used in the generated HTML output
+    $title = match ($inputText) {
+        "Ave_maris_stella" => "Ave maris stella (Iambic Euripidaeic meter)",
+        "Ave_Regina"       => "Ave Regina Angelorum (Iambic Enneasyllabic meter)",
+        "Bernardus"        => "Bernardus Melanensis, Hora novissima (Dactylic/Adonic meter)",
+        "Boethius"         => "Boethius, Nubibus atriis (Adonic meter)",
+        "Catullus"         => "Catullus, Viuamus mea Lesbia atque amemus (Hendecasyllabic meter)",
+        "Horace"           => "Horace, Maecenas atavis edite regibus (Dodecasyllabic meter)",
+        "Iste_confessor"   => "Iste confessor Domini (Sapphic meter)",
+        "Ps150"            => "Psalmi CL (Irregular meter/Prose)",
+        "Shakespeare"      => "Shakespeare, If Music Be the Food of Love (Decasyllabic meter = Iambic pentameter)",
+        "Stephanus"        => "Stephanus, O ter quaterque felix Cicada (Anacreontic meter)",
+        "Veni_creator"     => "Veni creator Spiritus (Iambic Archilochic meter)",
+        default            => throw new UnexpectedValueException(
+            "Invalid input text '{$inputText}'")
+    };
+
+    $fileBasename = match ($inputText) {
+        "Ave_maris_stella" => "Ave_maris_stella",
+        "Ave_Regina"       => "Ave_Regina_Angelorum",
+        "Bernardus"        => "Bernardus-Hora_novissima",
+        "Boethius"         => "Boethius-Nubibus_atris",
+        "Catullus"         => "Catullus-Viuamus_mea_Lesbia",
+        "Horace"           => "Horace-Maecenas_atavis_edite_regibus",
+        "Iste_confessor"   => "Iste_confessor_Domini",
+        "Ps150"            => "Ps-150",
+        "Shakespeare"      => "Shakespeare-If_Music_Be",
+        "Stephanus"        => "Stephanus-O_ter_quaterque_felix_Cicada",
+        "Veni_creator"     => "Veni_creator_Spiritus",
+        default            => throw new UnexpectedValueException(
+            "Invalid input text '{$inputText}'")
+    };
+
+    $style = match ($inputStyle) {
+        "simple" => "simple",
+        "florid" => "florid",
+        default  => throw new UnexpectedValueException(
+            "Invalid style '{$inputStyle}'")
+    };
+
+} catch (Exception $e) {
+    error_log("Invalid form input data: '{$e->getMessage()}'\n");
+    
+    http_response_code(400);
+    include("error.html");
+    exit(1);
+}
 
 $arca = "./cgi-bin/arca-exe";
 
@@ -85,20 +94,21 @@ if ($inputType == "diy") {
 
     $fileString  = file_get_contents($infileName);
     $fileString  = str_replace(
-        array("{style}", "{musicMeter}", "{tone}"),
-        array($style[$inputStyle], $inputMeter, $inputTone), 
+        ["{style}", "{musicMeter}", "{tone}"],
+        [ucfirst($style), $inputMeter, $inputTone], 
         $fileString);
 
     $fileString = escapeshellarg($fileString);
 
     $rawMei = shell_exec("echo {$fileString} | {$arca} - -");
 
+
 } else {
 
     # For prepared files, we just select the correct input file based on the
     # style and run arca on that.
 
-    $infileName  = "input/prepared/$inputStyle/$fileBasename.xml";
+    $infileName  = "input/prepared/$style/$fileBasename.xml";
 
     $rawMei = shell_exec("{$arca} {$infileName} -");
 }
