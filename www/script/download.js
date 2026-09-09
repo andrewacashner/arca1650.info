@@ -8,14 +8,13 @@
  */
 
 document.addEventListener("DOMContentLoaded", (event) => {
-
   let downloadForm = document.getElementById("download-form");
 
   downloadForm.addEventListener("change", (event) =>
     setButtonStatus(event, downloadForm));
 
   downloadForm.addEventListener("submit", (event) => 
-    doDownload(event, downloadForm, window.meiXML));
+    doDownload(event, downloadForm, window.meiXML, window.meiTitle));
 });
 
 function setButtonStatus(event, form) {
@@ -31,20 +30,24 @@ function setButtonStatus(event, form) {
   }
 }
 
-async function doDownload(event, form, mei) {
+async function doDownload(event, form, mei, title) {
   event.preventDefault();
 
   let formData = new FormData(form);
   let downloadType = formData.get("download-type");
   console.log(`Download requested of type '${downloadType}'`);
 
+  // Replace all non-alphanumeric characters with underscores
+  let basename = title.replace(/[\W_]+/g, "_");
+  let filename = `${basename}.xml`;
+
   switch (downloadType) {
     case "xml":
-      downloadMei(mei);
+      downloadMei(mei, filename);
       break;
 
     case "pdf":
-      await downloadPdf(mei);
+      await downloadPdf(mei, filename);
       break;
 
     default: 
@@ -52,13 +55,22 @@ async function doDownload(event, form, mei) {
   }
 }
 
-function downloadMei(mei) {
-  let blob = new Blob([mei], { type: "application/xml" });
-  let url = URL.createObjectURL(blob);
-  window.open(url);
+// Given a Blob or File, have the browser download it
+function downloadObject(object, filename) {
+  let url = URL.createObjectURL(object);
+  let link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
+  link.click();
+  console.log(`'${filename}' downloaded`);
 }
 
-async function downloadPdf(mei) {
+function downloadMei(mei, filename) {
+  let file = new File([mei], "arca.mei", { type: "application/xml" });
+  downloadObject(file, filename);
+}
+
+async function downloadPdf(mei, filename) {
   const apiUrl = "https://meigarage.edirom.de/ege-webservice/Conversions/mei51%3Atext%3Axml/pdf-verovio%3Aapplication%3Apdf";
 
   let meiFile = new File([mei], "arca.mei", { type: "application/xml" });
@@ -75,9 +87,8 @@ async function downloadPdf(mei) {
   });
 
   if (response.ok) {
-    let pdfBlob = await response.blob();
-    let pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl);
+    let blob = await response.blob();
+    downloadObject(blob, filename);
   } else {
     console.log(response);
     alert("There was a problem generating the PDF.");
