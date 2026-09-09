@@ -69,7 +69,7 @@ function downloadMei(mei, basename) {
   downloadObject(file, `${basename}.mei`);
 }
 
-async function downloadPdf(mei, baseename) {
+async function downloadPdf(mei, basename) {
   const apiUrl = "https://meigarage.edirom.de/ege-webservice/Conversions/mei51%3Atext%3Axml/pdf-verovio%3Aapplication%3Apdf";
 
   let meiFile = new File([mei], "arca.mei", { type: "application/xml" });
