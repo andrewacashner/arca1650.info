@@ -39,15 +39,14 @@ async function doDownload(event, form, mei, title) {
 
   // Replace all non-alphanumeric characters with underscores
   let basename = title.replace(/[\W_]+/g, "_");
-  let filename = `${basename}.xml`;
 
   switch (downloadType) {
     case "xml":
-      downloadMei(mei, filename);
+      downloadMei(mei, basename);
       break;
 
     case "pdf":
-      await downloadPdf(mei, filename);
+      await downloadPdf(mei, basename);
       break;
 
     default: 
@@ -65,12 +64,12 @@ function downloadObject(object, filename) {
   console.log(`'${filename}' downloaded`);
 }
 
-function downloadMei(mei, filename) {
+function downloadMei(mei, basename) {
   let file = new File([mei], "arca.mei", { type: "application/xml" });
-  downloadObject(file, filename);
+  downloadObject(file, `${basename}.mei`);
 }
 
-async function downloadPdf(mei, filename) {
+async function downloadPdf(mei, baseename) {
   const apiUrl = "https://meigarage.edirom.de/ege-webservice/Conversions/mei51%3Atext%3Axml/pdf-verovio%3Aapplication%3Apdf";
 
   let meiFile = new File([mei], "arca.mei", { type: "application/xml" });
@@ -88,7 +87,7 @@ async function downloadPdf(mei, filename) {
 
   if (response.ok) {
     let blob = await response.blob();
-    downloadObject(blob, filename);
+    downloadObject(blob, `${basename}.pdf`);
   } else {
     console.log(response);
     alert("There was a problem generating the PDF.");
