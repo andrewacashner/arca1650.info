@@ -16,11 +16,16 @@
 
     <script>
       // Bring in MEI data from PHP and check input parameters -->
-      var mei = '<?=$mei?>';
+      let mei = '<?=$mei?>';
       if (mei.length === 0) {
           console.error("Empty MEI output from arca");
       }
       window.meiXML = mei;
+
+      let title = '<?=$title?>';
+      window.meiTitle = title;
+      console.log(`Title: ${title}`);
+      console.log(`Title: ${window.meiTitle}`);
 
       console.log("Setting input text [<?=$inputText?>] in method [<?=$inputType?>]: style [<?=$inputStyle?>], tone [<?=$inputTone?>], meter [<?=$inputMeter?>]...");
       console.log("Loading input file [<?=$infileName?>]...");
